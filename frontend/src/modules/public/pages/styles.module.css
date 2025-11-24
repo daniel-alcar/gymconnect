@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+h2 {
+  font-size: 17px;
+  font-weight: 500;
+  color: rgb(77, 77, 77);
+}
+button {
+  cursor: pointer;
+  background-color: #ffffff;
+  padding: 0.2rem 5rem;
+  border-color: #ffffff;
+  border-radius: 0.5rem;
+  margin: 1rem 0.1rem;
+}
+
+button:hover {
+  background-color: #e0e0e0;
+}
+button:active {
+  background-color: rgb(255, 215, 0);
+  border-color: rgb(255, 215, 0);
+}
+
+form {
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  padding: 2rem 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+input,
+select {
+  display: block;
+  width: 100%;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  background-color: #eeeeee;
+  border-color: #f5f5f5;
+  font-size: 1rem;
+}
+input:focus {
+  outline: none;
+  border-color: rgb(255, 215, 0);
+}
+.btnEstilizado,
+.btnEstilizado:active,
+.btnEstilizado:hover {
+  background-color: rgb(255, 215, 0);
+  border-color: rgb(255, 215, 0);
+  font-weight: 400;
+  padding: 0.5rem 1.2rem;
+  border-radius: 0.5rem;
+}

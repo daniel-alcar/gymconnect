@@ -1,0 +1,12 @@
+:root {
+  --primary-color: rgb(255, 215, 0);
+  --secundary-color: #fcffe4;
+  --terciary-color: #eeeeee;
+}
+body {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  margin: 0 auto;
+  padding: 0;
+  background-color: var(--secundary-color);
+}
