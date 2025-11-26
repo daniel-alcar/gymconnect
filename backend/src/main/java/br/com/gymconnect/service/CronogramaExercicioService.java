@@ -89,12 +89,7 @@ public class CronogramaExercicioService {
 
         List<CronogramaExercicio> exercicios = csr.findByCronograma_Aluno_IdUsuario(idAluno);
 
-        if (exercicios.isEmpty()) {
-            ResponseModel rm = new ResponseModel();
-            rm.setMensagem("Nenhum cronograma encontrado para esse aluno!");
-            return new ResponseEntity<>(rm, HttpStatus.NOT_FOUND);
-        }
-
+        // Sempre retornar a lista, mesmo que vazia
         return ResponseEntity.ok(exercicios);
     }
 

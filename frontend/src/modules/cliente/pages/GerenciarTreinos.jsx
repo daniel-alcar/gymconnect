@@ -1,8 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  usuarioAPI,
+  exercicioAPI,
+  cronogramaAPI,
+  cronogramaExercicioAPI,
+} from "../../../services/api";
 import styles from "./styles.module.css";
 
 export default function GerenciarTreinos() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [alunos, setAlunos] = useState([]);
+  const [exerciciosDisponiveis, setExerciciosDisponiveis] = useState([]);
 
   const [aluno, setAluno] = useState("");
   const [diaSemana, setDiaSemana] = useState("");
@@ -12,12 +22,42 @@ export default function GerenciarTreinos() {
     { nome: "", series: "", repeticoes: "", carga: "", video: "" },
   ]);
 
+  useEffect(() => {
+    carregarDados();
+  }, []);
+
+  async function carregarDados() {
+    try {
+      setLoading(true);
+      const [usuarios, exercicios] = await Promise.all([
+        usuarioAPI.listar(),
+        exercicioAPI.listar(),
+      ]);
+
+      const alunosFiltrados = usuarios.filter((u) => u.tipo === "ALUNO");
+      setAlunos(alunosFiltrados);
+      setExerciciosDisponiveis(exercicios);
+    } catch (err) {
+      setError("Erro ao carregar dados: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function abrirModal() {
     setModalOpen(true);
+    setError("");
+    setAluno("");
+    setDiaSemana("");
+    setTituloTreino("");
+    setExercicios([
+      { nome: "", series: "", repeticoes: "", carga: "", video: "" },
+    ]);
   }
 
   function fecharModal() {
     setModalOpen(false);
+    setError("");
   }
 
   function adicionarExercicio() {
@@ -38,30 +78,88 @@ export default function GerenciarTreinos() {
     setExercicios(novaLista);
   }
 
-  function cadastrarTreino(e) {
+  async function cadastrarTreino(e) {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    const novoTreino = {
-      id: Date.now(),
-      aluno,
-      diaSemana,
-      tituloTreino,
-      exercicios,
+    try {
+      const exerciciosIds = [];
+      for (const ex of exercicios) {
+        let exercicioExistente = exerciciosDisponiveis.find(
+          (e) => e.nome.toLowerCase() === ex.nome.toLowerCase()
+        );
+
+        if (!exercicioExistente) {
+          const novoExercicio = await exercicioAPI.cadastrar(
+            ex.nome,
+            ex.video || "https://youtube.com"
+          );
+          exerciciosIds.push(novoExercicio.idExercicio);
+
+          setExerciciosDisponiveis([...exerciciosDisponiveis, novoExercicio]);
+        } else {
+          exerciciosIds.push(exercicioExistente.idExercicio);
+        }
+      }
+
+      const cronograma = await cronogramaAPI.cadastrar({
+        aluno: { idUsuario: parseInt(aluno) },
+        diasTotais: null,
+      });
+
+      for (let i = 0; i < exercicios.length; i++) {
+        const ex = exercicios[i];
+        const diaSemanaEnum = mapearDiaSemana(diaSemana);
+
+        await cronogramaExercicioAPI.cadastrar({
+          cronograma: { idCronograma: cronograma.idCronograma },
+          exercicio: { idExercicio: exerciciosIds[i] },
+          diaSemana: diaSemanaEnum,
+          serie: parseInt(ex.series) || null,
+          repeticao: parseInt(ex.repeticoes) || null,
+          carga: parseInt(ex.carga) || null,
+        });
+      }
+
+      await carregarDados();
+      fecharModal();
+    } catch (err) {
+      setError("Erro ao cadastrar treino: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function mapearDiaSemana(dia) {
+    const mapeamento = {
+      SEGUNDA: "Segunda",
+      TERÇA: "Terca",
+      QUARTA: "Quarta",
+      QUINTA: "Quinta",
+      SEXTA: "Sexta",
+      SABADO: "Sabado",
+      DOMINGO: "Domingo",
     };
-
-    console.log("TREINO CADASTRADO:", novoTreino);
-
-    fecharModal();
+    return mapeamento[dia] || dia;
   }
 
   return (
     <div className={styles.listAlunos}>
       <div className={styles.topoLista}>
         <h2>Treinos Cadastrados</h2>
-        <button className={styles.btnEstilizado} onClick={abrirModal}>
+        <button
+          className={styles.btnEstilizado}
+          onClick={abrirModal}
+          disabled={loading}
+        >
           Criar Treino
         </button>
       </div>
+
+      {error && (
+        <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>
+      )}
 
       {modalOpen && (
         <div className={styles.modalOverlay}>
@@ -69,6 +167,9 @@ export default function GerenciarTreinos() {
             <h2>Criar Novo Treino</h2>
             <p>Defina os exercícios e detalhes do treino</p>
 
+            {error && (
+              <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>
+            )}
             <form onSubmit={cadastrarTreino}>
               <div className={styles.alertaCampos}>
                 Preencha todos os campos obrigatórios (*) para criar o treino
@@ -81,10 +182,14 @@ export default function GerenciarTreinos() {
                     value={aluno}
                     onChange={(e) => setAluno(e.target.value)}
                     required
+                    disabled={loading || alunos.length === 0}
                   >
                     <option value="">Selecione...</option>
-                    <option value="1">João Silva</option>
-                    <option value="2">Maria Santos</option>
+                    {alunos.map((a) => (
+                      <option key={a.idUsuario} value={a.idUsuario}>
+                        {a.nome}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -94,6 +199,7 @@ export default function GerenciarTreinos() {
                     value={diaSemana}
                     onChange={(e) => setDiaSemana(e.target.value)}
                     required
+                    disabled={loading}
                   >
                     <option value="">Selecione...</option>
                     <option value="SEGUNDA">Segunda-feira</option>
@@ -114,6 +220,7 @@ export default function GerenciarTreinos() {
                 value={tituloTreino}
                 onChange={(e) => setTituloTreino(e.target.value)}
                 required
+                disabled={loading}
               />
 
               <div className={styles.rowHeader}>
@@ -142,6 +249,7 @@ export default function GerenciarTreinos() {
                           atualizarExercicio(index, "nome", e.target.value)
                         }
                         required
+                        disabled={loading}
                       />
                     </div>
 
@@ -155,6 +263,7 @@ export default function GerenciarTreinos() {
                           atualizarExercicio(index, "series", e.target.value)
                         }
                         required
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -163,8 +272,8 @@ export default function GerenciarTreinos() {
                     <div className={styles.col}>
                       <label>Repetições *</label>
                       <input
-                        type="text"
-                        placeholder="Ex: 8-10"
+                        type="number"
+                        placeholder="Ex: 10"
                         value={ex.repeticoes}
                         onChange={(e) =>
                           atualizarExercicio(
@@ -174,18 +283,20 @@ export default function GerenciarTreinos() {
                           )
                         }
                         required
+                        disabled={loading}
                       />
                     </div>
 
                     <div className={styles.col}>
                       <label>Carga (opcional)</label>
                       <input
-                        type="text"
-                        placeholder="Ex: 20kg"
+                        type="number"
+                        placeholder="Ex: 20"
                         value={ex.carga}
                         onChange={(e) =>
                           atualizarExercicio(index, "carga", e.target.value)
                         }
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -198,12 +309,14 @@ export default function GerenciarTreinos() {
                     onChange={(e) =>
                       atualizarExercicio(index, "video", e.target.value)
                     }
+                    disabled={loading}
                   />
 
                   <button
                     type="button"
                     className={styles.btnRemover}
                     onClick={() => removerExercicio(index)}
+                    disabled={loading}
                   >
                     🗑 Remover
                   </button>
@@ -211,14 +324,19 @@ export default function GerenciarTreinos() {
               ))}
 
               <div className={styles.modalButtons}>
-                <button type="submit" className={styles.modalButton}>
-                  Salvar Treino
+                <button
+                  type="submit"
+                  className={styles.modalButton}
+                  disabled={loading}
+                >
+                  {loading ? "Salvando..." : "Salvar Treino"}
                 </button>
 
                 <button
                   type="button"
                   className={styles.modalButtonCancelar}
                   onClick={fecharModal}
+                  disabled={loading}
                 >
                   Cancelar
                 </button>
