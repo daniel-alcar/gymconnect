@@ -1,0 +1,12 @@
+body {
+  margin: 2rem 2rem;
+}
+span {
+  background-color: var(--terciary-color);
+  display: block;
+  border-radius: 2rem;
+  padding: 0.75rem 30rem;
+  margin: 0 auto;
+  width: fit-content;
+  font-weight: 700;
+}
