@@ -100,9 +100,7 @@ export default function GerenciarAlunos() {
           Adicionar Aluno
         </button>
       </div>
-
       <p>Gerencie os alunos da sua academia</p>
-
       {error && (
         <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>
       )}

@@ -1,7 +1,7 @@
 :root {
-  --primary-color: rgb(255, 215, 0);
-  --secundary-color: #fcffe4;
-  --terciary-color: #eeeeee;
+  --primary-color: #ffc300;
+  --secundary-color: #e3ecc8;
+  --terciary-color: #f5f5f5;
 }
 body {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",

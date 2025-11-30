@@ -21,11 +21,8 @@ export default function HomeCliente() {
 
   return (
     <div className={styles.container}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-        <div>
-          <h1>ACADEMIA</h1>
-          <p>Olá, {user?.nome || "Cliente"} - Gerencie seus alunos e treinos</p>
-        </div>
+      <div className={styles.navbar}>
+        <h1>GymConnect - Gerencia</h1>
         <button
           onClick={logout}
           style={{
@@ -40,7 +37,9 @@ export default function HomeCliente() {
           Sair
         </button>
       </div>
-
+      <div className={styles.title}>
+        <p>Olá, {user?.nome || "Cliente"} - Gerencie seus alunos e treinos</p>
+      </div>
       <div className={styles.btnGroup}>
         <button onClick={abrirAlunos}>Gerenciar Alunos</button>
         <button onClick={abrirTreinos}>Gerenciar Treinos</button>

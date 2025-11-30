@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import { cronogramaAPI, cronogramaExercicioAPI } from "../../../services/api";
+import { cronogramaExercicioAPI } from "../../../services/api";
 import styles from "./styles.module.css";
 
 export default function HomeAluno() {
@@ -22,13 +22,9 @@ export default function HomeAluno() {
       setLoading(true);
       setError("");
 
-      console.log("Buscando treinos para aluno ID:", user.idUsuario);
-
       const exercicios = await cronogramaExercicioAPI.listarPorAluno(
         user.idUsuario
       );
-
-      console.log("Exercícios recebidos:", exercicios);
 
       if (!exercicios || exercicios.length === 0) {
         setTreinos([]);
@@ -36,25 +32,16 @@ export default function HomeAluno() {
       }
 
       const treinosPorDia = exercicios.reduce((acc, ex) => {
-        if (!ex || !ex.exercicio) {
-          console.warn("Exercício sem dados completos:", ex);
-          return acc;
-        }
+        if (!ex || !ex.exercicio) return acc;
 
         let dia = "Sem dia";
         if (ex.diaSemana) {
-          if (typeof ex.diaSemana === "string") {
-            dia = ex.diaSemana;
-          } else if (ex.diaSemana.name) {
-            dia = ex.diaSemana.name;
-          } else {
-            dia = String(ex.diaSemana);
-          }
+          if (typeof ex.diaSemana === "string") dia = ex.diaSemana;
+          else if (ex.diaSemana.name) dia = ex.diaSemana.name;
+          else dia = String(ex.diaSemana);
         }
 
-        if (!acc[dia]) {
-          acc[dia] = [];
-        }
+        if (!acc[dia]) acc[dia] = [];
 
         acc[dia].push({
           id: ex.idCronogramaExercicio,
@@ -68,8 +55,6 @@ export default function HomeAluno() {
         return acc;
       }, {});
 
-      console.log("Treinos agrupados por dia:", treinosPorDia);
-
       const treinosLista = Object.keys(treinosPorDia).map((dia) => ({
         id: `treino-${dia}`,
         diaSemana: dia,
@@ -77,11 +62,8 @@ export default function HomeAluno() {
         nomeTreino: `Treino - ${dia}`,
       }));
 
-      console.log("Lista final de treinos:", treinosLista);
-
       setTreinos(treinosLista);
     } catch (err) {
-      console.error("Erro completo ao carregar treinos:", err);
       setError("Erro ao carregar treinos: " + err.message);
     } finally {
       setLoading(false);
@@ -100,18 +82,8 @@ export default function HomeAluno() {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "2rem",
-        }}
-      >
-        <div>
-          <h1>Olá, {user?.nome || "Aluno"}</h1>
-          <p>Seus treinos personalizados estão prontos</p>
-        </div>
+      <div className={styles.navbar}>
+        <h1>GymConnect - Gerencia</h1>
         <button
           onClick={logout}
           style={{
@@ -127,6 +99,11 @@ export default function HomeAluno() {
         </button>
       </div>
 
+      <div className={styles.title}>
+        <h2>Olá, {user?.nome || "Aluno"}</h2>
+        <p>Seus treinos personalizados estão prontos</p>
+      </div>
+
       <span>Cronograma semanal</span>
 
       {error && (
@@ -138,21 +115,15 @@ export default function HomeAluno() {
       ) : treinos.length === 0 ? (
         <p>Nenhum treino cadastrado ainda.</p>
       ) : (
-        <div>
-          <ul className={styles.treinosSemanais}>
-            <div className={styles.diaTreino}>
-              <li>
-                {treinos.map((t) => (
-                  <div key={t.id} className={styles.treinoCard}>
-                    <h3>{t.diaSemana}</h3>
-                    <p>{t.exercicios.length} exercício(s)</p>
-                    <button onClick={() => abrirModelTreino(t)}>Treinar</button>
-                  </div>
-                ))}
-              </li>
-            </div>
-          </ul>
-        </div>
+        <ul className={styles.diasTreinos}>
+          {treinos.map((t) => (
+            <li key={t.id} className={styles.treinoCard}>
+              <h3>{t.diaSemana}</h3>
+              <p>{t.exercicios.length} exercício(s)</p>
+              <button onClick={() => abrirModelTreino(t)}>Treinar</button>
+            </li>
+          ))}
+        </ul>
       )}
 
       {mostrarTreino && treinoSelecionado && (
