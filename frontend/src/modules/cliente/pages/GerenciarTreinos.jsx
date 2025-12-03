@@ -175,8 +175,8 @@ export default function GerenciarTreinos() {
                 Preencha todos os campos obrigatórios (*) para criar o treino
               </div>
 
-              <div className={styles.row}>
-                <div className={styles.col}>
+              <div>
+                <div>
                   <label>Aluno *</label>
                   <select
                     value={aluno}
@@ -238,8 +238,8 @@ export default function GerenciarTreinos() {
                 <div key={index} className={styles.exercicioBox}>
                   <h3>Exercício {index + 1}</h3>
 
-                  <div className={styles.row}>
-                    <div className={styles.col}>
+                  <div>
+                    <div>
                       <label>Nome do Exercício *</label>
                       <input
                         type="text"
@@ -253,7 +253,7 @@ export default function GerenciarTreinos() {
                       />
                     </div>
 
-                    <div className={styles.colMini}>
+                    <div>
                       <label>Séries *</label>
                       <input
                         type="number"
@@ -268,8 +268,8 @@ export default function GerenciarTreinos() {
                     </div>
                   </div>
 
-                  <div className={styles.row}>
-                    <div className={styles.col}>
+                  <div>
+                    <div>
                       <label>Repetições *</label>
                       <input
                         type="number"
@@ -287,7 +287,7 @@ export default function GerenciarTreinos() {
                       />
                     </div>
 
-                    <div className={styles.col}>
+                    <div>
                       <label>Carga (opcional)</label>
                       <input
                         type="number"

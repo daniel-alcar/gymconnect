@@ -78,6 +78,22 @@ span {
   padding: 0;
 }
 
+.modalContainer {
+  text-align: center;
+}
+
+.exercicioCard {
+  background-color: var(--terciary-color);
+  padding: 0.75rem;
+  display: block;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  margin-left: 20%;
+  margin-right: 15%;
+}
+
 @media (max-width: 900px) {
   .diasTreinos {
     grid-template-columns: repeat(2, 1fr);

@@ -22,7 +22,7 @@ export default function HomeCliente() {
   return (
     <div className={styles.container}>
       <div className={styles.navbar}>
-        <h1>GymConnect - Gerencia</h1>
+        <h1>GymConnect - Gerência</h1>
         <button
           onClick={logout}
           style={{

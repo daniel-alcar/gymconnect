@@ -83,7 +83,7 @@ export default function HomeAluno() {
   return (
     <div>
       <div className={styles.navbar}>
-        <h1>GymConnect - Gerencia</h1>
+        <h1>GymConnect</h1>
         <button
           onClick={logout}
           style={{
