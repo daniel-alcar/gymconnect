@@ -16,7 +16,7 @@ import br.com.gymconnect.service.CronogramaExercicioService;
 
 @RestController
 @RequestMapping("/cronogramaexercicio")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://localhost"})
 
 public class CronogramaExercicioController {
     

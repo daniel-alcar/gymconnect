@@ -15,7 +15,7 @@ import br.com.gymconnect.service.UsuarioService;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://localhost"})
 public class UsuarioController {
 
     @Autowired

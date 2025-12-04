@@ -46,12 +46,6 @@ public class ExercicioService {
 
         List<Exercicio> exercicios = er.findAll();
 
-        if (exercicios.isEmpty()) {
-            ResponseModel rm = new ResponseModel();
-            rm.setMensagem("Nenhum exercício encontrado!");
-            return new ResponseEntity<>(rm, HttpStatus.NOT_FOUND);
-        }
-
         return ResponseEntity.ok(exercicios);
     }
 

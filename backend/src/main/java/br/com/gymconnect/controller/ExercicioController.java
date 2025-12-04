@@ -19,7 +19,7 @@ import br.com.gymconnect.service.ExercicioService;
 
 @RestController
 @RequestMapping("/exercicios")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://localhost"})
 public class ExercicioController {
     
     @Autowired
