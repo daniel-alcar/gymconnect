@@ -1,70 +1,72 @@
-# 🩺 Sistema Web de Usuários
+# Como rodar o projeto com Docker Compose
 
-## 🧩 Tecnologias Utilizadas
-
-- **Backend:** Spring Boot `5.6.3`
-- **Linguagem:** Java SDK `21`
-- **Frontend:** React `22`
-- **Banco de Dados:** MySQL
-
-## 📋 Descrição do Projeto
-
-O projeto foi desenvolvido com o objetivo de demonstrar a integração entre **Spring Boot**, **React** e **MySQL**.
-
-O sistema possui duas interfaces principais:
-
-- **Tela de Login:** permite que usuários cadastrados acessem o sistema.
-- **Tela de Cadastro:** possibilita o registro de novos usuários no banco de dados.
-
-## ⚙️ Funcionalidades
-
-- Cadastro de novos usuários
-- Login de usuários existentes
-- Integração completa entre frontend e backend
-- Persistência de dados no MySQL
-
-## 🚀 Objetivo
-
-O objetivo do projeto é servir como base para aplicações web modernas utilizando **Java**, **Spring Boot**, **React** e **MySQL**, com foco em simplicidade e boas práticas de desenvolvimento.
+Siga os passos abaixo para configurar e executar o projeto GymConnect utilizando Docker Compose.
 
 ---
 
-src/modules/cliente/
-pages/
-DashboardCliente.jsx
-GerenciarAlunos.jsx
-CriarAluno.jsx
-GerenciarTreinos.jsx
-CriarTreino.jsx
-components/
-TabelaAlunos.jsx
-FormTreino.jsx
-CardAluno.jsx
+## 1. Preparação do ambiente
 
-src/modules/aluno/
-pages/
-HomeAluno.jsx
-CronogramaSemanal.jsx
-TreinoDoDia.jsx
-components/
-CardTreino.jsx
-ListaDias.jsx
+Caso você já tenha baixado alguma versão anterior do sistema:
 
-    src/modules/public/
+**Exclua completamente todas as pastas antigas do projeto.**
 
-pages/
-Home.jsx
-Login.jsx
-Cadastro.jsx
-components/
-FormLogin.jsx
+Agora siga os passos:
 
-components/
-ui/ → Botões, inputs, modal, loader etc.
-layout/ → Sidebar, Navbar, Footer
+1. Crie uma nova pasta vazia para armazenar o projeto.  
+2. Abra o CMD do Windows como administrador.
 
-routes/
-PublicRoutes.jsx
-PrivateAlunoRoutes.jsx
-PrivateClienteRoutes.jsx
-AppRoutes.jsx
+---
+
+## 2. Executando os comandos
+
+Execute os comandos abaixo na ordem indicada.
+
+### 1. Acesse a pasta criada
+
+```bash
+cd "CAMINHO-DA-SUA-PASTA"
+```
+
+### 2. Clone o repositório
+
+```bash
+git clone https://github.com/daniel-alcar/gymconnect.git gymconnect
+```
+
+### 3. Entre no diretório do projeto
+
+```bash
+cd gymconnect
+```
+
+### 4. Faça o build dos containers
+
+```bash
+docker compose build
+```
+
+Observação: Esta etapa pode demorar.  
+Quando finalizar, devem aparecer mensagens como:
+
+```
+gymconnect-backend Built
+gymconnect-frontend Built
+```
+
+### 5. Inicie os serviços
+
+```bash
+docker compose up -d
+```
+
+---
+
+## 3. Acessando o sistema
+
+Abra o navegador e acesse:
+
+```
+http://localhost
+```
+
+O sistema estará disponível.
