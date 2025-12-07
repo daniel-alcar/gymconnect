@@ -258,6 +258,8 @@ export default function GerenciarTreinos() {
                       <input
                         type="number"
                         placeholder="Ex: 4"
+                        min={0}
+                        step={1}
                         value={ex.series}
                         onChange={(e) =>
                           atualizarExercicio(index, "series", e.target.value)
@@ -274,6 +276,8 @@ export default function GerenciarTreinos() {
                       <input
                         type="number"
                         placeholder="Ex: 10"
+                        min={0}
+                        step={1}
                         value={ex.repeticoes}
                         onChange={(e) =>
                           atualizarExercicio(
@@ -292,6 +296,8 @@ export default function GerenciarTreinos() {
                       <input
                         type="number"
                         placeholder="Ex: 20"
+                        min={0}
+                        step={1}
                         value={ex.carga}
                         onChange={(e) =>
                           atualizarExercicio(index, "carga", e.target.value)
