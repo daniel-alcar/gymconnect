@@ -39,8 +39,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                     }
                 }
             } catch (Exception e) {
-                // Token inválido ou erro na validação - continua sem autenticação
-                // O Spring Security vai tratar a autorização depois
+     
             }
         }
 
