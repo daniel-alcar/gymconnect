@@ -110,28 +110,31 @@ Authorization: Bearer <token>
 
 ## Resumo de rotas
 
-| Método | Rota |                       Auth | Perfil |
-|--------|------|----------------------|-----|-----------|
-| POST | `/auth/login`                 | Não | — - - - - |
-| POST | `/auth/cadastrar`             | Não | — - - - - |
-| GET | `/auth/me`                     | Sim | Qualquer |
-| GET | `/usuarios`                    | Sim | CLIENTE |
-| DELETE | `/usuarios/{idUsuario}`     | Sim | Autenticado* |
-| GET | `/exercicios`                  | Sim | CLIENTE |
-| POST | `/exercicios`                 | Sim | CLIENTE |
-| DELETE | `/exercicios/{idExercicio}` | Sim | CLIENTE |
-| POST | `/cronograma`                 | Sim | CLIENTE |
-| DELETE | `/cronograma/{idCronograma}`| Sim | CLIENTE |
-| GET | `/cronograma/{idAluno}`        | Sim | Qualquer |
-| POST | `/cronogramaexercicio`        | Sim | CLIENTE |
-| DELETE | `/cronogramaexercicio/{idCronogramaExercicio}` | Sim | CLIENTE |
-| GET | `/cronogramaexercicio/aluno/{idAluno}` | Sim | Qualquer |
-| POST | `/cronogramaexecucao/me`      | Sim | Qualquer |
-| PUT | `/cronogramaexecucao/me/{idExecucao}` | Sim | Qualquer |
-| GET | `/cronogramaexecucao/me/cronograma/{idCronograma}` | Sim | Qualquer |
-| POST | `/perfil/me`                  | Sim | Qualquer |
-| POST | `/registrodiario/me`          | Sim | Qualquer |
-| POST | `/chat/coach`                 | Sim | Qualquer |
+```markdown
+| Método | Rota                                                        | Auth | Perfil         |
+|--------|--------------------------------------------------------------|------|-----------------|
+| POST   | `/auth/login`                                               | Não | —               |
+| POST   | `/auth/cadastrar`                                           | Não | —               |
+| GET    | `/auth/me`                                                  | Sim | Qualquer        |
+| GET    | `/usuarios`                                                 | Sim | CLIENTE         |
+| DELETE | `/usuarios/{idUsuario}`                                     | Sim | Autenticado*    |
+| GET    | `/exercicios`                                               | Sim | CLIENTE         |
+| POST   | `/exercicios`                                               | Sim | CLIENTE         |
+| DELETE | `/exercicios/{idExercicio}`                                 | Sim | CLIENTE         |
+| POST   | `/cronograma`                                               | Sim | CLIENTE         |
+| DELETE | `/cronograma/{idCronograma}`                                | Sim | CLIENTE         |
+| GET    | `/cronograma/{idAluno}`                                     | Sim | Qualquer        |
+| POST   | `/cronogramaexercicio`                                      | Sim | CLIENTE         |
+| DELETE | `/cronogramaexercicio/{idCronogramaExercicio}`              | Sim | CLIENTE         |
+| GET    | `/cronogramaexercicio/aluno/{idAluno}`                      | Sim | Qualquer        |
+| POST   | `/cronogramaexecucao/me`                                    | Sim | Qualquer        |
+| PUT    | `/cronogramaexecucao/me/{idExecucao}`                       | Sim | Qualquer        |
+| GET    | `/cronogramaexecucao/me/cronograma/{idCronograma}`          | Sim | Qualquer        |
+| POST   | `/perfil/me`                                                | Sim | Qualquer        |
+| POST   | `/registrodiario/me`                                        | Sim | Qualquer        |
+| POST   | `/chat/coach`                                               | Sim | Qualquer        |
+```
+
 
 ---
 
