@@ -1,7 +1,19 @@
+# GymConnect
+
+## Documentação da API (frontend / Flutter)
+
+Toda a referência de rotas, JSON de entrada/saída e autenticação JWT está em:
+
+**[backend/API.md](backend/API.md)**
+
+- **URL base da API:** `http://localhost:8080`
+- **Login:** `POST /auth/login` → header `Authorization: Bearer <token>` nas demais rotas
+
+---
+
 # Como rodar o projeto com Docker Compose
 
 Siga os passos abaixo para configurar e executar o projeto GymConnect utilizando Docker Compose.
-
 ---
 
 ## 1. Preparação do ambiente
