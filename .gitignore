@@ -22,3 +22,10 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Variáveis de ambiente / segredos (NÃO versionar)
+# O .env.example (modelo) PODE ser versionado; o .env real NÃO.
+.env
+.env.local
+*.env
+!.env.example
