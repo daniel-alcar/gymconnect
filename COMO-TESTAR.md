@@ -2,11 +2,11 @@
 
 Este guia explica, do zero, como rodar o **backend (API Java)** e o **app mobile (Flutter/Android)**.
 
-> A solução mobile usa duas pastas do repositório:
+> Esta branch (`ryan`) contém a solução mobile, em duas pastas:
 > - **`backend/`** → API Java (Spring Boot) + MySQL.
 > - **`mobile/`** → app Flutter (Android).
 >
-> A pasta `frontend/` (React) é o projeto web original, mantido **apenas como referência** — não precisa rodar.
+> (O projeto web original em React não faz parte desta branch — a solução é o app mobile consumindo o backend.)
 
 ---
 
@@ -45,9 +45,19 @@ git checkout ryan
 
 ## 2️⃣ Configurar a chave do Gemini (para o Chat IA)
 
-A tela **Chat IA** usa o Gemini. Crie uma chave gratuita em
-**https://aistudio.google.com/app/apikey** (formato `AIza...`).
+A tela **Chat IA** conversa com o Gemini através do backend. Para isso, é
+preciso uma **chave de API do Google AI Studio** (é gratuita).
 
+### Como gerar a chave no Google AI Studio
+1. Acesse **https://aistudio.google.com/app/apikey** e faça login com uma conta Google.
+2. Clique em **"Create API key"** (Criar chave de API).
+3. Selecione um projeto do Google Cloud existente **ou** deixe criar um novo automaticamente.
+4. A chave será gerada no formato **`AIza...`** — clique para **copiar**.
+5. Guarde com segurança (trate como senha; não compartilhe nem suba para o Git).
+
+> O modelo usado é o `gemini-2.5-flash`, disponível no nível gratuito — suficiente para testes.
+
+### Coloque a chave no projeto
 Copie o modelo de variáveis e preencha:
 
 ```bash
@@ -110,7 +120,11 @@ Com o `.env` preenchido (passo 2) e o Docker Desktop rodando (modo **Linux Conta
 docker-compose up -d --build
 docker-compose logs -f backend     # aguarde "Started GymconnectApplication"
 ```
-Sobe MySQL + backend + frontend. API em `http://localhost:8080`.
+Sobe **MySQL + backend**. A API fica em `http://localhost:8080` e o banco já é
+criado e inicializado automaticamente.
+
+> Se o Docker travar em "engine starting" (problema do ambiente, não do projeto),
+> use a **Opção A (sem Docker)**.
 
 **Testar se a API respondeu:**
 ```bash
