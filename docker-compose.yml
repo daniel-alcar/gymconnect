@@ -44,6 +44,9 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-gymconnect123}
       JWT_SECRET: ${JWT_SECRET:-my-secret-key-change-in-production}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      # Chave da API do Gemini (backend lê gemini.api-key=${keigemini})
+      keigemini: ${keigemini}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
     ports:
       - "8080:8080"
     depends_on:
