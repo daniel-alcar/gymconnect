@@ -55,21 +55,6 @@ services:
     networks:
       - gymconnect-network
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=http://localhost:8080
-    container_name: gymconnect-frontend
-    restart: unless-stopped
-    ports:
-      - "${FRONTEND_PORT:-80}:80"
-    depends_on:
-      - backend
-    networks:
-      - gymconnect-network
-
 networks:
   gymconnect-network:
     driver: bridge
