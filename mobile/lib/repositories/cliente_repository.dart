@@ -29,6 +29,30 @@ class ClienteRepository {
   Future<List<TreinoDia>> treinosDoAluno(int idAluno) =>
       _treinoRepository.carregarTreinos(idAluno);
 
+  /// Edita um vínculo de treino (PUT /cronogramaexercicio/{id}).
+  Future<void> atualizarVinculo({
+    required int idCronogramaExercicio,
+    required int idCronograma,
+    required int idExercicio,
+    DiaSemana? diaSemana,
+    int? serie,
+    int? repeticao,
+    int? carga,
+  }) =>
+      _gestaoService.atualizarVinculo(
+        idCronogramaExercicio: idCronogramaExercicio,
+        idCronograma: idCronograma,
+        idExercicio: idExercicio,
+        diaSemana: diaSemana,
+        serie: serie,
+        repeticao: repeticao,
+        carga: carga,
+      );
+
+  /// Remove um vínculo de treino (DELETE /cronogramaexercicio/{id}).
+  Future<void> removerVinculo(int idCronogramaExercicio) =>
+      _gestaoService.removerVinculo(idCronogramaExercicio);
+
   // ----- Exercícios (biblioteca) -----
   Future<List<Exercicio>> listarExercicios() => _exercicioService.listar();
 

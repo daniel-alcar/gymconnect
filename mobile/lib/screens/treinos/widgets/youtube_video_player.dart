@@ -6,7 +6,15 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 /// Usa `youtube_player_flutter`. Extrai o ID do vídeo a partir da URL.
 class YoutubeVideoPlayer extends StatefulWidget {
   final String url;
-  const YoutubeVideoPlayer({super.key, required this.url});
+
+  /// Inicia a reprodução automaticamente ao montar (UX de 1 clique).
+  final bool autoPlay;
+
+  const YoutubeVideoPlayer({
+    super.key,
+    required this.url,
+    this.autoPlay = false,
+  });
 
   @override
   State<YoutubeVideoPlayer> createState() => _YoutubeVideoPlayerState();
@@ -23,8 +31,8 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
     if (_videoId != null) {
       _controller = YoutubePlayerController(
         initialVideoId: _videoId!,
-        flags: const YoutubePlayerFlags(
-          autoPlay: false,
+        flags: YoutubePlayerFlags(
+          autoPlay: widget.autoPlay,
           mute: false,
         ),
       );

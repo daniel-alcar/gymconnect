@@ -140,7 +140,7 @@ class _TreinosScreenState extends State<TreinosScreen> {
               child: Text(
                 'TREINO DO DIA',
                 style: TextStyle(
-                  color: AppColors.wordmark,
+                  color: AppColors.amareloPressed,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1,
@@ -151,10 +151,10 @@ class _TreinosScreenState extends State<TreinosScreen> {
               padding: const EdgeInsets.only(bottom: 16),
               child: Text(
                 dia.titulo,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
             ),

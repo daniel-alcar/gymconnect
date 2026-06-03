@@ -33,7 +33,7 @@ class _AlunosScreenState extends State<AlunosScreen> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.c.surface,
         title: const Text('Remover aluno'),
         content: Text(
             'Deseja remover "${aluno.nome}"? Esta ação não pode ser desfeita.'),
@@ -128,19 +128,19 @@ class _AlunosScreenState extends State<AlunosScreen> {
         return Card(
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.amarelo,
               child: Text(
                 aluno.nome.isNotEmpty ? aluno.nome[0].toUpperCase() : '?',
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700),
+                    color: AppColors.onAmarelo, fontWeight: FontWeight.w700),
               ),
             ),
             title: Text(aluno.nome,
-                style: const TextStyle(
-                    color: AppColors.textPrimary,
+                style: TextStyle(
+                    color: context.c.textPrimary,
                     fontWeight: FontWeight.w600)),
             subtitle: Text(aluno.email,
-                style: const TextStyle(color: AppColors.textSecondary)),
+                style: TextStyle(color: context.c.textSecondary)),
             trailing: IconButton(
               icon: const Icon(Icons.delete_outline, color: AppColors.danger),
               onPressed: () => _confirmarRemover(aluno),

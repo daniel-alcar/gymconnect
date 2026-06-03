@@ -87,7 +87,7 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
               DropdownButtonFormField<int>(
                 initialValue: _alunoId,
                 isExpanded: true,
-                dropdownColor: AppColors.surface,
+                dropdownColor: context.c.surface,
                 decoration: const InputDecoration(
                   labelText: 'Aluno *',
                   prefixIcon: Icon(Icons.person_outline),
@@ -97,8 +97,7 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
                     .map((Usuario a) => DropdownMenuItem(
                           value: a.idUsuario,
                           child: Text(a.nome,
-                              style: const TextStyle(
-                                  color: AppColors.textPrimary)),
+                              style: TextStyle(color: context.c.textPrimary)),
                         ))
                     .toList(),
                 onChanged:
@@ -111,7 +110,7 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
               DropdownButtonFormField<DiaSemana>(
                 initialValue: _dia,
                 isExpanded: true,
-                dropdownColor: AppColors.surface,
+                dropdownColor: context.c.surface,
                 decoration: const InputDecoration(
                   labelText: 'Dia da semana *',
                   prefixIcon: Icon(Icons.calendar_today_outlined),
@@ -121,8 +120,7 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
                     .map((d) => DropdownMenuItem(
                           value: d,
                           child: Text(d.label,
-                              style: const TextStyle(
-                                  color: AppColors.textPrimary)),
+                              style: TextStyle(color: context.c.textPrimary)),
                         ))
                     .toList(),
                 onChanged: salvando ? null : (v) => setState(() => _dia = v),
@@ -133,12 +131,12 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Exercícios',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                   TextButton.icon(
@@ -168,7 +166,7 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
                         height: 22,
                         width: 22,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2.5, color: Colors.white),
+                            strokeWidth: 2.5, color: AppColors.onAmarelo),
                       )
                     : const Text('Salvar Treino'),
               ),
@@ -209,7 +207,7 @@ class _ExercicioFormCard extends StatelessWidget {
               children: [
                 Text('Exercício ${indice + 1}',
                     style: const TextStyle(
-                        color: AppColors.wordmark,
+                        color: AppColors.amareloPressed,
                         fontWeight: FontWeight.w700)),
                 if (podeRemover)
                   IconButton(

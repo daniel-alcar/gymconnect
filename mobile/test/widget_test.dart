@@ -9,9 +9,9 @@ void main() {
       const MaterialApp(home: Scaffold(body: AppLogo())),
     );
 
-    // Logo presente com o ícone de halter.
+    // Logo presente com o ícone de corredor (identidade GymConnect).
     expect(find.byType(AppLogo), findsOneWidget);
-    expect(find.byIcon(Icons.fitness_center), findsOneWidget);
+    expect(find.byIcon(Icons.directions_run), findsOneWidget);
 
     // O nome "GymConnect" é renderizado via Text.rich (RichText).
     final textos = tester

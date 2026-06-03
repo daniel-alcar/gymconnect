@@ -16,6 +16,7 @@ class AppConstants {
   // Chaves de persistência (SharedPreferences)
   static const String tokenKey = 'gc_token';
   static const String userKey = 'gc_user';
+  static const String themeKey = 'gc_theme_mode';
 
   // Timeouts do Dio
   static const Duration connectTimeout = Duration(seconds: 20);

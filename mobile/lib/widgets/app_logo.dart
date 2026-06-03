@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme/app_theme.dart';
+import '../core/theme/app_colors.dart';
 
-/// Logo do GymConnect: quadrado azul arredondado com halter + wordmark.
+/// Logo do GymConnect: ícone de corredor sobre o amarelo + wordmark
+/// "Gym"(amarelo) + "Connect"(cinza/claro), fiel à identidade original.
 class AppLogo extends StatelessWidget {
   final double size;
   final bool mostrarNome;
@@ -17,14 +18,14 @@ class AppLogo extends StatelessWidget {
         AppLogoMark(size: size),
         if (mostrarNome) ...[
           SizedBox(height: size * 0.22),
-          AppWordmark(fontSize: size * 0.42),
+          AppWordmark(fontSize: size * 0.40),
         ],
       ],
     );
   }
 }
 
-/// Apenas o ícone (quadrado azul com halter).
+/// Ícone da marca (quadrado amarelo arredondado com o corredor).
 class AppLogoMark extends StatelessWidget {
   final double size;
   const AppLogoMark({super.key, this.size = 56});
@@ -35,42 +36,49 @@ class AppLogoMark extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(size * 0.30),
+        color: AppColors.amarelo,
+        borderRadius: BorderRadius.circular(size * 0.28),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.35),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: AppColors.amarelo.withValues(alpha: 0.35),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Transform.rotate(
-        angle: -0.785, // -45°, halter inclinado como no design
-        child: Icon(
-          Icons.fitness_center,
-          size: size * 0.52,
-          color: Colors.white,
-        ),
+      child: Icon(
+        Icons.directions_run,
+        size: size * 0.58,
+        color: AppColors.onAmarelo,
       ),
     );
   }
 }
 
-/// Texto "GymConnect" estilizado.
+/// Texto "GymConnect" — "Gym" amarelo escuro + "Connect" na cor de texto do tema.
 class AppWordmark extends StatelessWidget {
   final double fontSize;
   const AppWordmark({super.key, this.fontSize = 28});
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'GymConnect',
-      style: TextStyle(
-        fontSize: fontSize,
-        fontWeight: FontWeight.w800,
-        color: AppColors.wordmark,
-        letterSpacing: -0.5,
+    return Text.rich(
+      TextSpan(
+        children: [
+          const TextSpan(
+            text: 'Gym',
+            style: TextStyle(color: AppColors.amareloPressed),
+          ),
+          TextSpan(
+            text: 'Connect',
+            style: TextStyle(color: context.c.textPrimary),
+          ),
+        ],
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.5,
+        ),
       ),
     );
   }
