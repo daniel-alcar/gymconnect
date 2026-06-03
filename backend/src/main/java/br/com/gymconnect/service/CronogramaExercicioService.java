@@ -93,4 +93,46 @@ public class CronogramaExercicioService {
         return ResponseEntity.ok(exercicios);
     }
 
+    public ResponseEntity<?> atualizar(Long idCronogramaExercicio, CronogramaExercicio dados) {
+        ResponseModel rm = new ResponseModel();
+
+        Optional<CronogramaExercicio> vinculoOpt = csr.findById(idCronogramaExercicio);
+        if (vinculoOpt.isEmpty()) {
+            rm.setMensagem("Cronograma de exercicios não encontrado!");
+            return new ResponseEntity<>(rm, HttpStatus.NOT_FOUND);
+        }
+
+        if (dados.getCronograma() == null || dados.getCronograma().getIdCronograma() == null) {
+            rm.setMensagem("Campo cronograma precisa ser preenchido!");
+            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+        }
+        if (dados.getExercicio() == null || dados.getExercicio().getIdExercicio() == null) {
+            rm.setMensagem("Exercicio não preenchido!");
+            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Cronograma> cronogramaOpt = cr.findById(dados.getCronograma().getIdCronograma());
+        if (cronogramaOpt.isEmpty()) {
+            rm.setMensagem("Campo cronograma precisa ser preenchido!");
+            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Exercicio> exercicioOpt = exr.findById(dados.getExercicio().getIdExercicio());
+        if (exercicioOpt.isEmpty()) {
+            rm.setMensagem("Exercicio não preenchido!");
+            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+        }
+
+        CronogramaExercicio existente = vinculoOpt.get();
+        existente.setCronograma(cronogramaOpt.get());
+        existente.setExercicio(exercicioOpt.get());
+        existente.setDiaSemana(dados.getDiaSemana());
+        existente.setSerie(dados.getSerie());
+        existente.setRepeticao(dados.getRepeticao());
+        existente.setCarga(dados.getCarga());
+
+        CronogramaExercicio salvo = csr.save(existente);
+        return new ResponseEntity<>(salvo, HttpStatus.OK);
+    }
+
 }
