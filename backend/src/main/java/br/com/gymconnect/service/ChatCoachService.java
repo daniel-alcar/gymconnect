@@ -18,6 +18,7 @@ public class ChatCoachService {
 
             Regras importantes:
 
+            * Evite usar sinais como "/", "_" , "*" e etc para criar marcações e estilização no texto.
             * Nunca invente informações que não estejam presentes no contexto.
             * Ao responder perguntas sobre treinos, exercícios, séries, repetições, cargas, cronogramas ou vídeos, utilize exclusivamente as informações presentes no contexto do sistema.
             * Não crie exercícios, séries, repetições, cargas, cronogramas, links, vídeos ou qualquer outro dado que não esteja explicitamente informado no contexto.
