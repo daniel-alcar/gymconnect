@@ -26,7 +26,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
   final _senhaController = TextEditingController();
   final _confirmarController = TextEditingController();
   TipoUsuario _tipo = TipoUsuario.aluno;
+
+  // Controles INDEPENDENTES de visibilidade (item 1).
   bool _ocultarSenha = true;
+  bool _ocultarConfirmar = true;
 
   @override
   void dispose() {
@@ -40,7 +43,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
   Future<void> _cadastrar() async {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-
     final auth = context.read<AuthProvider>();
     try {
       await auth.cadastrar(
@@ -81,20 +83,20 @@ class _CadastroScreenState extends State<CadastroScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
+                Text(
                   'Criar conta',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Preencha os dados para começar sua jornada.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: context.c.textSecondary),
                 ),
                 const SizedBox(height: 24),
                 Card(
@@ -127,6 +129,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
+                        // Senha — toggle próprio
                         TextFormField(
                           controller: _senhaController,
                           enabled: !carregando,
@@ -146,25 +149,33 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
+                        // Confirmar Senha — toggle INDEPENDENTE
                         TextFormField(
                           controller: _confirmarController,
                           enabled: !carregando,
-                          obscureText: _ocultarSenha,
+                          obscureText: _ocultarConfirmar,
                           textInputAction: TextInputAction.done,
                           validator: (v) => Validators.confirmarSenha(
                               v, _senhaController.text),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Confirmar senha',
-                            prefixIcon: Icon(Icons.lock_reset_outlined),
+                            prefixIcon: const Icon(Icons.lock_reset_outlined),
+                            suffixIcon: IconButton(
+                              icon: Icon(_ocultarConfirmar
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined),
+                              onPressed: () => setState(() =>
+                                  _ocultarConfirmar = !_ocultarConfirmar),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const Align(
+                        Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
                             'Tipo de perfil',
                             style: TextStyle(
-                              color: AppColors.textPrimary,
+                              color: context.c.textPrimary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -206,7 +217,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                                   width: 22,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
-                                    color: Colors.white,
+                                    color: AppColors.onAmarelo,
                                   ),
                                 )
                               : const Text('Criar Conta'),
@@ -219,10 +230,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Já tem uma conta? ',
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
+                    Text('Já tem uma conta? ',
+                        style: TextStyle(color: context.c.textSecondary)),
                     GestureDetector(
                       onTap: carregando
                           ? null
@@ -230,7 +239,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       child: const Text(
                         'Entrar',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: AppColors.amareloPressed,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -263,30 +272,32 @@ class _PerfilOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: selecionado
-              ? AppColors.primary.withValues(alpha: 0.15)
-              : AppColors.surfaceAlt,
-          borderRadius: BorderRadius.circular(14),
+              ? AppColors.amarelo.withValues(alpha: 0.18)
+              : context.c.surfaceAlt,
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selecionado ? AppColors.primary : AppColors.border,
+            color: selecionado ? AppColors.amarelo : context.c.border,
             width: selecionado ? 1.6 : 1,
           ),
         ),
         child: Column(
           children: [
             Icon(icone,
-                color:
-                    selecionado ? AppColors.primary : AppColors.textSecondary),
+                color: selecionado
+                    ? AppColors.amareloPressed
+                    : context.c.textSecondary),
             const SizedBox(height: 8),
             Text(
               titulo,
               style: TextStyle(
-                color:
-                    selecionado ? AppColors.textPrimary : AppColors.textSecondary,
+                color: selecionado
+                    ? context.c.textPrimary
+                    : context.c.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),

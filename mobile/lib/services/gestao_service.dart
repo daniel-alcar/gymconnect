@@ -56,6 +56,45 @@ class GestaoService {
     }
   }
 
+  /// `PUT /cronogramaexercicio/{id}` → atualiza o vínculo (exercício + dia/série/rep/carga).
+  Future<void> atualizarVinculo({
+    required int idCronogramaExercicio,
+    required int idCronograma,
+    required int idExercicio,
+    DiaSemana? diaSemana,
+    int? serie,
+    int? repeticao,
+    int? carga,
+  }) async {
+    try {
+      final res = await _client.dio.put(
+        '/cronogramaexercicio/$idCronogramaExercicio',
+        data: {
+          'cronograma': {'idCronograma': idCronograma},
+          'exercicio': {'idExercicio': idExercicio},
+          'diaSemana': diaSemana?.value,
+          'serie': serie,
+          'repeticao': repeticao,
+          'carga': carga,
+        },
+      );
+      if (!_client.isSucesso(res)) throw _client.tratarResposta(res);
+    } on Object catch (e) {
+      throw _client.normalize(e);
+    }
+  }
+
+  /// `DELETE /cronogramaexercicio/{id}` → remove um vínculo do treino.
+  Future<void> removerVinculo(int idCronogramaExercicio) async {
+    try {
+      final res =
+          await _client.dio.delete('/cronogramaexercicio/$idCronogramaExercicio');
+      if (!_client.isSucesso(res)) throw _client.tratarResposta(res);
+    } on Object catch (e) {
+      throw _client.normalize(e);
+    }
+  }
+
   /// `DELETE /cronograma/{id}`.
   Future<void> removerCronograma(int idCronograma) async {
     try {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/cronograma_exercicio.dart';
 import '../../../utils/validators.dart';
 import 'youtube_video_player.dart';
@@ -26,7 +27,7 @@ class ExercicioCard extends StatefulWidget {
 
 class _ExercicioCardState extends State<ExercicioCard> {
   final _pesoController = TextEditingController();
-  bool _mostrarVideo = false;
+  bool _reproduzir = false;
   String? _erroPeso;
 
   @override
@@ -40,7 +41,6 @@ class _ExercicioCardState extends State<ExercicioCard> {
     final erro = Validators.pesoOpcional(texto);
     setState(() => _erroPeso = erro);
     if (erro != null) return;
-
     final peso =
         texto.isEmpty ? null : double.tryParse(texto.replaceAll(',', '.'));
     widget.onMarcarFeito(peso);
@@ -58,17 +58,16 @@ class _ExercicioCardState extends State<ExercicioCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Cabeçalho: nome + pill de carga
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Text(
                     exercicio?.nome ?? 'Exercício',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: context.c.textPrimary,
                     ),
                   ),
                 ),
@@ -77,17 +76,18 @@ class _ExercicioCardState extends State<ExercicioCard> {
             ),
             const SizedBox(height: 14),
 
-            // Vídeo embutido (youtube_player_flutter)
+            // Vídeo: thumbnail imediata + play em 1 clique (autoplay).
             if (exercicio?.temVideo ?? false) ...[
-              if (_mostrarVideo)
-                YoutubeVideoPlayer(url: exercicio!.linkYoutube!)
+              if (_reproduzir)
+                YoutubeVideoPlayer(url: exercicio!.linkYoutube!, autoPlay: true)
               else
                 _VideoThumb(
-                    onPlay: () => setState(() => _mostrarVideo = true)),
+                  url: exercicio!.linkYoutube!,
+                  onPlay: () => setState(() => _reproduzir = true),
+                ),
               const SizedBox(height: 14),
             ],
 
-            // Caixas de séries / repetições
             Row(
               children: [
                 Expanded(
@@ -125,7 +125,6 @@ class _ExercicioCardState extends State<ExercicioCard> {
               const SizedBox(height: 14),
             ],
 
-            // Botão Marcar como Feito (tonal claro) / estado concluído
             SizedBox(
               width: double.infinity,
               child: widget.feito
@@ -134,7 +133,7 @@ class _ExercicioCardState extends State<ExercicioCard> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: AppColors.success.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: AppColors.success.withValues(alpha: 0.5),
                         ),
@@ -157,17 +156,13 @@ class _ExercicioCardState extends State<ExercicioCard> {
                     )
                   : FilledButton(
                       onPressed: widget.processando ? null : _concluir,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primarySoft,
-                        foregroundColor: const Color(0xFF1A2A52),
-                      ),
                       child: widget.processando
                           ? const SizedBox(
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2.5,
-                                color: Color(0xFF1A2A52),
+                                color: AppColors.onAmarelo,
                               ),
                             )
                           : const Text('Marcar como Feito'),
@@ -189,14 +184,14 @@ class _Pill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.18),
+        color: AppColors.amarelo.withValues(alpha: 0.20),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         texto,
         style: const TextStyle(
-          color: AppColors.wordmark,
-          fontWeight: FontWeight.w600,
+          color: AppColors.amareloPressed,
+          fontWeight: FontWeight.w700,
           fontSize: 13,
         ),
       ),
@@ -216,23 +211,23 @@ class _StatBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceAlt,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        color: context.c.surfaceAlt,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: context.c.border),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icone, size: 14, color: AppColors.textSecondary),
+              Icon(icone, size: 14, color: context.c.textSecondary),
               const SizedBox(width: 6),
               Text(
                 label,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
+                style: TextStyle(
+                  color: context.c.textSecondary,
                   fontSize: 11,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -241,8 +236,8 @@ class _StatBox extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             valor,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: context.c.textPrimary,
               fontSize: 22,
               fontWeight: FontWeight.w800,
             ),
@@ -253,32 +248,59 @@ class _StatBox extends StatelessWidget {
   }
 }
 
+/// Thumbnail do YouTube exibida de imediato, com botão de play sobreposto.
 class _VideoThumb extends StatelessWidget {
+  final String url;
   final VoidCallback onPlay;
-  const _VideoThumb({required this.onPlay});
+  const _VideoThumb({required this.url, required this.onPlay});
 
   @override
   Widget build(BuildContext context) {
+    final id = YoutubePlayer.convertUrlToId(url);
+    final thumb =
+        id != null ? 'https://img.youtube.com/vi/$id/hqdefault.jpg' : null;
+
     return InkWell(
       onTap: onPlay,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        height: 150,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.9),
-              shape: BoxShape.circle,
+      borderRadius: BorderRadius.circular(12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: thumb != null
+                  ? Image.network(
+                      thumb,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Container(color: Colors.black),
+                      loadingBuilder: (ctx, child, progress) =>
+                          progress == null
+                              ? child
+                              : Container(color: Colors.black12),
+                    )
+                  : Container(color: Colors.black),
             ),
-            child: const Icon(Icons.play_arrow,
-                color: Color(0xFF111A2E), size: 32),
-          ),
+            // Camada escura + ícone de play (sinaliza que há vídeo).
+            Container(color: Colors.black.withValues(alpha: 0.25)),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.amarelo,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.play_arrow,
+                  color: AppColors.onAmarelo, size: 34),
+            ),
+          ],
         ),
       ),
     );

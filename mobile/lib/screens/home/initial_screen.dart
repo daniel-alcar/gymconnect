@@ -13,11 +13,14 @@ class InitialScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF111A2E), AppColors.background],
+            colors: [
+              AppColors.amarelo.withValues(alpha: 0.18),
+              context.c.background,
+            ],
           ),
         ),
         child: SafeArea(
@@ -26,15 +29,15 @@ class InitialScreen extends StatelessWidget {
             child: Column(
               children: [
                 const Spacer(flex: 2),
-                const AppLogoMark(size: 84),
+                const AppLogoMark(size: 88),
                 const SizedBox(height: 20),
                 const AppWordmark(fontSize: 36),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Sua evolução começa aqui.\nConecte-se ao seu melhor desempenho.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: AppColors.textSecondary,
+                    color: context.c.textSecondary,
                     fontSize: 15,
                     height: 1.4,
                   ),
@@ -45,7 +48,6 @@ class InitialScreen extends StatelessWidget {
                     Expanded(
                       child: _FeatureChip(
                         icone: Icons.auto_awesome,
-                        cor: AppColors.success,
                         titulo: 'Treino IA',
                       ),
                     ),
@@ -53,7 +55,6 @@ class InitialScreen extends StatelessWidget {
                     Expanded(
                       child: _FeatureChip(
                         icone: Icons.show_chart,
-                        cor: AppColors.primary,
                         titulo: 'Progresso',
                       ),
                     ),
@@ -77,13 +78,10 @@ class InitialScreen extends StatelessWidget {
                   child: const Text('Cadastrar'),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Ao continuar, você concorda com nossos Termos.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: context.c.textSecondary, fontSize: 12),
                 ),
                 const Spacer(flex: 1),
               ],
@@ -97,32 +95,27 @@ class InitialScreen extends StatelessWidget {
 
 class _FeatureChip extends StatelessWidget {
   final IconData icone;
-  final Color cor;
   final String titulo;
-  const _FeatureChip({
-    required this.icone,
-    required this.cor,
-    required this.titulo,
-  });
+  const _FeatureChip({required this.icone, required this.titulo});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        color: context.c.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: context.c.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icone, color: cor, size: 24),
+          Icon(icone, color: AppColors.amareloPressed, size: 24),
           const SizedBox(height: 12),
           Text(
             titulo,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: context.c.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),

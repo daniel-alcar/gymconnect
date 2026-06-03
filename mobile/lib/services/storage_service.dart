@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_constants.dart';
@@ -40,7 +41,22 @@ class StorageService {
     }
   }
 
-  // ----- Limpeza (logout) -----
+  // ----- Preferência de tema (não é apagada no logout) -----
+  Future<void> salvarThemeMode(ThemeMode modo) async {
+    final prefs = await _instance;
+    await prefs.setString(AppConstants.themeKey, modo.name);
+  }
+
+  Future<ThemeMode> lerThemeMode() async {
+    final prefs = await _instance;
+    final raw = prefs.getString(AppConstants.themeKey);
+    return ThemeMode.values.firstWhere(
+      (m) => m.name == raw,
+      orElse: () => ThemeMode.light, // padrão: claro (identidade oficial)
+    );
+  }
+
+  // ----- Limpeza (logout) — preserva a preferência de tema -----
   Future<void> limpar() async {
     final prefs = await _instance;
     await prefs.remove(AppConstants.tokenKey);

@@ -39,7 +39,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.c.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -57,12 +57,12 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
+                Text(
                   'Novo exercício',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -119,7 +119,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                             height: 22,
                             width: 22,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2.5, color: Colors.white),
+                                strokeWidth: 2.5, color: AppColors.onAmarelo),
                           )
                         : const Text('Cadastrar'),
                   ),
@@ -136,7 +136,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.c.surface,
         title: const Text('Remover exercício'),
         content: Text('Deseja remover "${ex.nome}" da biblioteca?'),
         actions: [
@@ -182,8 +182,6 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _abrirCadastro,
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
         label: const Text('Novo'),
       ),
@@ -235,19 +233,17 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
         final ex = provider.exercicios[i];
         return Card(
           child: ListTile(
-            leading: const CircleAvatar(
-              backgroundColor: AppColors.surfaceAlt,
-              child: Icon(Icons.fitness_center, color: AppColors.primary),
+            leading: CircleAvatar(
+              backgroundColor: context.c.surfaceAlt,
+              child: const Icon(Icons.fitness_center,
+                  color: AppColors.amareloPressed),
             ),
             title: Text(ex.nome,
-                style: const TextStyle(
-                    color: AppColors.textPrimary,
+                style: TextStyle(
+                    color: context.c.textPrimary,
                     fontWeight: FontWeight.w600)),
-            subtitle: ex.temVideo
-                ? const Text('Com vídeo',
-                    style: TextStyle(color: AppColors.textSecondary))
-                : const Text('Sem vídeo',
-                    style: TextStyle(color: AppColors.textSecondary)),
+            subtitle: Text(ex.temVideo ? 'Com vídeo' : 'Sem vídeo',
+                style: TextStyle(color: context.c.textSecondary)),
             trailing: IconButton(
               icon: const Icon(Icons.delete_outline, color: AppColors.danger),
               onPressed: () => _confirmarRemover(ex),

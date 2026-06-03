@@ -12,6 +12,7 @@ import '../../utils/date_formatter.dart';
 import '../../utils/snackbar_helper.dart';
 import '../../utils/validators.dart';
 import '../../widgets/app_logo.dart';
+import '../configuracoes/configuracoes_screen.dart';
 
 /// TELA 6 – PERFIL. Atualização de informações pessoais (POST /perfil/me).
 class PerfilScreen extends StatefulWidget {
@@ -49,7 +50,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
   Future<void> _salvar() async {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-
     final perfil = Perfil(
       dataNascimento: _dataNascimento != null
           ? DateFormatter.toIso(_dataNascimento!)
@@ -61,7 +61,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
           ? null
           : _objetivoController.text.trim(),
     );
-
     try {
       await context.read<PerfilProvider>().salvar(perfil);
       if (mounted) SnackbarHelper.sucesso(context, 'Perfil salvo com sucesso!');
@@ -76,7 +75,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
         title: const Text('Sair'),
         content: const Text('Deseja realmente encerrar a sessão?'),
         actions: [
@@ -112,8 +110,15 @@ class _PerfilScreenState extends State<PerfilScreen> {
         ),
         actions: [
           IconButton(
+            tooltip: 'Configurações',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ConfiguracoesScreen()),
+            ),
+          ),
+          IconButton(
             tooltip: 'Sair',
-            icon: const Icon(Icons.logout, color: AppColors.textSecondary),
+            icon: const Icon(Icons.logout),
             onPressed: _logout,
           ),
         ],
@@ -127,7 +132,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Avatar + dados do usuário logado
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -135,7 +139,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                       children: [
                         CircleAvatar(
                           radius: 28,
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: AppColors.amarelo,
                           child: Text(
                             (usuario?.nome.isNotEmpty ?? false)
                                 ? usuario!.nome[0].toUpperCase()
@@ -143,7 +147,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: AppColors.onAmarelo,
                             ),
                           ),
                         ),
@@ -154,17 +158,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
                             children: [
                               Text(
                                 usuario?.nome ?? '—',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
+                                  color: context.c.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 usuario?.email ?? '—',
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
+                                style: TextStyle(
+                                  color: context.c.textSecondary,
                                   fontSize: 13,
                                 ),
                               ),
@@ -173,16 +177,16 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary
-                                      .withValues(alpha: 0.18),
+                                  color: AppColors.amarelo
+                                      .withValues(alpha: 0.20),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
                                   usuario?.tipo.label ?? '',
                                   style: const TextStyle(
-                                    color: AppColors.wordmark,
+                                    color: AppColors.amareloPressed,
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                               ),
@@ -194,21 +198,20 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Informações pessoais',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Todos os campos são opcionais.',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                  style: TextStyle(color: context.c.textSecondary, fontSize: 13),
                 ),
                 const SizedBox(height: 16),
-
                 InkWell(
                   onTap: salvando ? null : _selecionarData,
                   child: InputDecorator(
@@ -222,8 +225,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           : 'Selecionar data',
                       style: TextStyle(
                         color: _dataNascimento != null
-                            ? AppColors.textPrimary
-                            : AppColors.textSecondary,
+                            ? context.c.textPrimary
+                            : context.c.textSecondary,
                       ),
                     ),
                   ),
@@ -260,7 +263,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           width: 22,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            color: Colors.white,
+                            color: AppColors.onAmarelo,
                           ),
                         )
                       : const Text('Salvar'),

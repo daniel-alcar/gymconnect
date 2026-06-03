@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/chat_message.dart';
 
 /// Balão de mensagem do chat (usuário à direita, IA à esquerda).
@@ -15,14 +15,14 @@ class ChatBubble extends StatelessWidget {
     final Color fundo;
     final Color texto;
     if (mensagem.erro) {
-      fundo = AppColors.danger.withValues(alpha: 0.18);
-      texto = const Color(0xFFFFB4B4);
+      fundo = AppColors.danger.withValues(alpha: 0.14);
+      texto = AppColors.danger;
     } else if (doUsuario) {
-      fundo = AppColors.primary;
-      texto = Colors.white;
+      fundo = AppColors.amarelo;
+      texto = AppColors.onAmarelo;
     } else {
-      fundo = AppColors.surface;
-      texto = AppColors.textPrimary;
+      fundo = context.c.surface;
+      texto = context.c.textPrimary;
     }
 
     return Align(
@@ -41,16 +41,15 @@ class ChatBubble extends StatelessWidget {
             bottomLeft: Radius.circular(doUsuario ? 16 : 4),
             bottomRight: Radius.circular(doUsuario ? 4 : 16),
           ),
-          border: doUsuario
-              ? null
-              : Border.all(color: AppColors.border),
+          border: doUsuario ? null : Border.all(color: context.c.border),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!doUsuario && !mensagem.erro) ...[
-              const Icon(Icons.smart_toy, size: 18, color: AppColors.primary),
+              const Icon(Icons.smart_toy,
+                  size: 18, color: AppColors.amareloPressed),
               const SizedBox(width: 8),
             ],
             Flexible(child: Text(mensagem.texto, style: TextStyle(color: texto))),

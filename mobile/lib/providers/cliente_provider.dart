@@ -45,6 +45,38 @@ class ClienteProvider extends ChangeNotifier {
   List<TreinoDia> get treinosAluno => _treinosAluno;
   int? get alunoSelecionado => _alunoSelecionado;
 
+  /// Edita um vínculo de treino e recarrega os treinos do aluno selecionado.
+  Future<void> atualizarVinculo({
+    required int idCronogramaExercicio,
+    required int idCronograma,
+    required int idExercicio,
+    DiaSemana? diaSemana,
+    int? serie,
+    int? repeticao,
+    int? carga,
+  }) async {
+    await _repository.atualizarVinculo(
+      idCronogramaExercicio: idCronogramaExercicio,
+      idCronograma: idCronograma,
+      idExercicio: idExercicio,
+      diaSemana: diaSemana,
+      serie: serie,
+      repeticao: repeticao,
+      carga: carga,
+    );
+    if (_alunoSelecionado != null) {
+      await carregarTreinosDoAluno(_alunoSelecionado!);
+    }
+  }
+
+  /// Remove um vínculo de treino e recarrega os treinos do aluno selecionado.
+  Future<void> removerVinculo(int idCronogramaExercicio) async {
+    await _repository.removerVinculo(idCronogramaExercicio);
+    if (_alunoSelecionado != null) {
+      await carregarTreinosDoAluno(_alunoSelecionado!);
+    }
+  }
+
   Future<void> carregarTreinosDoAluno(int idAluno) async {
     _alunoSelecionado = idAluno;
     _carregandoTreinosAluno = true;

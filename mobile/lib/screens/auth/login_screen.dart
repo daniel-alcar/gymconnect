@@ -34,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _entrar() async {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-
     final auth = context.read<AuthProvider>();
     try {
       await auth.login(_emailController.text, _senhaController.text);
@@ -70,20 +69,20 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Bem-vindo de volta',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Acesse sua conta para continuar sua jornada de alta performance.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textSecondary, height: 1.4),
+                  style: TextStyle(color: context.c.textSecondary, height: 1.4),
                 ),
                 const SizedBox(height: 28),
                 Card(
@@ -137,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: 22,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
-                                    color: Colors.white,
+                                    color: AppColors.onAmarelo,
                                   ),
                                 )
                               : const Row(
@@ -157,10 +156,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Não tem uma conta? ',
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
+                    Text('Não tem uma conta? ',
+                        style: TextStyle(color: context.c.textSecondary)),
                     GestureDetector(
                       onTap: carregando
                           ? null
@@ -168,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Cadastrar',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: AppColors.amareloPressed,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -194,8 +191,8 @@ class _Label extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Text(
         texto,
-        style: const TextStyle(
-          color: AppColors.textPrimary,
+        style: TextStyle(
+          color: context.c.textPrimary,
           fontWeight: FontWeight.w600,
         ),
       ),

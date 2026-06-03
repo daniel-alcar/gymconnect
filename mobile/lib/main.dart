@@ -7,6 +7,7 @@ import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/cliente_provider.dart';
 import 'providers/perfil_provider.dart';
+import 'providers/theme_provider.dart';
 import 'providers/treino_provider.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/chat_repository.dart';
@@ -51,6 +52,7 @@ class _GymConnectAppState extends State<GymConnectApp> {
   late final PerfilProvider _perfilProvider;
   late final ChatProvider _chatProvider;
   late final ClienteProvider _clienteProvider;
+  late final ThemeProvider _themeProvider;
 
   late final AppRouter _appRouter;
 
@@ -91,13 +93,15 @@ class _GymConnectAppState extends State<GymConnectApp> {
     _perfilProvider = PerfilProvider(perfilRepo);
     _chatProvider = ChatProvider(chatRepo);
     _clienteProvider = ClienteProvider(clienteRepo);
+    _themeProvider = ThemeProvider(_storage);
 
     // Logout automático quando o backend responde 401/403.
     _dioClient.onUnauthorized = _authProvider.sessaoExpirada;
 
     _appRouter = AppRouter(_authProvider);
 
-    // Carrega a sessão salva (token + usuário) e revalida.
+    // Carrega a preferência de tema e a sessão salva (token + usuário).
+    _themeProvider.carregar();
     _authProvider.carregarSessao();
   }
 
@@ -108,6 +112,7 @@ class _GymConnectAppState extends State<GymConnectApp> {
     _perfilProvider.dispose();
     _chatProvider.dispose();
     _clienteProvider.dispose();
+    _themeProvider.dispose();
     super.dispose();
   }
 
@@ -120,12 +125,17 @@ class _GymConnectAppState extends State<GymConnectApp> {
         ChangeNotifierProvider.value(value: _perfilProvider),
         ChangeNotifierProvider.value(value: _chatProvider),
         ChangeNotifierProvider.value(value: _clienteProvider),
+        ChangeNotifierProvider.value(value: _themeProvider),
       ],
-      child: MaterialApp.router(
-        title: AppConstants.appName,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.dark,
-        routerConfig: _appRouter.router,
+      child: Consumer<ThemeProvider>(
+        builder: (_, tema, __) => MaterialApp.router(
+          title: AppConstants.appName,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: tema.modo,
+          routerConfig: _appRouter.router,
+        ),
       ),
     );
   }

@@ -6,10 +6,11 @@ import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../routes/route_names.dart';
 import '../../widgets/app_logo.dart';
+import '../configuracoes/configuracoes_screen.dart';
 
-/// TELA 4 – DASHBOARD (aba inicial da navigation bar).
+/// TELA 4 – DASHBOARD (aba inicial da navigation bar do aluno).
 class DashboardScreen extends StatelessWidget {
-  /// Permite navegar para outra aba do [MainShell] (0=Dash,1=Treinos,2=Perfil,3=Chat).
+  /// Navega para outra aba (0=Dash,1=Treinos,2=Perfil,3=Chat).
   final void Function(int aba)? onNavegar;
 
   const DashboardScreen({super.key, this.onNavegar});
@@ -18,18 +19,15 @@ class DashboardScreen extends StatelessWidget {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
         title: const Text('Sair'),
         content: const Text('Deseja realmente encerrar a sessão?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar')),
           FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sair'),
-          ),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Sair')),
         ],
       ),
     );
@@ -56,8 +54,16 @@ class DashboardScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            tooltip: 'Configurações',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (_) => const ConfiguracoesScreen()),
+            ),
+          ),
+          IconButton(
             tooltip: 'Sair',
-            icon: const Icon(Icons.logout, color: AppColors.textSecondary),
+            icon: const Icon(Icons.logout),
             onPressed: () => _confirmarLogout(context),
           ),
         ],
@@ -69,24 +75,20 @@ class DashboardScreen extends StatelessWidget {
           children: [
             Text(
               'Olá, $primeiroNome',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
+            Text(
               'Pronto para o treino de hoje?',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
+              style: TextStyle(color: context.c.textSecondary, fontSize: 15),
             ),
             const SizedBox(height: 20),
-
-            // Card hero "Treinos"
             _HeroCard(onTap: () => onNavegar?.call(1)),
             const SizedBox(height: 16),
-
-            // Grid Perfil / AI Chat
             Row(
               children: [
                 Expanded(
@@ -110,13 +112,12 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 28),
-
-            const Text(
+            Text(
               'Atividade Recente',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -143,7 +144,7 @@ class _HeroCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF1B3A6B), Color(0xFF12203A)],
+              colors: [AppColors.amarelo, Color(0xFFFFB000)],
             ),
           ),
           padding: const EdgeInsets.all(20),
@@ -154,10 +155,11 @@ class _HeroCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: AppColors.onAmarelo.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.fitness_center, color: Colors.white),
+                child: const Icon(Icons.fitness_center,
+                    color: AppColors.onAmarelo),
               ),
               const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,13 +169,13 @@ class _HeroCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: AppColors.onAmarelo,
                     ),
                   ),
                   SizedBox(height: 2),
                   Text(
                     'Veja o treino do dia e marque como feito',
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                    style: TextStyle(color: Color(0xCC1A1A1A), fontSize: 13),
                   ),
                 ],
               ),
@@ -213,32 +215,29 @@ class _MenuCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: destaque
-                      ? AppColors.primary
-                      : AppColors.surfaceAlt,
+                  color: destaque ? AppColors.amarelo : context.c.surfaceAlt,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icone,
-                  color: destaque ? Colors.white : AppColors.textSecondary,
+                  color: destaque
+                      ? AppColors.onAmarelo
+                      : context.c.textSecondary,
                 ),
               ),
               const SizedBox(height: 32),
               Text(
                 titulo,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: context.c.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitulo,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 13,
-                ),
+                style: TextStyle(color: context.c.textSecondary, fontSize: 13),
               ),
             ],
           ),
@@ -253,25 +252,25 @@ class _AtividadeVazia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
+    return Card(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 28, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
         child: Column(
           children: [
-            Icon(Icons.history, color: AppColors.textSecondary, size: 40),
-            SizedBox(height: 12),
+            Icon(Icons.history, color: context.c.textSecondary, size: 40),
+            const SizedBox(height: 12),
             Text(
               'Nenhuma atividade recente ainda',
               style: TextStyle(
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               'Conclua treinos para acompanhar seu histórico aqui.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              style: TextStyle(color: context.c.textSecondary, fontSize: 13),
             ),
           ],
         ),

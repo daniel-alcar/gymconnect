@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/errors/app_exception.dart';
 import '../../core/theme/app_theme.dart';
+import '../../models/cronograma_exercicio.dart';
 import '../../models/usuario.dart';
 import '../../providers/cliente_provider.dart';
+import '../../utils/snackbar_helper.dart';
 import '../../widgets/app_logo.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/loading_indicator.dart';
 import 'criar_treino_screen.dart';
+import 'editar_vinculo_screen.dart';
 
 /// CLIENTE – Treinos: criar novo treino e visualizar treinos por aluno.
 class TreinosClienteScreen extends StatefulWidget {
@@ -56,8 +60,6 @@ class _TreinosClienteScreenState extends State<TreinosClienteScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _abrirCriarTreino,
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
         label: const Text('Criar Treino'),
       ),
@@ -66,12 +68,12 @@ class _TreinosClienteScreenState extends State<TreinosClienteScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
           children: [
-            const Text(
+            Text(
               'Visualizar treinos por aluno',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: context.c.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -92,27 +94,27 @@ class _DropdownAluno extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (provider.carregandoAlunos && provider.alunos.isEmpty) {
-      return const Card(
+      return Card(
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Text('Carregando alunos...',
-              style: TextStyle(color: AppColors.textSecondary)),
+              style: TextStyle(color: context.c.textSecondary)),
         ),
       );
     }
     if (provider.alunos.isEmpty) {
-      return const Card(
+      return Card(
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Text('Nenhum aluno cadastrado ainda.',
-              style: TextStyle(color: AppColors.textSecondary)),
+              style: TextStyle(color: context.c.textSecondary)),
         ),
       );
     }
     return DropdownButtonFormField<int>(
       initialValue: provider.alunoSelecionado,
       isExpanded: true,
-      dropdownColor: AppColors.surface,
+      dropdownColor: context.c.surface,
       decoration: const InputDecoration(
         labelText: 'Aluno',
         prefixIcon: Icon(Icons.person_outline),
@@ -122,7 +124,7 @@ class _DropdownAluno extends StatelessWidget {
           .map((Usuario a) => DropdownMenuItem(
                 value: a.idUsuario,
                 child: Text(a.nome,
-                    style: const TextStyle(color: AppColors.textPrimary)),
+                    style: TextStyle(color: context.c.textPrimary)),
               ))
           .toList(),
       onChanged: (id) {
@@ -190,7 +192,7 @@ class _Conteudo extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.wordmark,
+                  color: AppColors.amareloPressed,
                 ),
               ),
             ),
@@ -204,16 +206,36 @@ class _Conteudo extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   leading: const Icon(Icons.fitness_center,
-                      color: AppColors.primary),
+                      color: AppColors.amareloPressed),
                   title: Text(ex.exercicio?.nome ?? 'Exercício',
-                      style: const TextStyle(
-                          color: AppColors.textPrimary,
+                      style: TextStyle(
+                          color: context.c.textPrimary,
                           fontWeight: FontWeight.w600)),
                   subtitle: detalhes.isEmpty
                       ? null
                       : Text(detalhes,
-                          style: const TextStyle(
-                              color: AppColors.textSecondary)),
+                          style: TextStyle(color: context.c.textSecondary)),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: 'Editar',
+                        icon: Icon(Icons.edit_outlined,
+                            color: context.c.textSecondary),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => EditarVinculoScreen(vinculo: ex),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Excluir',
+                        icon: const Icon(Icons.delete_outline,
+                            color: AppColors.danger),
+                        onPressed: () => _confirmarRemoverVinculo(context, ex),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }),
@@ -221,5 +243,44 @@ class _Conteudo extends StatelessWidget {
         );
       }).toList(),
     );
+  }
+}
+
+/// Confirma e remove um vínculo de treino (DELETE /cronogramaexercicio/{id}).
+Future<void> _confirmarRemoverVinculo(
+    BuildContext context, CronogramaExercicio ex) async {
+  if (ex.idCronogramaExercicio == null) return;
+  final confirmar = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: context.c.surface,
+      title: const Text('Remover exercício'),
+      content: Text(
+          'Remover "${ex.exercicio?.nome ?? 'exercício'}" deste treino?'),
+      actions: [
+        TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar')),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+          onPressed: () => Navigator.pop(ctx, true),
+          child: const Text('Remover'),
+        ),
+      ],
+    ),
+  );
+  if (confirmar == true && context.mounted) {
+    try {
+      await context
+          .read<ClienteProvider>()
+          .removerVinculo(ex.idCronogramaExercicio!);
+      if (context.mounted) {
+        SnackbarHelper.sucesso(context, 'Exercício removido do treino.');
+      }
+    } on AppException catch (e) {
+      if (context.mounted) SnackbarHelper.erro(context, e.message);
+    } catch (_) {
+      if (context.mounted) SnackbarHelper.erro(context, 'Erro ao remover.');
+    }
   }
 }

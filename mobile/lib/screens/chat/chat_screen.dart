@@ -95,8 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                     SizedBox(width: 12),
-                    Text('A IA está digitando...',
-                        style: TextStyle(color: AppColors.textSecondary)),
+                    Text('A IA está digitando...'),
                   ],
                 ),
               ),
@@ -110,9 +109,9 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildAreaEnvio(bool enviando) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: context.c.surface,
+        border: Border(top: BorderSide(color: context.c.border)),
       ),
       child: Row(
         children: [
