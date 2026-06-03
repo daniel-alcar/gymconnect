@@ -71,4 +71,32 @@ public class CronogramaService {
         List<Cronograma> cronogramas = cr.findByAlunoIdUsuario(idAluno);
         return ResponseEntity.ok(cronogramas);
     }
+
+    public ResponseEntity<?> atualizar(Long idCronograma, Cronograma dados) {
+        ResponseModel rm = new ResponseModel();
+
+        Optional<Cronograma> cronogramaOpt = cr.findById(idCronograma);
+        if (cronogramaOpt.isEmpty()) {
+            rm.setMensagem("Cronograma não encontrado!");
+            return new ResponseEntity<>(rm, HttpStatus.NOT_FOUND);
+        }
+
+        if (dados.getAluno() == null) {
+            rm.setMensagem("Aluno obrigatório.");
+            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Usuario> alunoOpt = ur.findById(dados.getAluno().getIdUsuario());
+        if (alunoOpt.isEmpty()) {
+            rm.setMensagem("Aluno não cadastrado!");
+            return new ResponseEntity<>(rm, HttpStatus.NOT_FOUND);
+        }
+
+        Cronograma existente = cronogramaOpt.get();
+        existente.setAluno(alunoOpt.get());
+        existente.setDiasTotais(dados.getDiasTotais());
+
+        Cronograma salvo = cr.save(existente);
+        return new ResponseEntity<>(salvo, HttpStatus.OK);
+    }
 }
