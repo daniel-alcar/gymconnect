@@ -122,9 +122,11 @@ Authorization: Bearer <token>
 | POST   | `/exercicios`                                               | Sim | CLIENTE         |
 | DELETE | `/exercicios/{idExercicio}`                                 | Sim | CLIENTE         |
 | POST   | `/cronograma`                                               | Sim | CLIENTE         |
+| PUT    | `/cronograma/{idCronograma}`                                | Sim | CLIENTE         |
 | DELETE | `/cronograma/{idCronograma}`                                | Sim | CLIENTE         |
 | GET    | `/cronograma/{idAluno}`                                     | Sim | Qualquer        |
 | POST   | `/cronogramaexercicio`                                      | Sim | CLIENTE         |
+| PUT    | `/cronogramaexercicio/{idCronogramaExercicio}`              | Sim | CLIENTE         |
 | DELETE | `/cronogramaexercicio/{idCronogramaExercicio}`              | Sim | CLIENTE         |
 | GET    | `/cronogramaexercicio/aluno/{idAluno}`                      | Sim | Qualquer        |
 | POST   | `/cronogramaexecucao/me`                                    | Sim | Qualquer        |
@@ -317,6 +319,38 @@ Plano de treino vinculado a um **aluno**.
 
 ---
 
+### PUT `/cronograma/{idCronograma}`
+
+Atualiza um cronograma existente. O `idCronograma` da URL não muda; os vínculos exercício–cronograma são editados em `/cronogramaexercicio/{id}`.
+
+**Perfil:** CLIENTE.
+
+**Enviar** (mesmo formato do POST, sem `idCronograma` no body):
+
+```json
+{
+  "aluno": {
+    "idUsuario": 2
+  },
+  "diasTotais": 45
+}
+```
+
+| Campo | Tipo | Editável |
+|-------|------|----------|
+| aluno.idUsuario | long | sim |
+| diasTotais | int | sim (pode ser `null`) |
+
+**Receber:**
+
+| Status | Corpo |
+|--------|--------|
+| 200 | `Cronograma` atualizado |
+| 400 | `{ "mensagem": "Aluno obrigatório." }` |
+| 404 | cronograma ou aluno não encontrado |
+
+---
+
 ### GET `/cronograma/{idAluno}`
 
 Lista cronogramas do aluno.
@@ -379,6 +413,48 @@ Vincula um exercício da biblioteca a um dia/série do cronograma.
 **Receber 200:** objeto `CronogramaExercicio` salvo (campo `cronograma` pode vir omitido por `@JsonBackReference`).
 
 **Receber 400:** `{ "mensagem": "Campo cronograma precisa ser preenchido!" }` ou exercício inválido.
+
+---
+
+### PUT `/cronogramaexercicio/{idCronogramaExercicio}`
+
+Atualiza um vínculo exercício–cronograma. O `idCronogramaExercicio` da URL não muda.
+
+**Perfil:** CLIENTE.
+
+**Enviar** (mesmo formato do POST, sem `idCronogramaExercicio` no body):
+
+```json
+{
+  "cronograma": {
+    "idCronograma": 1
+  },
+  "exercicio": {
+    "idExercicio": 3
+  },
+  "diaSemana": "Terca",
+  "serie": 3,
+  "repeticao": 10,
+  "carga": 50
+}
+```
+
+| Campo | Tipo | Editável |
+|-------|------|----------|
+| cronograma.idCronograma | long | sim |
+| exercicio.idExercicio | long | sim |
+| diaSemana | `DiaSemana` | sim |
+| serie | int | sim |
+| repeticao | int | sim |
+| carga | int | sim |
+
+**Receber:**
+
+| Status | Corpo |
+|--------|--------|
+| 200 | `CronogramaExercicio` atualizado |
+| 400 | validação (cronograma/exercício inválido) |
+| 404 | vínculo não encontrado |
 
 ---
 
