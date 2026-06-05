@@ -52,8 +52,8 @@ class _AlunoShellState extends State<AlunoShell> {
           ),
           // Mascote da GIA (recolorida automaticamente pelo IconTheme da navbar).
           NavigationDestination(
-            icon: ImageIcon(AssetImage(AppLogoAssets.gia), size: 26),
-            selectedIcon: ImageIcon(AssetImage(AppLogoAssets.gia), size: 26),
+            icon: ImageIcon(AssetImage(AppLogoAssets.gia), size: 32),
+            selectedIcon: ImageIcon(AssetImage(AppLogoAssets.gia), size: 32),
             label: 'GIA',
           ),
         ],
