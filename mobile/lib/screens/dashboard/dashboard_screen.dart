@@ -271,18 +271,11 @@ class _MenuCard extends StatelessWidget {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: destaque ? AppColors.amarelo : context.c.surfaceAlt,
+                    color: AppColors.cinza,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.all(6),
-                  child: Image.asset(
-                    imagem!,
-                    fit: BoxFit.contain,
-                    color: destaque
-                        ? AppColors.onAmarelo
-                        : context.c.textSecondary,
-                    colorBlendMode: BlendMode.srcIn,
-                  ),
+                  padding: const EdgeInsets.all(7),
+                  child: Image.asset(imagem!, fit: BoxFit.contain),
                 )
               else
                 Container(
