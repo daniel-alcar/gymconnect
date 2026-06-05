@@ -149,7 +149,13 @@ class _BoasVindasGia extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(AppLogoAssets.gia, height: 180, fit: BoxFit.contain),
+            Image.asset(
+              AppLogoAssets.gia,
+              height: 180,
+              fit: BoxFit.contain,
+              color: context.c.textPrimary,
+              colorBlendMode: BlendMode.srcIn,
+            ),
             const SizedBox(height: 8),
             Text(
               'Converse com a GIA',

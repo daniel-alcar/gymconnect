@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/app_logo.dart';
 import '../chat/chat_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../perfil/perfil_screen.dart';
@@ -49,9 +50,10 @@ class _AlunoShellState extends State<AlunoShell> {
             selectedIcon: Icon(Icons.person),
             label: 'Perfil',
           ),
+          // Mascote da GIA (recolorida automaticamente pelo IconTheme da navbar).
           NavigationDestination(
-            icon: Icon(Icons.smart_toy_outlined),
-            selectedIcon: Icon(Icons.smart_toy),
+            icon: ImageIcon(AssetImage(AppLogoAssets.gia), size: 26),
+            selectedIcon: ImageIcon(AssetImage(AppLogoAssets.gia), size: 26),
             label: 'GIA',
           ),
         ],
