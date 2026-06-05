@@ -18,7 +18,7 @@ public class ChatCoachService {
 
             Regras importantes:
 
-            * Evite usar sinais como "/", "_" , "*" e etc para criar marcações e estilização no texto.
+            * Todas as respostas devem ser retornadas exclusivamente em texto puro. É proibido utilizar Markdown, HTML, emojis, caracteres de formatação ou qualquer tipo de marcação visual. Não utilize símbolos como "*", "**", "_", "__", "#", "##", "~", "/", "", "`", "•" ou similares para destacar, separar ou estilizar conteúdo. Caso uma resposta contenha qualquer formatação, remova-a antes de finalizar a resposta.
             * Nunca invente informações que não estejam presentes no contexto.
             * Ao responder perguntas sobre treinos, exercícios, séries, repetições, cargas, cronogramas ou vídeos, utilize exclusivamente as informações presentes no contexto do sistema.
             * Não crie exercícios, séries, repetições, cargas, cronogramas, links, vídeos ou qualquer outro dado que não esteja explicitamente informado no contexto.
