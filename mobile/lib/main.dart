@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
+import 'providers/atividade_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/cliente_provider.dart';
@@ -53,6 +54,7 @@ class _GymConnectAppState extends State<GymConnectApp> {
   late final ChatProvider _chatProvider;
   late final ClienteProvider _clienteProvider;
   late final ThemeProvider _themeProvider;
+  late final AtividadeProvider _atividadeProvider;
 
   late final AppRouter _appRouter;
 
@@ -94,6 +96,7 @@ class _GymConnectAppState extends State<GymConnectApp> {
     _chatProvider = ChatProvider(chatRepo);
     _clienteProvider = ClienteProvider(clienteRepo);
     _themeProvider = ThemeProvider(_storage);
+    _atividadeProvider = AtividadeProvider(_storage);
 
     // Logout automático quando o backend responde 401/403.
     _dioClient.onUnauthorized = _authProvider.sessaoExpirada;
@@ -113,6 +116,7 @@ class _GymConnectAppState extends State<GymConnectApp> {
     _chatProvider.dispose();
     _clienteProvider.dispose();
     _themeProvider.dispose();
+    _atividadeProvider.dispose();
     super.dispose();
   }
 
@@ -126,6 +130,7 @@ class _GymConnectAppState extends State<GymConnectApp> {
         ChangeNotifierProvider.value(value: _chatProvider),
         ChangeNotifierProvider.value(value: _clienteProvider),
         ChangeNotifierProvider.value(value: _themeProvider),
+        ChangeNotifierProvider.value(value: _atividadeProvider),
       ],
       child: Consumer<ThemeProvider>(
         builder: (_, tema, __) => MaterialApp.router(

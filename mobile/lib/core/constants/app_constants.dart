@@ -17,6 +17,8 @@ class AppConstants {
   static const String tokenKey = 'gc_token';
   static const String userKey = 'gc_user';
   static const String themeKey = 'gc_theme_mode';
+  static const String fotoPerfilPrefix = 'gc_foto_perfil_'; // + idUsuario
+  static const String atividadesPrefix = 'gc_atividades_'; // + idUsuario
 
   // Timeouts do Dio
   static const Duration connectTimeout = Duration(seconds: 20);

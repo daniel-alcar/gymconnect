@@ -3,17 +3,34 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../models/atividade.dart';
+import '../../providers/atividade_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../routes/route_names.dart';
+import '../../utils/date_formatter.dart';
 import '../../widgets/app_logo.dart';
 import '../configuracoes/configuracoes_screen.dart';
 
 /// TELA 4 – DASHBOARD (aba inicial da navigation bar do aluno).
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   /// Navega para outra aba (0=Dash,1=Treinos,2=Perfil,3=Chat).
   final void Function(int aba)? onNavegar;
 
   const DashboardScreen({super.key, this.onNavegar});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final id = context.read<AuthProvider>().usuario?.idUsuario;
+      if (id != null) context.read<AtividadeProvider>().carregar(id);
+    });
+  }
 
   Future<void> _confirmarLogout(BuildContext context) async {
     final confirmar = await showDialog<bool>(
@@ -32,6 +49,7 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
     if (confirmar == true && context.mounted) {
+      context.read<AtividadeProvider>().limpar();
       await context.read<AuthProvider>().logout();
       if (context.mounted) context.go(RouteNames.login);
     }
@@ -40,6 +58,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final usuario = context.watch<AuthProvider>().usuario;
+    final atividades = context.watch<AtividadeProvider>().itens;
     final primeiroNome = (usuario?.nome ?? 'Atleta').split(' ').first;
 
     return Scaffold(
@@ -51,8 +70,7 @@ class DashboardScreen extends StatelessWidget {
             tooltip: 'Configurações',
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                  builder: (_) => const ConfiguracoesScreen()),
+              MaterialPageRoute(builder: (_) => const ConfiguracoesScreen()),
             ),
           ),
           IconButton(
@@ -81,7 +99,7 @@ class DashboardScreen extends StatelessWidget {
               style: TextStyle(color: context.c.textSecondary, fontSize: 15),
             ),
             const SizedBox(height: 20),
-            _HeroCard(onTap: () => onNavegar?.call(1)),
+            _HeroCard(onTap: () => widget.onNavegar?.call(1)),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -90,7 +108,7 @@ class DashboardScreen extends StatelessWidget {
                     icone: Icons.person_outline,
                     titulo: 'Perfil',
                     subtitulo: 'Seus dados',
-                    onTap: () => onNavegar?.call(2),
+                    onTap: () => widget.onNavegar?.call(2),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -100,7 +118,7 @@ class DashboardScreen extends StatelessWidget {
                     titulo: 'AI Chat',
                     subtitulo: 'Tire suas dúvidas',
                     destaque: true,
-                    onTap: () => onNavegar?.call(3),
+                    onTap: () => widget.onNavegar?.call(3),
                   ),
                 ),
               ],
@@ -115,8 +133,47 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            const _AtividadeVazia(),
+            if (atividades.isEmpty)
+              const _AtividadeVazia()
+            else
+              ...atividades.map((a) => _AtividadeTile(atividade: a)),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AtividadeTile extends StatelessWidget {
+  final Atividade atividade;
+  const _AtividadeTile({required this.atividade});
+
+  @override
+  Widget build(BuildContext context) {
+    final isTreino = atividade.tipo == AtividadeTipo.treino;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: (isTreino ? AppColors.amarelo : AppColors.success)
+              .withValues(alpha: 0.18),
+          child: Icon(
+            isTreino ? Icons.emoji_events : Icons.check_circle,
+            color: isTreino ? AppColors.amareloPressed : AppColors.success,
+          ),
+        ),
+        title: Text(
+          atividade.titulo,
+          style: TextStyle(
+              color: context.c.textPrimary, fontWeight: FontWeight.w600),
+        ),
+        subtitle: atividade.subtitulo == null
+            ? null
+            : Text(atividade.subtitulo!,
+                style: TextStyle(color: context.c.textSecondary)),
+        trailing: Text(
+          DateFormatter.relativo(atividade.data),
+          style: TextStyle(color: context.c.textSecondary, fontSize: 12),
         ),
       ),
     );
@@ -152,8 +209,8 @@ class _HeroCard extends StatelessWidget {
                   color: AppColors.onAmarelo.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.fitness_center,
-                    color: AppColors.onAmarelo),
+                child:
+                    const Icon(Icons.fitness_center, color: AppColors.onAmarelo),
               ),
               const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,9 +271,8 @@ class _MenuCard extends StatelessWidget {
                 ),
                 child: Icon(
                   icone,
-                  color: destaque
-                      ? AppColors.onAmarelo
-                      : context.c.textSecondary,
+                  color:
+                      destaque ? AppColors.onAmarelo : context.c.textSecondary,
                 ),
               ),
               const SizedBox(height: 32),
@@ -262,7 +318,7 @@ class _AtividadeVazia extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Conclua treinos para acompanhar seu histórico aqui.',
+              'Conclua exercícios e treinos para acompanhar seu histórico aqui.',
               textAlign: TextAlign.center,
               style: TextStyle(color: context.c.textSecondary, fontSize: 13),
             ),
