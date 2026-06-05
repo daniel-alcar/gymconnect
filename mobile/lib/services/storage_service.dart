@@ -56,6 +56,33 @@ class StorageService {
     );
   }
 
+  // ----- Foto de perfil (path local, por usuário) -----
+  Future<void> salvarFotoPerfil(int idUsuario, String path) async {
+    final prefs = await _instance;
+    await prefs.setString('${AppConstants.fotoPerfilPrefix}$idUsuario', path);
+  }
+
+  Future<String?> lerFotoPerfil(int idUsuario) async {
+    final prefs = await _instance;
+    return prefs.getString('${AppConstants.fotoPerfilPrefix}$idUsuario');
+  }
+
+  Future<void> removerFotoPerfil(int idUsuario) async {
+    final prefs = await _instance;
+    await prefs.remove('${AppConstants.fotoPerfilPrefix}$idUsuario');
+  }
+
+  // ----- Atividades recentes (JSON, por usuário) -----
+  Future<void> salvarAtividades(int idUsuario, String jsonList) async {
+    final prefs = await _instance;
+    await prefs.setString('${AppConstants.atividadesPrefix}$idUsuario', jsonList);
+  }
+
+  Future<String?> lerAtividades(int idUsuario) async {
+    final prefs = await _instance;
+    return prefs.getString('${AppConstants.atividadesPrefix}$idUsuario');
+  }
+
   // ----- Limpeza (logout) — preserva a preferência de tema -----
   Future<void> limpar() async {
     final prefs = await _instance;

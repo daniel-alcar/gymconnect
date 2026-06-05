@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/errors/app_exception.dart';
@@ -8,13 +11,14 @@ import '../../models/perfil.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/perfil_provider.dart';
 import '../../routes/route_names.dart';
+import '../../services/storage_service.dart';
 import '../../utils/date_formatter.dart';
 import '../../utils/snackbar_helper.dart';
 import '../../utils/validators.dart';
 import '../../widgets/app_logo.dart';
 import '../configuracoes/configuracoes_screen.dart';
 
-/// TELA 6 – PERFIL. Atualização de informações pessoais (POST /perfil/me).
+/// TELA 6 – PERFIL. Foto (câmera/galeria, local) + dados pessoais (POST /perfil/me).
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
 
@@ -26,13 +30,105 @@ class _PerfilScreenState extends State<PerfilScreen> {
   final _formKey = GlobalKey<FormState>();
   final _alturaController = TextEditingController();
   final _objetivoController = TextEditingController();
+  final _storage = StorageService();
+  final _picker = ImagePicker();
+
   DateTime? _dataNascimento;
+  int? _idUsuario;
+  String? _fotoPath;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _carregarFoto());
+  }
 
   @override
   void dispose() {
     _alturaController.dispose();
     _objetivoController.dispose();
     super.dispose();
+  }
+
+  Future<void> _carregarFoto() async {
+    final id = context.read<AuthProvider>().usuario?.idUsuario;
+    if (id == null) return;
+    _idUsuario = id;
+    final path = await _storage.lerFotoPerfil(id);
+    // Só usa o path se o arquivo ainda existir no dispositivo.
+    if (path != null && File(path).existsSync()) {
+      if (mounted) setState(() => _fotoPath = path);
+    }
+  }
+
+  Future<void> _selecionarFoto(ImageSource origem) async {
+    try {
+      final XFile? img = await _picker.pickImage(
+        source: origem,
+        maxWidth: 1080,
+        imageQuality: 85,
+      );
+      if (img == null) return;
+      if (_idUsuario != null) {
+        await _storage.salvarFotoPerfil(_idUsuario!, img.path);
+      }
+      if (mounted) {
+        setState(() => _fotoPath = img.path);
+        SnackbarHelper.sucesso(context, 'Foto de perfil atualizada!');
+      }
+    } catch (_) {
+      if (mounted) {
+        SnackbarHelper.erro(context, 'Não foi possível acessar a imagem.');
+      }
+    }
+  }
+
+  Future<void> _removerFoto() async {
+    if (_idUsuario != null) await _storage.removerFotoPerfil(_idUsuario!);
+    if (mounted) setState(() => _fotoPath = null);
+  }
+
+  void _abrirOpcoesFoto() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: context.c.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera, color: AppColors.amareloPressed),
+              title: const Text('Tirar foto'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _selecionarFoto(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.photo_library, color: AppColors.amareloPressed),
+              title: const Text('Escolher da galeria'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _selecionarFoto(ImageSource.gallery);
+              },
+            ),
+            if (_fotoPath != null)
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: AppColors.danger),
+                title: const Text('Remover foto'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _removerFoto();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _selecionarData() async {
@@ -131,19 +227,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     padding: const EdgeInsets.all(20),
                     child: Row(
                       children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: AppColors.amarelo,
-                          child: Text(
-                            (usuario?.nome.isNotEmpty ?? false)
-                                ? usuario!.nome[0].toUpperCase()
-                                : '?',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onAmarelo,
-                            ),
-                          ),
+                        _Avatar(
+                          fotoPath: _fotoPath,
+                          inicial: (usuario?.nome.isNotEmpty ?? false)
+                              ? usuario!.nome[0].toUpperCase()
+                              : '?',
+                          onTap: _abrirOpcoesFoto,
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -171,8 +260,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: AppColors.amarelo
-                                      .withValues(alpha: 0.20),
+                                  color:
+                                      AppColors.amarelo.withValues(alpha: 0.20),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -266,6 +355,61 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Avatar do perfil: mostra a foto local (se houver) ou a inicial, com selo de câmera.
+class _Avatar extends StatelessWidget {
+  final String? fotoPath;
+  final String inicial;
+  final VoidCallback onTap;
+
+  const _Avatar({
+    required this.fotoPath,
+    required this.inicial,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          CircleAvatar(
+            radius: 32,
+            backgroundColor: AppColors.amarelo,
+            backgroundImage:
+                fotoPath != null ? FileImage(File(fotoPath!)) : null,
+            child: fotoPath == null
+                ? Text(
+                    inicial,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.onAmarelo,
+                    ),
+                  )
+                : null,
+          ),
+          Positioned(
+            right: -2,
+            bottom: -2,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.amarelo,
+                shape: BoxShape.circle,
+                border: Border.all(color: context.c.surface, width: 2),
+              ),
+              child: const Icon(Icons.photo_camera,
+                  size: 14, color: AppColors.onAmarelo),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Necessário para consumir as APIs REST do backend Java -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Foto de perfil: câmera e seleção de imagens da galeria -->
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:label="GymConnect"

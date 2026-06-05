@@ -30,6 +30,9 @@ dependencies:
   # Formatação de datas
   intl: ^0.19.0
 
+  # Câmera / galeria (foto de perfil)
+  image_picker: ^1.1.2
+
 dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test:

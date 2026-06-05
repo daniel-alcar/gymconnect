@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../../core/errors/app_exception.dart';
 import '../../core/theme/app_theme.dart';
+import '../../models/atividade.dart';
 import '../../models/cronograma_exercicio.dart';
+import '../../providers/atividade_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/treino_provider.dart';
 import '../../utils/snackbar_helper.dart';
@@ -22,6 +24,7 @@ class TreinosScreen extends StatefulWidget {
 
 class _TreinosScreenState extends State<TreinosScreen> {
   int? _processandoId;
+  final Set<String> _diasConcluidos = {};
 
   @override
   void initState() {
@@ -49,19 +52,43 @@ class _TreinosScreenState extends State<TreinosScreen> {
             peso: peso,
           );
       if (mounted) {
+        // Registra no histórico "Atividade Recente".
+        final id = context.read<AuthProvider>().usuario?.idUsuario;
+        if (id != null) {
+          context.read<AtividadeProvider>().registrar(
+                id,
+                Atividade.exercicio(
+                  ex.exercicio?.nome ?? 'Exercício',
+                  peso: peso,
+                ),
+              );
+        }
         SnackbarHelper.sucesso(
           context,
           peso != null
-              ? 'Treino concluído e peso registrado!'
-              : 'Treino marcado como feito!',
+              ? 'Exercício concluído e peso registrado!'
+              : 'Exercício marcado como feito!',
         );
       }
     } on AppException catch (e) {
       if (mounted) SnackbarHelper.erro(context, e.message);
     } catch (_) {
-      if (mounted) SnackbarHelper.erro(context, 'Erro ao registrar treino.');
+      if (mounted) SnackbarHelper.erro(context, 'Erro ao registrar exercício.');
     } finally {
       if (mounted) setState(() => _processandoId = null);
+    }
+  }
+
+  Future<void> _concluirTreino(String diaTitulo) async {
+    final id = context.read<AuthProvider>().usuario?.idUsuario;
+    if (id != null) {
+      await context
+          .read<AtividadeProvider>()
+          .registrar(id, Atividade.treino(diaTitulo));
+    }
+    setState(() => _diasConcluidos.add(diaTitulo));
+    if (mounted) {
+      SnackbarHelper.sucesso(context, 'Treino "$diaTitulo" concluído! 💪');
     }
   }
 
@@ -160,10 +187,60 @@ class _TreinosScreenState extends State<TreinosScreen> {
                 onMarcarFeito: (peso) => _marcarFeito(ex, peso),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
+            _BotaoConcluirTreino(
+              concluido: _diasConcluidos.contains(dia.titulo),
+              onConcluir: () => _concluirTreino(dia.titulo),
+            ),
+            const SizedBox(height: 24),
           ],
         );
       },
+    );
+  }
+}
+
+/// Botão de "Concluir treino" do dia (vira selo quando concluído).
+class _BotaoConcluirTreino extends StatelessWidget {
+  final bool concluido;
+  final VoidCallback onConcluir;
+
+  const _BotaoConcluirTreino({
+    required this.concluido,
+    required this.onConcluir,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (concluido) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: AppColors.success.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.success.withValues(alpha: 0.5)),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.emoji_events, color: AppColors.success, size: 20),
+            SizedBox(width: 8),
+            Text('Treino concluído',
+                style: TextStyle(
+                    color: AppColors.success, fontWeight: FontWeight.w700)),
+          ],
+        ),
+      );
+    }
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: onConcluir,
+        icon: const Icon(Icons.check_circle_outline),
+        label: const Text('Concluir treino'),
+      ),
     );
   }
 }
