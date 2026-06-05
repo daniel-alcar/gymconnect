@@ -10,6 +10,8 @@ class AppLogoAssets {
   static const String gia = 'assets/images/gia.png'; // mascote branca (fundo escuro)
   static const String giaDark =
       'assets/images/gia_dark.png'; // mascote preta (fundo claro)
+  static const String giaIcon =
+      'assets/images/gia_icon.png'; // só o robô, recortado (para a navbar)
 
   /// Retorna a mascote certa para o tema atual:
   /// preta no modo claro, branca no modo escuro.
