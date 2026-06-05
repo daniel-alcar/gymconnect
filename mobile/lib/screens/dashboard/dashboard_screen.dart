@@ -267,10 +267,10 @@ class _MenuCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (imagem != null)
-                SizedBox(
+                const SizedBox(
                   width: 52,
                   height: 52,
-                  child: Image.asset(imagem!, fit: BoxFit.contain),
+                  child: GiaMascot(height: 52),
                 )
               else
                 Container(
