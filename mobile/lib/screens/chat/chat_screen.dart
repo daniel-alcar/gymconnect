@@ -7,7 +7,7 @@ import '../../widgets/app_logo.dart';
 import '../../widgets/empty_state.dart';
 import 'widgets/chat_bubble.dart';
 
-/// TELA 7 – CHAT IA. Conversa com o coach IA (Gemini via backend).
+/// TELA 7 – GIA (GymConnect IA). Conversa com o assistente (Gemini via backend).
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
@@ -57,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             AppLogoMark(size: 30),
             SizedBox(width: 10),
-            Text('Chat IA',
+            Text('GIA',
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20)),
           ],
         ),
@@ -70,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: provider.vazio
                   ? const EmptyState(
                       icone: Icons.smart_toy_outlined,
-                      titulo: 'Converse com seu coach IA',
+                      titulo: 'Converse com a GIA',
                       descricao:
                           'Pergunte sobre seu treino, séries, cargas e dicas.\n'
                           'Ex.: "Quantas séries faço no supino?"',
