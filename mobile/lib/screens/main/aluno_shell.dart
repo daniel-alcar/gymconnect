@@ -52,7 +52,7 @@ class _AlunoShellState extends State<AlunoShell> {
           NavigationDestination(
             icon: Icon(Icons.smart_toy_outlined),
             selectedIcon: Icon(Icons.smart_toy),
-            label: 'AI Chat',
+            label: 'Chat IA',
           ),
         ],
       ),

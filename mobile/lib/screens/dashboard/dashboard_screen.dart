@@ -115,7 +115,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: _MenuCard(
                     icone: Icons.smart_toy_outlined,
-                    titulo: 'AI Chat',
+                    titulo: 'Chat IA',
                     subtitulo: 'Tire suas dúvidas',
                     destaque: true,
                     onTap: () => widget.onNavegar?.call(3),
