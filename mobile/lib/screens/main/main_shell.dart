@@ -8,7 +8,7 @@ import 'aluno_shell.dart';
 /// Decide a navegação conforme o perfil do usuário logado.
 ///
 /// - CLIENTE (academia/professor): área de gestão (Exercícios, Treinos, Alunos).
-/// - ALUNO: Dashboard, Treinos, Perfil, Chat IA.
+/// - ALUNO: Dashboard, Treinos, Perfil, GIA (assistente).
 class MainShell extends StatelessWidget {
   const MainShell({super.key});
 
