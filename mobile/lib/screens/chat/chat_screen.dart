@@ -149,17 +149,10 @@ class _BoasVindasGia extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                color: AppColors.cinza,
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: Image.asset(
-                AppLogoAssets.gia,
-                height: 150,
-                fit: BoxFit.contain,
-              ),
+            Image.asset(
+              AppLogoAssets.gia,
+              height: 170,
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: 8),
             Text(
