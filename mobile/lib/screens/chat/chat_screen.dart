@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/chat_provider.dart';
 import '../../widgets/app_logo.dart';
-import '../../widgets/empty_state.dart';
 import 'widgets/chat_bubble.dart';
 
 /// TELA 7 – GIA (GymConnect IA). Conversa com o assistente (Gemini via backend).
@@ -68,14 +67,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: provider.vazio
-                  ? const EmptyState(
-                      icone: Icons.smart_toy_outlined,
-                      titulo: 'Converse com a GIA',
-                      descricao:
-                          'A Inteligência Artificial do GymConnect.\n'
-                          'Pergunte sobre seu treino, séries, cargas e dicas.\n'
-                          'Ex.: "Quantas séries faço no supino?"',
-                    )
+                  ? const _BoasVindasGia()
                   : ListView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(16),
@@ -140,6 +132,44 @@ class _ChatScreenState extends State<ChatScreen> {
             child: const Icon(Icons.send),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Tela inicial da GIA (sem mensagens): mascote em destaque + boas-vindas.
+class _BoasVindasGia extends StatelessWidget {
+  const _BoasVindasGia();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(AppLogoAssets.gia, height: 180, fit: BoxFit.contain),
+            const SizedBox(height: 8),
+            Text(
+              'Converse com a GIA',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: context.c.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'A Inteligência Artificial do GymConnect.\n'
+              'Pergunte sobre seu treino, séries, cargas e dicas.\n'
+              'Ex.: "Quantas séries faço no supino?"',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: context.c.textSecondary, height: 1.4),
+            ),
+          ],
+        ),
       ),
     );
   }

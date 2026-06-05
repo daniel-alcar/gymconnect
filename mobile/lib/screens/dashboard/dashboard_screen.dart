@@ -115,6 +115,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: _MenuCard(
                     icone: Icons.smart_toy_outlined,
+                    imagem: AppLogoAssets.gia,
                     titulo: 'GIA',
                     subtitulo: 'Tire suas dúvidas',
                     destaque: true,
@@ -240,6 +241,7 @@ class _HeroCard extends StatelessWidget {
 
 class _MenuCard extends StatelessWidget {
   final IconData icone;
+  final String? imagem;
   final String titulo;
   final String subtitulo;
   final bool destaque;
@@ -250,6 +252,7 @@ class _MenuCard extends StatelessWidget {
     required this.titulo,
     required this.subtitulo,
     required this.onTap,
+    this.imagem,
     this.destaque = false,
   });
 
@@ -263,18 +266,31 @@ class _MenuCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: destaque ? AppColors.amarelo : context.c.surfaceAlt,
-                  borderRadius: BorderRadius.circular(12),
+              if (imagem != null)
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: destaque ? AppColors.amarelo : context.c.surfaceAlt,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(6),
+                  child: Image.asset(imagem!, fit: BoxFit.contain),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: destaque ? AppColors.amarelo : context.c.surfaceAlt,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icone,
+                    color: destaque
+                        ? AppColors.onAmarelo
+                        : context.c.textSecondary,
+                  ),
                 ),
-                child: Icon(
-                  icone,
-                  color:
-                      destaque ? AppColors.onAmarelo : context.c.textSecondary,
-                ),
-              ),
               const SizedBox(height: 32),
               Text(
                 titulo,
