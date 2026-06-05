@@ -78,9 +78,9 @@ class _IconeGia extends StatelessWidget {
       height: 24,
       child: Center(
         child: OverflowBox(
-          maxWidth: 60,
-          maxHeight: 60,
-          child: ImageIcon(AssetImage(AppLogoAssets.gia), size: 60),
+          maxWidth: 70,
+          maxHeight: 70,
+          child: ImageIcon(AssetImage(AppLogoAssets.gia), size: 70),
         ),
       ),
     );
