@@ -275,7 +275,14 @@ class _MenuCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(6),
-                  child: Image.asset(imagem!, fit: BoxFit.contain),
+                  child: Image.asset(
+                    imagem!,
+                    fit: BoxFit.contain,
+                    color: destaque
+                        ? AppColors.onAmarelo
+                        : context.c.textSecondary,
+                    colorBlendMode: BlendMode.srcIn,
+                  ),
                 )
               else
                 Container(
