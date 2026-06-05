@@ -57,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             AppLogoMark(size: 30),
             SizedBox(width: 10),
-            Text('AI Chat',
+            Text('Chat IA',
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20)),
           ],
         ),
