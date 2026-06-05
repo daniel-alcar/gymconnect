@@ -4,20 +4,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gymconnect/widgets/app_logo.dart';
 
 void main() {
-  testWidgets('AppLogo renderiza o ícone e o nome do app', (tester) async {
+  testWidgets('AppLogo e AppLogoMark renderizam as imagens da marca',
+      (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: AppLogo())),
+      const MaterialApp(
+        home: Scaffold(
+          body: Column(children: [AppLogo(), AppLogoMark()]),
+        ),
+      ),
     );
 
-    // Logo presente com o ícone de corredor (identidade GymConnect).
+    // Ambos exibem a logo oficial via Image.asset.
     expect(find.byType(AppLogo), findsOneWidget);
-    expect(find.byIcon(Icons.directions_run), findsOneWidget);
-
-    // O nome "GymConnect" é renderizado via Text.rich (RichText).
-    final textos = tester
-        .widgetList<RichText>(find.byType(RichText))
-        .map((rt) => rt.text.toPlainText())
-        .toList();
-    expect(textos.any((t) => t.contains('GymConnect')), isTrue);
+    expect(find.byType(AppLogoMark), findsOneWidget);
+    expect(find.byType(Image), findsNWidgets(2));
   });
 }
