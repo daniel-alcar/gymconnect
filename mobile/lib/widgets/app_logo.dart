@@ -7,7 +7,30 @@ class AppLogoAssets {
   static const String fullWhite =
       'assets/images/gymconnect_logo_white.png'; // texto, fundo escuro
   static const String mark = 'assets/images/gymconnect_mark.png'; // só imagem
-  static const String gia = 'assets/images/gia.png'; // mascote da GIA
+  static const String gia = 'assets/images/gia.png'; // mascote branca (fundo escuro)
+  static const String giaDark =
+      'assets/images/gia_dark.png'; // mascote preta (fundo claro)
+
+  /// Retorna a mascote certa para o tema atual:
+  /// preta no modo claro, branca no modo escuro.
+  static String giaFor(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? gia : giaDark;
+}
+
+/// Mascote da GIA que se adapta ao tema (preta no claro, branca no escuro).
+class GiaMascot extends StatelessWidget {
+  final double height;
+  const GiaMascot({super.key, this.height = 160});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      AppLogoAssets.giaFor(context),
+      height: height,
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.medium,
+    );
+  }
 }
 
 /// Logo COMPLETA (corredor + "GymConnect"), adaptando-se ao tema:
