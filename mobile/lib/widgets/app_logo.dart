@@ -7,6 +7,7 @@ class AppLogoAssets {
   static const String fullWhite =
       'assets/images/gymconnect_logo_white.png'; // texto, fundo escuro
   static const String mark = 'assets/images/gymconnect_mark.png'; // só imagem
+  static const String gia = 'assets/images/gia.png'; // mascote da GIA
 }
 
 /// Logo COMPLETA (corredor + "GymConnect"), adaptando-se ao tema:
