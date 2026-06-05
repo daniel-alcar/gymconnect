@@ -72,6 +72,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       icone: Icons.smart_toy_outlined,
                       titulo: 'Converse com a GIA',
                       descricao:
+                          'A Inteligência Artificial do GymConnect.\n'
                           'Pergunte sobre seu treino, séries, cargas e dicas.\n'
                           'Ex.: "Quantas séries faço no supino?"',
                     )
