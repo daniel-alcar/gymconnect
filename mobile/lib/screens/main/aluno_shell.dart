@@ -73,7 +73,7 @@ class _IconeGia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
       width: 24,
       height: 24,
       child: Center(
@@ -81,8 +81,8 @@ class _IconeGia extends StatelessWidget {
           maxWidth: 70,
           maxHeight: 70,
           child: Transform.translate(
-            offset: Offset(0, 8),
-            child: ImageIcon(AssetImage(AppLogoAssets.gia), size: 70),
+            offset: const Offset(0, 8),
+            child: const ImageIcon(AssetImage(AppLogoAssets.gia), size: 70),
           ),
         ),
       ),
