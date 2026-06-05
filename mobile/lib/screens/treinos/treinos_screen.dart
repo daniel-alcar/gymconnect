@@ -72,13 +72,7 @@ class _TreinosScreenState extends State<TreinosScreen> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16,
-        title: const Row(
-          children: [
-            AppLogoMark(size: 30),
-            SizedBox(width: 10),
-            AppWordmark(fontSize: 20),
-          ],
-        ),
+        title: const AppLogo(height: 30),
       ),
       body: SafeArea(
         top: false,

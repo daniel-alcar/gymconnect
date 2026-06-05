@@ -67,13 +67,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            AppLogoMark(size: 30),
-            SizedBox(width: 10),
-            AppWordmark(fontSize: 20),
-          ],
-        ),
+        title: const AppLogo(height: 30),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

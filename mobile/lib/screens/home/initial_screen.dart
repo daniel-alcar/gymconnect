@@ -29,10 +29,8 @@ class InitialScreen extends StatelessWidget {
             child: Column(
               children: [
                 const Spacer(flex: 2),
-                const AppLogoMark(size: 88),
-                const SizedBox(height: 20),
-                const AppWordmark(fontSize: 36),
-                const SizedBox(height: 12),
+                const AppLogo(height: 104),
+                const SizedBox(height: 16),
                 Text(
                   'Sua evolução começa aqui.\nConecte-se ao seu melhor desempenho.',
                   textAlign: TextAlign.center,
