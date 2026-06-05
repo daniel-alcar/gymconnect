@@ -64,28 +64,14 @@ class _AlunoShellState extends State<AlunoShell> {
   }
 }
 
-/// Icone da aba GIA: mantem o slot no tamanho dos demais (24) mas amplia a
-/// arte (que tem margem transparente) para ~44 via OverflowBox, deixando o
-/// desenho visivel do mesmo tamanho dos outros icones. A cor segue o
-/// IconTheme da NavigationBar (selecionado/nao selecionado).
+/// Icone da aba GIA: usa a imagem do robo ja recortada (sem o texto "GIA" e
+/// sem margens), entao centraliza e dimensiona como um icone normal. A cor
+/// segue o IconTheme da NavigationBar (selecionado/nao selecionado).
 class _IconeGia extends StatelessWidget {
   const _IconeGia();
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: Center(
-        child: OverflowBox(
-          maxWidth: 70,
-          maxHeight: 70,
-          child: Transform.translate(
-            offset: const Offset(0, 8),
-            child: const ImageIcon(AssetImage(AppLogoAssets.gia), size: 70),
-          ),
-        ),
-      ),
-    );
+    return const ImageIcon(AssetImage(AppLogoAssets.giaIcon), size: 28);
   }
 }
