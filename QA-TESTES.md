@@ -176,6 +176,74 @@ Qualquer outro erro (rede, 404, 409, 500) **não** pode deslogar.
 
 ---
 
+## 12. Testes Visuais / UI / UX 🟠🟡
+
+Sempre repetir os checks visuais **nos dois temas (claro e escuro)** e **nos dois
+perfis (PROF e ALUNO)**. Procurar por: texto cortado, elementos sobrepostos,
+imagem invisível/esticada, contraste ruim, e estados (carregando/vazio/erro).
+
+### 12.1 Identidade visual e imagens
+| # | Cenário | Resultado esperado |
+|---|---------|--------------------|
+| 12.1.1 | Logo no topo (claro × escuro) | Versão certa em cada tema; nítida, sem distorção |
+| 12.1.2 | Mascote da GIA (tela do chat) | **Visível e legível nos dois temas** (não some no claro) |
+| 12.1.3 | Mascote da GIA na navbar | Mesmo tamanho dos outros ícones, **centralizada**, não minúscula |
+| 12.1.4 | Ícone GIA no card do Dashboard | Proporcional, sem cortar |
+| 12.1.5 | Thumbnails de vídeo (YouTube) | Carregam; placeholder enquanto carrega; fallback se falhar |
+| 12.1.6 | Foto de perfil | Recorte circular correto, sem esticar/achatar |
+| 12.1.7 | Ícones em geral | Cor adequada ao tema (sem ícone "sumido" por contraste) |
+
+### 12.2 Tema claro/escuro (cada tela)
+| # | Cenário | Resultado esperado |
+|---|---------|--------------------|
+| 12.2.1 | Alternar tema com o app aberto | Atualiza na hora, sem reiniciar |
+| 12.2.2 | Texto sobre fundo | **Contraste suficiente** em todos os textos (nada cinza-sobre-cinza) |
+| 12.2.3 | Campos de formulário | Label, hint, borda e erro legíveis nos dois temas |
+| 12.2.4 | Cards e divisórias | Bordas/sombras visíveis sem "vazar" no fundo |
+| 12.2.5 | Botões (primário/secundário/perigo) | Cores corretas; texto legível; estado desabilitado perceptível |
+| 12.2.6 | SnackBars e diálogos | Fundo/texto legíveis; não somem no tema |
+
+### 12.3 Layout e responsividade
+| # | Cenário | Resultado esperado |
+|---|---------|--------------------|
+| 12.3.1 | Telas pequenas e grandes | Sem **overflow** (faixa listrada amarela/preta) |
+| 12.3.2 | Fonte grande do sistema (acessibilidade) | Layout se adapta; texto não corta |
+| 12.3.3 | Rotação (retrato/paisagem) | Não quebra nem perde estado |
+| 12.3.4 | Teclado aberto | Campo em foco fica visível; nada coberto |
+| 12.3.5 | Textos longos (nome/descrição/exercício) | Quebra ou "..." (ellipsis), sem estourar o card |
+| 12.3.6 | Notch/recorte e barra de gestos | Conteúdo não fica sob o notch nem sob a navbar |
+| 12.3.7 | Listas longas | Rolagem suave; sem cortar último item atrás da navbar/FAB |
+
+### 12.4 Estados de tela (cada listagem)
+| # | Cenário | Resultado esperado |
+|---|---------|--------------------|
+| 12.4.1 | Carregando | Spinner/skeleton centralizado, sem "pular" o layout |
+| 12.4.2 | Vazio | Empty state com ícone + texto explicativo (treinos, exercícios, alunos, atividade, chat) |
+| 12.4.3 | Erro | Mensagem clara + ação "Tentar novamente" |
+| 12.4.4 | Pull-to-refresh | Indicador aparece e some corretamente |
+
+### 12.5 Consistência e microinterações
+| # | Cenário | Resultado esperado |
+|---|---------|--------------------|
+| 12.5.1 | Navbar (PROF e ALUNO) | Ícone selecionado destacado; rótulos não cortados |
+| 12.5.2 | FAB | Não sobrepõe conteúdo importante; **sem crash de Hero ao navegar** |
+| 12.5.3 | Menu ⋮ (editar/excluir) | Abre alinhado; opções legíveis no tema |
+| 12.5.4 | Botão durante envio | Vira loading e **desabilita** (evita duplo toque) |
+| 12.5.5 | Selo "Concluído" / "Desmarcar" | Cores e ícones corretos; alinhados |
+| 12.5.6 | Espaçamentos/alinhamentos | Padrão consistente entre telas (margens, títulos) |
+
+### 12.6 Varredura tela a tela (passar em todas, claro+escuro)
+Inicial · Login · Cadastro · Dashboard · Treinos · Perfil · GIA · Configurações ·
+(PROF) Exercícios · Criar/Editar Treino · Alunos.
+Para cada uma: sem overflow, contraste ok, imagens ok, estados (load/vazio/erro)
+ok, e nada cortado/atrás de barra do sistema.
+
+> Dica: rodar `flutter run` e observar o console — avisos de **RenderFlex
+> overflow** e exceções de **Hero/assets** aparecem lá mesmo quando o problema é
+> pequeno na tela.
+
+---
+
 ### Como reportar um bug (sugestão)
 Inclua: perfil (PROF/ALUNO), passos numerados, resultado esperado x obtido,
 print/vídeo, e — se possível — o **log do `flutter run`** (a parte do erro) e o
