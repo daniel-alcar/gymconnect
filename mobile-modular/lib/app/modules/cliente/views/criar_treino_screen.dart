@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:gymconnect/app/core/errors/app_exception.dart';
 import 'package:gymconnect/app/core/theme/app_theme.dart';
 import 'package:gymconnect/app/modules/treinos/models/dia_semana.dart';
+import 'package:gymconnect/app/modules/treinos/models/exercicio.dart';
 import 'package:gymconnect/app/modules/treinos/models/exercicio_form.dart';
 import 'package:gymconnect/app/modules/auth/models/usuario.dart';
 import 'package:gymconnect/app/modules/cliente/providers/cliente_provider.dart';
@@ -26,10 +27,11 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
   @override
   void initState() {
     super.initState();
-    // Garante a lista de alunos carregada.
+    // Garante alunos e a biblioteca de exercícios carregados.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final p = context.read<ClienteProvider>();
       if (p.alunos.isEmpty) p.carregarAlunos();
+      if (p.exercicios.isEmpty) p.carregarExercicios();
     });
   }
 
@@ -140,7 +142,9 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
                     ),
                   ),
                   TextButton.icon(
-                    onPressed: salvando ? null : _adicionarExercicio,
+                    onPressed: (salvando || provider.exercicios.isEmpty)
+                        ? null
+                        : _adicionarExercicio,
                     icon: const Icon(Icons.add),
                     label: const Text('Adicionar'),
                   ),
@@ -148,15 +152,39 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
               ),
               const SizedBox(height: 8),
 
-              ..._exercicios.asMap().entries.map(
-                    (entry) => _ExercicioFormCard(
-                      indice: entry.key,
-                      form: entry.value,
-                      podeRemover: _exercicios.length > 1,
-                      habilitado: !salvando,
-                      onRemover: () => _removerExercicio(entry.key),
+              if (provider.exercicios.isEmpty)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline,
+                            color: AppColors.amareloPressed),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Nenhum exercício na biblioteca. Cadastre exercícios '
+                            'na aba "Exercícios" para montar o treino.',
+                            style: TextStyle(color: context.c.textSecondary),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                )
+              else
+                ..._exercicios.asMap().entries.map(
+                      (entry) => _ExercicioFormCard(
+                        indice: entry.key,
+                        form: entry.value,
+                        exerciciosBiblioteca: provider.exercicios,
+                        podeRemover: _exercicios.length > 1,
+                        habilitado: !salvando,
+                        onRemover: () => _removerExercicio(entry.key),
+                        onSelecionar: (id) =>
+                            setState(() => entry.value.idExercicio = id),
+                      ),
+                    ),
 
               const SizedBox(height: 16),
               FilledButton(
@@ -181,20 +209,28 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
 class _ExercicioFormCard extends StatelessWidget {
   final int indice;
   final ExercicioForm form;
+  final List<Exercicio> exerciciosBiblioteca;
   final bool podeRemover;
   final bool habilitado;
   final VoidCallback onRemover;
+  final ValueChanged<int?> onSelecionar;
 
   const _ExercicioFormCard({
     required this.indice,
     required this.form,
+    required this.exerciciosBiblioteca,
     required this.podeRemover,
     required this.habilitado,
     required this.onRemover,
+    required this.onSelecionar,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Garante que o valor selecionado ainda existe na lista.
+    final ids = exerciciosBiblioteca.map((e) => e.idExercicio).toSet();
+    final valorAtual = ids.contains(form.idExercicio) ? form.idExercicio : null;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -217,16 +253,27 @@ class _ExercicioFormCard extends StatelessWidget {
                   ),
               ],
             ),
-            TextFormField(
-              initialValue: form.nome,
-              enabled: habilitado,
-              onChanged: (v) => form.nome = v,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Informe o nome' : null,
+            DropdownButtonFormField<int>(
+              initialValue: valorAtual,
+              isExpanded: true,
+              dropdownColor: context.c.surface,
               decoration: const InputDecoration(
-                labelText: 'Nome do exercício *',
-                hintText: 'Ex.: Supino Reto',
+                labelText: 'Exercício *',
+                prefixIcon: Icon(Icons.fitness_center),
               ),
+              hint: const Text('Selecione um exercício'),
+              items: exerciciosBiblioteca
+                  .map((e) => DropdownMenuItem(
+                        value: e.idExercicio,
+                        child: Text(
+                          e.nome,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: context.c.textPrimary),
+                        ),
+                      ))
+                  .toList(),
+              onChanged: habilitado ? onSelecionar : null,
+              validator: (v) => v == null ? 'Selecione um exercício' : null,
             ),
             const SizedBox(height: 12),
             Row(
@@ -253,32 +300,12 @@ class _ExercicioFormCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    initialValue: form.carga,
-                    enabled: habilitado,
-                    keyboardType: TextInputType.number,
-                    onChanged: (v) => form.carga = v,
-                    decoration:
-                        const InputDecoration(labelText: 'Carga (kg)'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextFormField(
-                    initialValue: form.video,
-                    enabled: habilitado,
-                    keyboardType: TextInputType.url,
-                    onChanged: (v) => form.video = v,
-                    decoration: const InputDecoration(
-                      labelText: 'Vídeo (URL)',
-                      hintText: 'opcional',
-                    ),
-                  ),
-                ),
-              ],
+            TextFormField(
+              initialValue: form.carga,
+              enabled: habilitado,
+              keyboardType: TextInputType.number,
+              onChanged: (v) => form.carga = v,
+              decoration: const InputDecoration(labelText: 'Carga (kg)'),
             ),
           ],
         ),

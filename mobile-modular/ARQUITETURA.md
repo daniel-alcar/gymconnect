@@ -47,8 +47,9 @@ Cada módulo subdivide em `models/ services/ repositories/ providers/ views/`.
 
 - **Offline-First**: SQLite (`core/database`), sessão local (login offline) e
   cache de treinos; conclusões de exercício/treino persistidas por usuário.
-- **Professor**: biblioteca de exercícios com CRUD (criar/editar/excluir),
-  campo de descrição/execução e biblioteca pré-populada (seed no backend).
+- **Professor**: biblioteca de exercícios com CRUD (criar/editar/excluir) e
+  descrição/execução; ao criar treino, **seleciona** exercícios da biblioteca e
+  só informa séries/repetições/carga. Biblioteca pré-populada (seed no backend).
 - **Aluno**: vídeo + descrição de execução; marcar/desmarcar exercício e treino
   com estado persistente.
 

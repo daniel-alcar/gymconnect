@@ -1,24 +1,23 @@
 /// Linha de exercício do formulário de "Criar Treino" (perfil CLIENTE).
 ///
-/// Modelo de entrada da UI — convertido para chamadas de API no repository.
+/// O professor SELECIONA um exercício existente da biblioteca (idExercicio) e
+/// informa apenas séries / repetições / carga.
 class ExercicioForm {
-  String nome;
+  int? idExercicio;
   String series;
   String repeticoes;
   String carga;
-  String video;
 
   ExercicioForm({
-    this.nome = '',
+    this.idExercicio,
     this.series = '',
     this.repeticoes = '',
     this.carga = '',
-    this.video = '',
   });
 
   int? get serieInt => int.tryParse(series.trim());
   int? get repeticaoInt => int.tryParse(repeticoes.trim());
   int? get cargaInt => int.tryParse(carga.trim());
 
-  bool get valido => nome.trim().isNotEmpty;
+  bool get valido => idExercicio != null;
 }
