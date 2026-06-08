@@ -20,9 +20,12 @@ class AuthRepository {
 
     final usuario = await _authService.getCurrentUser();
     await _storage.salvarUsuario(usuario);
-    await _sessionLocal.saveSession(
-      SessionModel.fromUsuario(usuario, token: loginResponse.token),
-    );
+    // Cache local da sessão é best-effort: nunca deve bloquear o login.
+    try {
+      await _sessionLocal.saveSession(
+        SessionModel.fromUsuario(usuario, token: loginResponse.token),
+      );
+    } catch (_) {/* segue logado mesmo se o cache local falhar */}
     return usuario;
   }
 
@@ -46,9 +49,11 @@ class AuthRepository {
     await _storage.salvarUsuario(usuario);
     final token = await _storage.lerToken();
     if (token != null && token.isNotEmpty) {
-      await _sessionLocal.saveSession(
-        SessionModel.fromUsuario(usuario, token: token),
-      );
+      try {
+        await _sessionLocal.saveSession(
+          SessionModel.fromUsuario(usuario, token: token),
+        );
+      } catch (_) {/* best-effort */}
     }
     return usuario;
   }
