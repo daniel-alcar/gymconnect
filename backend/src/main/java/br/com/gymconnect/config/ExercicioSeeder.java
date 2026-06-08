@@ -1,6 +1,8 @@
 package br.com.gymconnect.config;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -23,9 +25,6 @@ public class ExercicioSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (er.count() > 0) {
-            return;
-        }
 
         List<Exercicio> base = List.of(
             criar("Supino reto com barra",
@@ -60,7 +59,19 @@ public class ExercicioSeeder implements CommandLineRunner {
                 "Sentado, tornozelos atras do apoio. Estenda os joelhos ate quase a extensao total contraindo o quadriceps e retorne controlando o peso.")
         );
 
-        er.saveAll(base);
+        // Insere apenas os que ainda nao existem (por nome), mesmo que a
+        // tabela ja tenha outros exercicios cadastrados.
+        Set<String> existentes = er.findAll().stream()
+                .map(e -> e.getNome() == null ? "" : e.getNome().trim().toLowerCase())
+                .collect(Collectors.toSet());
+
+        List<Exercicio> faltando = base.stream()
+                .filter(e -> !existentes.contains(e.getNome().trim().toLowerCase()))
+                .collect(Collectors.toList());
+
+        if (!faltando.isEmpty()) {
+            er.saveAll(faltando);
+        }
     }
 
     private Exercicio criar(String nome, String link, String descricao) {

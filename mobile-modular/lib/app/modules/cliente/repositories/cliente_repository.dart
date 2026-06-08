@@ -89,39 +89,22 @@ class ClienteRepository {
 
   // ----- Criar treino para um aluno -----
   ///
-  /// Fluxo (igual ao React): garante os exercícios na biblioteca → cria o
-  /// cronograma do aluno → vincula cada exercício com dia/série/rep/carga.
+  /// Fluxo: cria o cronograma do aluno → vincula cada exercício SELECIONADO da
+  /// biblioteca (idExercicio) com dia/série/rep/carga.
   Future<void> criarTreino({
     required int idAluno,
     required DiaSemana diaSemana,
     required List<ExercicioForm> exercicios,
   }) async {
-    final biblioteca = await _exercicioService.listar();
-
-    // 1) Resolve/garante o id de cada exercício na biblioteca.
-    final idsExercicio = <int>[];
-    for (final ex in exercicios) {
-      final existente = biblioteca.where(
-        (e) => e.nome.toLowerCase() == ex.nome.trim().toLowerCase(),
-      );
-      if (existente.isNotEmpty && existente.first.idExercicio != null) {
-        idsExercicio.add(existente.first.idExercicio!);
-      } else {
-        final novo = await cadastrarExercicio(ex.nome, ex.video);
-        idsExercicio.add(novo.idExercicio!);
-        biblioteca.add(novo);
-      }
-    }
-
-    // 2) Cria o cronograma do aluno.
+    // 1) Cria o cronograma do aluno.
     final cronograma = await _gestaoService.criarCronograma(idAluno: idAluno);
 
-    // 3) Vincula cada exercício ao cronograma.
-    for (var i = 0; i < exercicios.length; i++) {
-      final ex = exercicios[i];
+    // 2) Vincula cada exercício (já existente na biblioteca) ao cronograma.
+    for (final ex in exercicios) {
+      if (ex.idExercicio == null) continue;
       await _gestaoService.vincularExercicio(
         idCronograma: cronograma.idCronograma,
-        idExercicio: idsExercicio[i],
+        idExercicio: ex.idExercicio!,
         diaSemana: diaSemana,
         serie: ex.serieInt,
         repeticao: ex.repeticaoInt,
