@@ -6,8 +6,8 @@ Esta pasta guarda versões que **não são mais a oficial** do projeto.
 App Flutter organizado **por tipo** (`lib/{core,models,services,repositories,
 providers,screens,...}`). Foi a primeira organização do app.
 
-> **A versão oficial agora é `mobile-modular/`** (organizada por módulo,
-> arquitetura E-V-R-S-C-P). `old/mobile/` é mantida apenas para histórico e
-> está congelada — novas alterações vão para `mobile-modular/`.
+> **A versão oficial agora é `mobile/`** (organizada por módulo, arquitetura
+> E-V-R-S-C-P). `old/mobile/` é mantida apenas para histórico e está congelada
+> — novas alterações vão para `mobile/`.
 
 O backend (`backend/`) é o mesmo para todas as versões.
