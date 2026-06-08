@@ -9,16 +9,20 @@ import org.springframework.stereotype.Service;
 
 import br.com.gymconnect.model.Exercicio;
 import br.com.gymconnect.model.ResponseModel;
+import br.com.gymconnect.repository.CronogramaExercicioRepository;
 import br.com.gymconnect.repository.ExercicioRepository;
 
 @Service
 public class ExercicioService {
-    
+
     @Autowired
     private ResponseModel rm;
 
     @Autowired
     private ExercicioRepository er;
+
+    @Autowired
+    private CronogramaExercicioRepository cer;
 
     public ResponseEntity<?> cadastrar(Exercicio ex){
 
@@ -60,8 +64,17 @@ public class ExercicioService {
 
     public ResponseEntity<ResponseModel> remover(Long idExercicio){
 
+        // Evita violar a FK: exercicio em uso em algum treino nao pode ser
+        // removido (retorna mensagem amigavel em vez de estourar erro -> 403).
+        if (cer.existsByExercicio_IdExercicio(idExercicio)) {
+            rm.setMensagem(
+                "Nao e possivel excluir: este exercicio esta em uso em um ou "
+                + "mais treinos. Remova-o dos treinos primeiro.");
+            return new ResponseEntity<>(rm, HttpStatus.CONFLICT);
+        }
+
         er.deleteById(idExercicio);
-        
+
         rm.setMensagem("Exercicio deletado");
         return new ResponseEntity<>(rm, HttpStatus.OK);
     }
