@@ -115,10 +115,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: _MenuCard(
                     icone: Icons.smart_toy_outlined,
-                    imagem: AppLogoAssets.gia,
+                    imagem: AppLogoAssets.giaIcon,
                     titulo: 'GIA',
                     subtitulo: 'Tire suas dúvidas',
-                    destaque: true,
                     onTap: () => widget.onNavegar?.call(3),
                   ),
                 ),
@@ -244,7 +243,6 @@ class _MenuCard extends StatelessWidget {
   final String? imagem;
   final String titulo;
   final String subtitulo;
-  final bool destaque;
   final VoidCallback onTap;
 
   const _MenuCard({
@@ -253,7 +251,6 @@ class _MenuCard extends StatelessWidget {
     required this.subtitulo,
     required this.onTap,
     this.imagem,
-    this.destaque = false,
   });
 
   @override
@@ -266,26 +263,23 @@ class _MenuCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (imagem != null)
-                const SizedBox(
-                  width: 52,
-                  height: 52,
-                  child: GiaMascot(height: 52),
-                )
-              else
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: destaque ? AppColors.amarelo : context.c.surfaceAlt,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    icone,
-                    color: destaque
-                        ? AppColors.onAmarelo
-                        : context.c.textSecondary,
-                  ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: context.c.surfaceAlt,
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                child: imagem != null
+                    ? ImageIcon(
+                        AssetImage(imagem!),
+                        size: 28,
+                        color: context.c.textSecondary,
+                      )
+                    : Icon(
+                        icone,
+                        color: context.c.textSecondary,
+                      ),
+              ),
               const SizedBox(height: 32),
               Text(
                 titulo,
