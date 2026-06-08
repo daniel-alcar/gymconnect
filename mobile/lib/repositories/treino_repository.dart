@@ -45,23 +45,35 @@ class TreinoRepository {
       try {
         final cronogramas =
             await _treinoService.listarCronogramasPorAluno(idAluno);
-        await _cache.salvarTreinos(idAluno, cronogramas);
+        // Atualiza o cache local (best-effort: não derruba o fluxo online).
+        try {
+          await _cache.salvarTreinos(idAluno, cronogramas);
+        } catch (_) {/* ignora falha de cache local */}
         return _agruparPorDia(cronogramas);
       } on AppException catch (e) {
         // Erro de autenticação propaga (logout). Falha de rede tenta o cache.
         if (e.isAuthError) rethrow;
-        final cache = await _cache.lerTreinos(idAluno);
+        final cache = await _lerCacheSeguro(idAluno);
         if (cache != null) return _agruparPorDia(cache);
         rethrow;
       }
     }
 
     // Offline: serve o cache local.
-    final cache = await _cache.lerTreinos(idAluno);
+    final cache = await _lerCacheSeguro(idAluno);
     if (cache != null) return _agruparPorDia(cache);
     throw const AppException(
       'Você está offline e ainda não há treinos salvos neste dispositivo.',
     );
+  }
+
+  /// Lê o cache local ignorando falhas (retorna null se indisponível).
+  Future<List<Cronograma>?> _lerCacheSeguro(int idAluno) async {
+    try {
+      return await _cache.lerTreinos(idAluno);
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Agrupa os exercícios de todos os cronogramas por dia da semana.

@@ -32,7 +32,13 @@ class DbHelper {
 
   Future<void> _onCreate(Database db, int version) async {
     final ddl = await rootBundle.loadString('assets/sql/create_tables.sql');
-    final comandos = ddl
+    // Remove linhas de comentario (--) antes de dividir, para que um ';'
+    // dentro de um comentario nunca seja interpretado como fim de comando.
+    final semComentarios = ddl
+        .split('\n')
+        .where((linha) => !linha.trimLeft().startsWith('--'))
+        .join('\n');
+    final comandos = semComentarios
         .split(';')
         .map((c) => c.trim())
         .where((c) => c.isNotEmpty);
