@@ -42,10 +42,15 @@ class AuthProvider extends ChangeNotifier {
     try {
       _usuario = await _repository.revalidarSessao();
       _status = AuthStatus.autenticado;
-    } on AppException {
-      await _repository.logout();
-      _definirNaoAutenticado();
-      return;
+    } on AppException catch (e) {
+      // Offline-First: só desloga se o token for inválido/expirado (401/403).
+      // Em falha de rede (sem statusCode), mantém a sessão salva e segue offline.
+      if (e.isAuthError) {
+        await _repository.logout();
+        _definirNaoAutenticado();
+        return;
+      }
+      // Mantém autenticado com os dados locais (modo offline).
     }
     notifyListeners();
   }

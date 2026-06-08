@@ -27,4 +27,11 @@ class Cronograma {
           .toList(),
     );
   }
+
+  /// Serializa para o cache local (formato compatível com [fromJson]).
+  Map<String, dynamic> toJson() => {
+        'idCronograma': idCronograma,
+        'diasTotais': diasTotais,
+        'exercicio': exercicios.map((e) => e.toJson()).toList(),
+      };
 }

@@ -205,6 +205,7 @@ class _Conteudo extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
+                  onTap: () => _abrirEdicaoVinculo(context, ex),
                   leading: const Icon(Icons.fitness_center,
                       color: AppColors.amareloPressed),
                   title: Text(ex.exercicio?.nome ?? 'Exercício',
@@ -215,24 +216,42 @@ class _Conteudo extends StatelessWidget {
                       ? null
                       : Text(detalhes,
                           style: TextStyle(color: context.c.textSecondary)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        tooltip: 'Editar',
-                        icon: Icon(Icons.edit_outlined,
-                            color: context.c.textSecondary),
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => EditarVinculoScreen(vinculo: ex),
-                          ),
+                  trailing: PopupMenuButton<String>(
+                    tooltip: 'Opções',
+                    icon: Icon(Icons.more_vert, color: context.c.textSecondary),
+                    color: context.c.surface,
+                    onSelected: (opcao) {
+                      if (opcao == 'editar') {
+                        _abrirEdicaoVinculo(context, ex);
+                      } else if (opcao == 'excluir') {
+                        _confirmarRemoverVinculo(context, ex);
+                      }
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'editar',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_outlined,
+                                color: context.c.textPrimary, size: 20),
+                            const SizedBox(width: 12),
+                            Text('Editar',
+                                style:
+                                    TextStyle(color: context.c.textPrimary)),
+                          ],
                         ),
                       ),
-                      IconButton(
-                        tooltip: 'Excluir',
-                        icon: const Icon(Icons.delete_outline,
-                            color: AppColors.danger),
-                        onPressed: () => _confirmarRemoverVinculo(context, ex),
+                      const PopupMenuItem(
+                        value: 'excluir',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_outline,
+                                color: AppColors.danger, size: 20),
+                            SizedBox(width: 12),
+                            Text('Excluir',
+                                style: TextStyle(color: AppColors.danger)),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -244,6 +263,14 @@ class _Conteudo extends StatelessWidget {
       }).toList(),
     );
   }
+}
+
+/// Abre a tela de edição do vínculo de treino (PUT /cronogramaexercicio/{id}).
+Future<void> _abrirEdicaoVinculo(
+    BuildContext context, CronogramaExercicio ex) async {
+  await Navigator.of(context).push(
+    MaterialPageRoute(builder: (_) => EditarVinculoScreen(vinculo: ex)),
+  );
 }
 
 /// Confirma e remove um vínculo de treino (DELETE /cronogramaexercicio/{id}).

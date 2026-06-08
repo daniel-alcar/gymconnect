@@ -14,6 +14,8 @@ import 'repositories/auth_repository.dart';
 import 'repositories/chat_repository.dart';
 import 'repositories/cliente_repository.dart';
 import 'repositories/perfil_repository.dart';
+import 'repositories/session_local_repository.dart';
+import 'repositories/treino_cache_repository.dart';
 import 'repositories/treino_repository.dart';
 import 'routes/app_router.dart';
 import 'services/auth_service.dart';
@@ -76,10 +78,18 @@ class _GymConnectAppState extends State<GymConnectApp> {
     final exercicioService = ExercicioService(_dioClient);
     final gestaoService = GestaoService(_dioClient);
 
+    // Repositories (locais — Offline-First com SQLite)
+    final sessionLocalRepo = SessionLocalRepository();
+    final treinoCacheRepo = TreinoCacheRepository();
+
     // Repositories
-    final authRepo = AuthRepository(authService, _storage);
-    final treinoRepo =
-        TreinoRepository(treinoService, execucaoService, registroService);
+    final authRepo = AuthRepository(authService, _storage, sessionLocalRepo);
+    final treinoRepo = TreinoRepository(
+      treinoService,
+      execucaoService,
+      registroService,
+      treinoCacheRepo,
+    );
     final perfilRepo = PerfilRepository(perfilService);
     final chatRepo = ChatRepository(chatService);
     final clienteRepo = ClienteRepository(
