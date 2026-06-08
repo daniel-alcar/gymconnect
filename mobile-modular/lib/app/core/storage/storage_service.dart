@@ -83,6 +83,29 @@ class StorageService {
     return prefs.getString('${AppConstants.atividadesPrefix}$idUsuario');
   }
 
+  // ----- Exercícios marcados como feitos (JSON de ids, por usuário) -----
+  Future<void> salvarExerciciosFeitos(int idUsuario, String jsonList) async {
+    final prefs = await _instance;
+    await prefs.setString('${AppConstants.exFeitosPrefix}$idUsuario', jsonList);
+  }
+
+  Future<String?> lerExerciciosFeitos(int idUsuario) async {
+    final prefs = await _instance;
+    return prefs.getString('${AppConstants.exFeitosPrefix}$idUsuario');
+  }
+
+  // ----- Dias de treino concluídos (JSON de títulos, por usuário) -----
+  Future<void> salvarDiasConcluidos(int idUsuario, String jsonList) async {
+    final prefs = await _instance;
+    await prefs.setString(
+        '${AppConstants.diasConcluidosPrefix}$idUsuario', jsonList);
+  }
+
+  Future<String?> lerDiasConcluidos(int idUsuario) async {
+    final prefs = await _instance;
+    return prefs.getString('${AppConstants.diasConcluidosPrefix}$idUsuario');
+  }
+
   // ----- Limpeza (logout) — preserva a preferência de tema -----
   Future<void> limpar() async {
     final prefs = await _instance;

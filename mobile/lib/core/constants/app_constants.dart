@@ -19,6 +19,8 @@ class AppConstants {
   static const String themeKey = 'gc_theme_mode';
   static const String fotoPerfilPrefix = 'gc_foto_perfil_'; // + idUsuario
   static const String atividadesPrefix = 'gc_atividades_'; // + idUsuario
+  static const String exFeitosPrefix = 'gc_ex_feitos_'; // + idUsuario
+  static const String diasConcluidosPrefix = 'gc_dias_concluidos_'; // + idUsuario
 
   // Timeouts do Dio
   static const Duration connectTimeout = Duration(seconds: 20);

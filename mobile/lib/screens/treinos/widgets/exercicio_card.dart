@@ -12,6 +12,7 @@ class ExercicioCard extends StatefulWidget {
   final bool feito;
   final bool processando;
   final Future<void> Function(double? peso) onMarcarFeito;
+  final VoidCallback? onDesmarcar;
 
   const ExercicioCard({
     super.key,
@@ -19,6 +20,7 @@ class ExercicioCard extends StatefulWidget {
     required this.feito,
     required this.processando,
     required this.onMarcarFeito,
+    this.onDesmarcar,
   });
 
   @override
@@ -88,6 +90,12 @@ class _ExercicioCardState extends State<ExercicioCard> {
               const SizedBox(height: 14),
             ],
 
+            // Descrição / execução correta (definida pelo professor).
+            if (exercicio?.temDescricao ?? false) ...[
+              _DescricaoExercicio(texto: exercicio!.descricao!),
+              const SizedBox(height: 14),
+            ],
+
             Row(
               children: [
                 Expanded(
@@ -128,31 +136,43 @@ class _ExercicioCardState extends State<ExercicioCard> {
             SizedBox(
               width: double.infinity,
               child: widget.feito
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.success.withValues(alpha: 0.5),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle,
-                              color: AppColors.success, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Concluído',
-                            style: TextStyle(
-                              color: AppColors.success,
-                              fontWeight: FontWeight.w700,
+                  ? Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.success.withValues(alpha: 0.5),
                             ),
                           ),
-                        ],
-                      ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.check_circle,
+                                  color: AppColors.success, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Concluído',
+                                style: TextStyle(
+                                  color: AppColors.success,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (widget.onDesmarcar != null)
+                          TextButton.icon(
+                            onPressed:
+                                widget.processando ? null : widget.onDesmarcar,
+                            icon: const Icon(Icons.undo, size: 18),
+                            label: const Text('Desmarcar'),
+                          ),
+                      ],
                     )
                   : FilledButton(
                       onPressed: widget.processando ? null : _concluir,
@@ -167,6 +187,66 @@ class _ExercicioCardState extends State<ExercicioCard> {
                             )
                           : const Text('Marcar como Feito'),
                     ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Bloco expansível com a descrição/execução correta do exercício.
+class _DescricaoExercicio extends StatefulWidget {
+  final String texto;
+  const _DescricaoExercicio({required this.texto});
+
+  @override
+  State<_DescricaoExercicio> createState() => _DescricaoExercicioState();
+}
+
+class _DescricaoExercicioState extends State<_DescricaoExercicio> {
+  bool _expandido = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.c.surfaceAlt,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: context.c.border),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14),
+          childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+          initiallyExpanded: false,
+          onExpansionChanged: (v) => setState(() => _expandido = v),
+          leading: const Icon(Icons.menu_book_outlined,
+              color: AppColors.amareloPressed),
+          title: Text(
+            'Como executar',
+            style: TextStyle(
+              color: context.c.textPrimary,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
+          trailing: Icon(
+            _expandido ? Icons.expand_less : Icons.expand_more,
+            color: context.c.textSecondary,
+          ),
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                widget.texto,
+                style: TextStyle(
+                  color: context.c.textSecondary,
+                  height: 1.4,
+                  fontSize: 14,
+                ),
+              ),
             ),
           ],
         ),
