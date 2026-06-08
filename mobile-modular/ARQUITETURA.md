@@ -1,9 +1,8 @@
 # GymConnect — Arquitetura por Módulo (E-V-R-S-C-P)
 
-Esta é a versão do app **organizada por módulo**, seguindo a arquitetura em
-camadas ensinada nas aulas (Entity / View / Repository / Service / Controller /
-Provider). É funcionalmente idêntica à versão organizada por tipo — apenas a
-disposição das pastas muda.
+Versão do app **organizada por módulo**, seguindo a arquitetura em camadas das
+aulas (Entity / View / Repository / Service / Controller / Provider).
+Funcionalmente idêntica à versão organizada por tipo (`mobile/`).
 
 ## Estrutura
 
@@ -20,56 +19,38 @@ lib/
     │   ├── theme/                 #   app_theme.dart / app_colors.dart
     │   └── constants/             #   app_constants.dart
     ├── shared/
-    │   ├── widgets/               # Componentes reutilizáveis (logo, campos, etc.)
+    │   ├── widgets/               # Componentes reutilizáveis
     │   └── utils/                 # Helpers (datas, snackbar, validators)
     ├── routes/                    # app_router.dart + route_names.dart
     └── modules/
-        ├── auth/                  # Login, cadastro, sessão (inclui login offline)
-        │   ├── models/            #   usuario, tipo_usuario, login_response, session_model
-        │   ├── services/          #   auth_service (backend)
-        │   ├── repositories/      #   auth_repository, session_local_repository (SQLite)
-        │   ├── providers/         #   auth_provider (estado)
-        │   └── views/             #   login_screen, cadastro_screen
-        ├── treinos/               # Treinos do aluno (Offline-First)
-        │   ├── models/            #   cronograma(+exercicio/execucao), exercicio, dia_semana...
-        │   ├── services/          #   treino_service, execucao_service, registro_service
-        │   ├── repositories/      #   treino_repository, treino_cache_repository (SQLite)
-        │   ├── providers/         #   treino_provider
-        │   └── views/             #   treinos_screen + widgets
-        ├── cliente/               # Perfil professor/academia (gestão)
-        │   ├── services/          #   exercicio_service, gestao_service, usuario_service
-        │   ├── repositories/      #   cliente_repository
-        │   ├── providers/         #   cliente_provider
-        │   └── views/             #   exercícios, criar/editar treino, alunos, shell
-        ├── chat/                  # GIA (assistente IA)
-        │   ├── models/ services/ repositories/ providers/ views/
-        ├── perfil/                # Perfil do usuário (foto local, dados)
-        │   └── models/ services/ repositories/ providers/ views/
-        └── home/                  # Dashboard, navegação (shells), tema, atividades
-            ├── models/            #   atividade
-            ├── providers/         #   atividade_provider, theme_provider
-            └── views/             #   dashboard, shells, splash, inicial, configurações
+        ├── auth/                  # Login, cadastro, sessão (login offline)
+        ├── treinos/              # Treinos do aluno (Offline-First) + descrição/execução
+        ├── cliente/              # Professor: exercícios (CRUD), treinos, alunos
+        ├── chat/                 # GIA (assistente IA)
+        ├── perfil/               # Perfil do usuário (foto local)
+        └── home/                 # Dashboard, shells, tema, atividades, conclusões
 ```
 
-## Camadas (responsabilidade)
+Cada módulo subdivide em `models/ services/ repositories/ providers/ views/`.
 
-| Camada            | Onde                         | Responsabilidade                              |
-|-------------------|------------------------------|-----------------------------------------------|
-| Entity (Model)    | `modules/*/models`           | Dado puro + (de)serialização                  |
-| Service           | `modules/*/services`         | Comunicação com o backend (via DIO)           |
-| Repository        | `modules/*/repositories`     | Orquestra service + cache local (SQLite)      |
-| Provider          | `modules/*/providers`        | Estado da UI (ChangeNotifier)                 |
-| View              | `modules/*/views`            | Telas e widgets                               |
+## Camadas
 
-## Offline-First
+| Camada      | Onde                       | Responsabilidade                          |
+|-------------|----------------------------|-------------------------------------------|
+| Entity      | `modules/*/models`         | Dado puro + (de)serialização              |
+| Service     | `modules/*/services`       | Comunicação com o backend (DIO)           |
+| Repository  | `modules/*/repositories`   | Orquestra service + cache local (SQLite)  |
+| Provider    | `modules/*/providers`      | Estado da UI (ChangeNotifier)             |
+| View        | `modules/*/views`          | Telas e widgets                           |
 
-- `core/database/db_helper.dart`: Singleton SQLite, DDL externo em
-  `assets/sql/create_tables.sql` lido via `rootBundle`.
-- `auth/repositories/session_local_repository.dart`: sessão local → login offline.
-- `treinos/repositories/treino_cache_repository.dart`: cache dos treinos →
-  treinos visíveis sem internet.
-- `core/network/connectivity_service.dart`: decide entre backend e cache.
+## Recursos principais
 
-> Observação: a única diferença para a versão "por tipo" é a localização dos
-> arquivos e os `import` (agora `package:gymconnect/app/...`). Nenhuma regra de
-> negócio ou chamada de backend mudou.
+- **Offline-First**: SQLite (`core/database`), sessão local (login offline) e
+  cache de treinos; conclusões de exercício/treino persistidas por usuário.
+- **Professor**: biblioteca de exercícios com CRUD (criar/editar/excluir),
+  campo de descrição/execução e biblioteca pré-populada (seed no backend).
+- **Aluno**: vídeo + descrição de execução; marcar/desmarcar exercício e treino
+  com estado persistente.
+
+> A única diferença para `mobile/` é a localização dos arquivos e os `import`
+> (`package:gymconnect/app/...`). Nenhuma regra de negócio muda.

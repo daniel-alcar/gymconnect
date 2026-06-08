@@ -31,10 +31,15 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
   Future<void> _carregar() =>
       context.read<ClienteProvider>().carregarExercicios();
 
-  Future<void> _abrirCadastro() async {
+  /// Abre o formulário para criar (existente == null) ou editar um exercício.
+  Future<void> _abrirFormulario([Exercicio? existente]) async {
+    final editando = existente != null;
     final formKey = GlobalKey<FormState>();
-    final nomeController = TextEditingController();
-    final linkController = TextEditingController();
+    final nomeController = TextEditingController(text: existente?.nome ?? '');
+    final linkController =
+        TextEditingController(text: existente?.linkYoutube ?? '');
+    final descricaoController =
+        TextEditingController(text: existente?.descricao ?? '');
 
     await showModalBottomSheet<void>(
       context: context,
@@ -51,80 +56,109 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
             top: 20,
             bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
           ),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Novo exercício',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: context.c.textPrimary,
+          child: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    editando ? 'Editar exercício' : 'Novo exercício',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: context.c.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: nomeController,
-                  validator: (v) => Validators.obrigatorio(v, campo: 'Nome'),
-                  decoration: const InputDecoration(
-                    labelText: 'Nome do exercício',
-                    prefixIcon: Icon(Icons.fitness_center),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: nomeController,
+                    validator: (v) => Validators.obrigatorio(v, campo: 'Nome'),
+                    decoration: const InputDecoration(
+                      labelText: 'Nome do exercício',
+                      prefixIcon: Icon(Icons.fitness_center),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 14),
-                TextFormField(
-                  controller: linkController,
-                  keyboardType: TextInputType.url,
-                  decoration: const InputDecoration(
-                    labelText: 'Link do YouTube (opcional)',
-                    hintText: 'https://youtube.com/watch?v=...',
-                    prefixIcon: Icon(Icons.ondemand_video),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: linkController,
+                    keyboardType: TextInputType.url,
+                    decoration: const InputDecoration(
+                      labelText: 'Link do YouTube (opcional)',
+                      hintText: 'https://youtube.com/watch?v=...',
+                      prefixIcon: Icon(Icons.ondemand_video),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Consumer<ClienteProvider>(
-                  builder: (_, p, __) => FilledButton(
-                    onPressed: p.salvando
-                        ? null
-                        : () async {
-                            if (!formKey.currentState!.validate()) return;
-                            try {
-                              await context
-                                  .read<ClienteProvider>()
-                                  .cadastrarExercicio(
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: descricaoController,
+                    minLines: 3,
+                    maxLines: 6,
+                    textInputAction: TextInputAction.newline,
+                    decoration: const InputDecoration(
+                      labelText: 'Descrição / execução (opcional)',
+                      hintText: 'Ex.: Mantenha a coluna neutra, desça '
+                          'controlando o movimento...',
+                      alignLabelWithHint: true,
+                      prefixIcon: Icon(Icons.notes),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Consumer<ClienteProvider>(
+                    builder: (_, p, __) => FilledButton(
+                      onPressed: p.salvando
+                          ? null
+                          : () async {
+                              if (!formKey.currentState!.validate()) return;
+                              try {
+                                final prov = context.read<ClienteProvider>();
+                                if (editando) {
+                                  await prov.atualizarExercicio(
+                                    existente.idExercicio!,
                                     nomeController.text,
                                     linkController.text,
+                                    descricaoController.text,
                                   );
-                              if (ctx.mounted) Navigator.pop(ctx);
-                              if (mounted) {
-                                SnackbarHelper.sucesso(
-                                    context, 'Exercício cadastrado!');
+                                } else {
+                                  await prov.cadastrarExercicio(
+                                    nomeController.text,
+                                    linkController.text,
+                                    descricaoController.text,
+                                  );
+                                }
+                                if (ctx.mounted) Navigator.pop(ctx);
+                                if (mounted) {
+                                  SnackbarHelper.sucesso(
+                                    context,
+                                    editando
+                                        ? 'Exercício atualizado!'
+                                        : 'Exercício cadastrado!',
+                                  );
+                                }
+                              } on AppException catch (e) {
+                                if (ctx.mounted) {
+                                  SnackbarHelper.erro(ctx, e.message);
+                                }
+                              } catch (_) {
+                                if (ctx.mounted) {
+                                  SnackbarHelper.erro(
+                                      ctx, 'Erro ao salvar exercício.');
+                                }
                               }
-                            } on AppException catch (e) {
-                              if (ctx.mounted) {
-                                SnackbarHelper.erro(ctx, e.message);
-                              }
-                            } catch (_) {
-                              if (ctx.mounted) {
-                                SnackbarHelper.erro(
-                                    ctx, 'Erro ao cadastrar exercício.');
-                              }
-                            }
-                          },
-                    child: p.salvando
-                        ? const SizedBox(
-                            height: 22,
-                            width: 22,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2.5, color: AppColors.onAmarelo),
-                          )
-                        : const Text('Cadastrar'),
+                            },
+                      child: p.salvando
+                          ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2.5, color: AppColors.onAmarelo),
+                            )
+                          : Text(editando ? 'Salvar' : 'Cadastrar'),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -181,7 +215,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _abrirCadastro,
+        onPressed: () => _abrirFormulario(),
         icon: const Icon(Icons.add),
         label: const Text('Novo'),
       ),
@@ -231,8 +265,13 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) {
         final ex = provider.exercicios[i];
+        final infos = <String>[
+          ex.temVideo ? 'Com vídeo' : 'Sem vídeo',
+          if (ex.temDescricao) 'Com descrição',
+        ].join('  •  ');
         return Card(
           child: ListTile(
+            onTap: () => _abrirFormulario(ex),
             leading: CircleAvatar(
               backgroundColor: context.c.surfaceAlt,
               child: const Icon(Icons.fitness_center,
@@ -242,11 +281,38 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                 style: TextStyle(
                     color: context.c.textPrimary,
                     fontWeight: FontWeight.w600)),
-            subtitle: Text(ex.temVideo ? 'Com vídeo' : 'Sem vídeo',
+            subtitle: Text(infos,
                 style: TextStyle(color: context.c.textSecondary)),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppColors.danger),
-              onPressed: () => _confirmarRemover(ex),
+            trailing: PopupMenuButton<String>(
+              tooltip: 'Opções',
+              icon: Icon(Icons.more_vert, color: context.c.textSecondary),
+              color: context.c.surface,
+              onSelected: (op) {
+                if (op == 'editar') {
+                  _abrirFormulario(ex);
+                } else if (op == 'excluir') {
+                  _confirmarRemover(ex);
+                }
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: 'editar',
+                  child: Row(children: [
+                    Icon(Icons.edit_outlined,
+                        color: context.c.textPrimary, size: 20),
+                    const SizedBox(width: 12),
+                    Text('Editar', style: TextStyle(color: context.c.textPrimary)),
+                  ]),
+                ),
+                const PopupMenuItem(
+                  value: 'excluir',
+                  child: Row(children: [
+                    Icon(Icons.delete_outline, color: AppColors.danger, size: 20),
+                    SizedBox(width: 12),
+                    Text('Excluir', style: TextStyle(color: AppColors.danger)),
+                  ]),
+                ),
+              ],
             ),
           ),
         );

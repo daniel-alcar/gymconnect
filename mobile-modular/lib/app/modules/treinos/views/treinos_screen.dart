@@ -24,7 +24,6 @@ class TreinosScreen extends StatefulWidget {
 
 class _TreinosScreenState extends State<TreinosScreen> {
   int? _processandoId;
-  final Set<String> _diasConcluidos = {};
 
   @override
   void initState() {
@@ -81,15 +80,26 @@ class _TreinosScreenState extends State<TreinosScreen> {
 
   Future<void> _concluirTreino(String diaTitulo) async {
     final id = context.read<AuthProvider>().usuario?.idUsuario;
+    final atividadeProv = context.read<AtividadeProvider>();
+    final treinoProv = context.read<TreinoProvider>();
     if (id != null) {
-      await context
-          .read<AtividadeProvider>()
-          .registrar(id, Atividade.treino(diaTitulo));
+      await atividadeProv.registrar(id, Atividade.treino(diaTitulo));
     }
-    setState(() => _diasConcluidos.add(diaTitulo));
+    await treinoProv.concluirDia(diaTitulo);
     if (mounted) {
       SnackbarHelper.sucesso(context, 'Treino "$diaTitulo" concluído! 💪');
     }
+  }
+
+  Future<void> _desmarcarTreino(String diaTitulo) async {
+    await context.read<TreinoProvider>().desmarcarDia(diaTitulo);
+  }
+
+  Future<void> _desmarcarExercicio(CronogramaExercicio ex) async {
+    if (ex.idCronogramaExercicio == null) return;
+    await context
+        .read<TreinoProvider>()
+        .desmarcarExercicio(ex.idCronogramaExercicio!);
   }
 
   @override
@@ -185,12 +195,14 @@ class _TreinosScreenState extends State<TreinosScreen> {
                 feito: provider.exercicioFeito(ex.idCronogramaExercicio),
                 processando: _processandoId == ex.idCronogramaExercicio,
                 onMarcarFeito: (peso) => _marcarFeito(ex, peso),
+                onDesmarcar: () => _desmarcarExercicio(ex),
               ),
             ),
             const SizedBox(height: 4),
             _BotaoConcluirTreino(
-              concluido: _diasConcluidos.contains(dia.titulo),
+              concluido: provider.diaConcluido(dia.titulo),
               onConcluir: () => _concluirTreino(dia.titulo),
+              onDesmarcar: () => _desmarcarTreino(dia.titulo),
             ),
             const SizedBox(height: 24),
           ],
@@ -204,34 +216,46 @@ class _TreinosScreenState extends State<TreinosScreen> {
 class _BotaoConcluirTreino extends StatelessWidget {
   final bool concluido;
   final VoidCallback onConcluir;
+  final VoidCallback onDesmarcar;
 
   const _BotaoConcluirTreino({
     required this.concluido,
     required this.onConcluir,
+    required this.onDesmarcar,
   });
 
   @override
   Widget build(BuildContext context) {
     if (concluido) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: AppColors.success.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.success.withValues(alpha: 0.5)),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.emoji_events, color: AppColors.success, size: 20),
-            SizedBox(width: 8),
-            Text('Treino concluído',
-                style: TextStyle(
-                    color: AppColors.success, fontWeight: FontWeight.w700)),
-          ],
-        ),
+      return Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+              border:
+                  Border.all(color: AppColors.success.withValues(alpha: 0.5)),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.emoji_events, color: AppColors.success, size: 20),
+                SizedBox(width: 8),
+                Text('Treino concluído',
+                    style: TextStyle(
+                        color: AppColors.success, fontWeight: FontWeight.w700)),
+              ],
+            ),
+          ),
+          TextButton.icon(
+            onPressed: onDesmarcar,
+            icon: const Icon(Icons.undo, size: 18),
+            label: const Text('Desmarcar treino'),
+          ),
+        ],
       );
     }
     return SizedBox(

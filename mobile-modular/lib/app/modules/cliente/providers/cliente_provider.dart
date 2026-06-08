@@ -113,12 +113,39 @@ class ClienteProvider extends ChangeNotifier {
   }
 
   /// Lança [AppException] em falha (a UI mostra o erro).
-  Future<void> cadastrarExercicio(String nome, String? link) async {
+  Future<void> cadastrarExercicio(String nome, String? link,
+      [String? descricao]) async {
     _salvando = true;
     notifyListeners();
     try {
-      final novo = await _repository.cadastrarExercicio(nome, link);
+      final novo = await _repository.cadastrarExercicio(nome, link, descricao);
       _exercicios = [..._exercicios, novo];
+    } finally {
+      _salvando = false;
+      notifyListeners();
+    }
+  }
+
+  /// Edita um exercício existente (PUT /exercicios/{id}).
+  Future<void> atualizarExercicio(
+    int idExercicio,
+    String nome,
+    String? link,
+    String? descricao,
+  ) async {
+    _salvando = true;
+    notifyListeners();
+    try {
+      final atualizado = await _repository.atualizarExercicio(
+        idExercicio,
+        nome,
+        link,
+        descricao,
+      );
+      _exercicios = [
+        for (final e in _exercicios)
+          if (e.idExercicio == idExercicio) atualizado else e,
+      ];
     } finally {
       _salvando = false;
       notifyListeners();

@@ -56,11 +56,33 @@ class ClienteRepository {
   // ----- Exercícios (biblioteca) -----
   Future<List<Exercicio>> listarExercicios() => _exercicioService.listar();
 
-  Future<Exercicio> cadastrarExercicio(String nome, String? link) {
+  Future<Exercicio> cadastrarExercicio(String nome, String? link,
+      [String? descricao]) {
     final linkFinal = (link == null || link.trim().isEmpty)
         ? 'https://youtube.com'
         : link.trim();
-    return _exercicioService.cadastrar(nome: nome.trim(), linkYoutube: linkFinal);
+    return _exercicioService.cadastrar(
+      nome: nome.trim(),
+      linkYoutube: linkFinal,
+      descricao: descricao?.trim(),
+    );
+  }
+
+  Future<Exercicio> atualizarExercicio(
+    int idExercicio,
+    String nome,
+    String? link,
+    String? descricao,
+  ) {
+    final linkFinal = (link == null || link.trim().isEmpty)
+        ? 'https://youtube.com'
+        : link.trim();
+    return _exercicioService.atualizar(
+      idExercicio: idExercicio,
+      nome: nome.trim(),
+      linkYoutube: linkFinal,
+      descricao: descricao?.trim(),
+    );
   }
 
   Future<void> removerExercicio(int id) => _exercicioService.remover(id);

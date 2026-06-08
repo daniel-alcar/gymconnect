@@ -30,11 +30,41 @@ class ExercicioService {
   Future<Exercicio> cadastrar({
     required String nome,
     required String linkYoutube,
+    String? descricao,
   }) async {
     try {
       final res = await _client.dio.post(
         '/exercicios',
-        data: {'nome': nome, 'linkYoutube': linkYoutube},
+        data: {
+          'nome': nome,
+          'linkYoutube': linkYoutube,
+          'descricao': descricao,
+        },
+      );
+      if (_client.isSucesso(res)) {
+        return Exercicio.fromJson(res.data as Map<String, dynamic>);
+      }
+      throw _client.tratarResposta(res);
+    } on Object catch (e) {
+      throw _client.normalize(e);
+    }
+  }
+
+  /// `PUT /exercicios/{id}` → exercício atualizado.
+  Future<Exercicio> atualizar({
+    required int idExercicio,
+    required String nome,
+    required String linkYoutube,
+    String? descricao,
+  }) async {
+    try {
+      final res = await _client.dio.put(
+        '/exercicios/$idExercicio',
+        data: {
+          'nome': nome,
+          'linkYoutube': linkYoutube,
+          'descricao': descricao,
+        },
       );
       if (_client.isSucesso(res)) {
         return Exercicio.fromJson(res.data as Map<String, dynamic>);

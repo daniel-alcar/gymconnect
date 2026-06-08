@@ -34,6 +34,30 @@ public class ExercicioService {
 
     }
 
+    public ResponseEntity<?> atualizar(Long idExercicio, Exercicio dados){
+
+        if (dados.getNome() == null || dados.getNome().isBlank()) {
+            rm.setMensagem("O campo nome exercicio precisa ser preenchido!");
+            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+        }
+        if (dados.getLinkYoutube() == null || dados.getLinkYoutube().isBlank()) {
+            rm.setMensagem("O campo Link não foi preenchido!");
+            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+        }
+
+        var opt = er.findById(idExercicio);
+        if (opt.isEmpty()) {
+            rm.setMensagem("Exercicio não encontrado");
+            return new ResponseEntity<>(rm, HttpStatus.NOT_FOUND);
+        }
+
+        Exercicio ex = opt.get();
+        ex.setNome(dados.getNome());
+        ex.setLinkYoutube(dados.getLinkYoutube());
+        ex.setDescricao(dados.getDescricao());
+        return new ResponseEntity<>(er.save(ex), HttpStatus.OK);
+    }
+
     public ResponseEntity<ResponseModel> remover(Long idExercicio){
 
         er.deleteById(idExercicio);

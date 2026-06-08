@@ -55,6 +55,7 @@ public class SecurityConfigurations {
                 .requestMatchers(HttpMethod.DELETE, "/usuarios").hasAuthority("CLIENTE")
                 .requestMatchers(HttpMethod.GET, "/usuarios").hasAnyAuthority("CLIENTE")
                 .requestMatchers(HttpMethod.POST, "/exercicios").hasAuthority("CLIENTE")
+                .requestMatchers(HttpMethod.PUT, "/exercicios/**").hasAuthority("CLIENTE")
                 .requestMatchers(HttpMethod.GET, "/exercicios").hasAuthority("CLIENTE")
                 .requestMatchers(HttpMethod.DELETE, "/exercicios/**").hasAuthority("CLIENTE")
                 .requestMatchers(HttpMethod.POST, "/cronograma").hasAuthority("CLIENTE")

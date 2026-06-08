@@ -22,6 +22,9 @@ public class Exercicio {
     @Column(name="link_youtube", nullable=false, length=264)
     private String linkYoutube;
 
+    @Column(name="descricao", length=2000)
+    private String descricao;
+
     public Long getIdExercicio() {
         return idExercicio;
     }
@@ -44,6 +47,14 @@ public class Exercicio {
 
     public void setLinkYoutube(String linkYoutube) {
         this.linkYoutube = linkYoutube;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
 }

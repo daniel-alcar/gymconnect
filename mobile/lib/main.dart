@@ -101,7 +101,7 @@ class _GymConnectAppState extends State<GymConnectApp> {
 
     // Providers
     _authProvider = AuthProvider(authRepo);
-    _treinoProvider = TreinoProvider(treinoRepo);
+    _treinoProvider = TreinoProvider(treinoRepo, _storage);
     _perfilProvider = PerfilProvider(perfilRepo);
     _chatProvider = ChatProvider(chatRepo);
     _clienteProvider = ClienteProvider(clienteRepo);
