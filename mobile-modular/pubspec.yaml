@@ -1,0 +1,50 @@
+name: gymconnect
+description: GymConnect - Aplicativo Android de treinos personalizados (Projeto Integrador).
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Gerenciamento de estado
+  provider: ^6.1.2
+
+  # HTTP client + interceptors JWT
+  dio: ^5.7.0
+
+  # Navegação declarativa com rotas protegidas
+  go_router: ^14.6.2
+
+  # Persistência local do JWT / usuário
+  shared_preferences: ^2.3.3
+
+  # Player de vídeo do YouTube embutido
+  youtube_player_flutter: ^9.1.1
+
+  # Formatação de datas
+  intl: ^0.19.0
+
+  # Câmera / galeria (foto de perfil)
+  image_picker: ^1.1.2
+
+  # Offline-First: banco local SQLite + caminho + conectividade
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  connectivity_plus: ^6.1.0
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/sql/create_tables.sql
