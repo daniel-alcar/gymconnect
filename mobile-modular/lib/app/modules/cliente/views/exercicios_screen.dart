@@ -215,6 +215,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_exercicios',
         onPressed: () => _abrirFormulario(),
         icon: const Icon(Icons.add),
         label: const Text('Novo'),

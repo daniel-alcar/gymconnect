@@ -59,6 +59,7 @@ class _TreinosClienteScreenState extends State<TreinosClienteScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_treinos_cliente',
         onPressed: _abrirCriarTreino,
         icon: const Icon(Icons.add),
         label: const Text('Criar Treino'),
