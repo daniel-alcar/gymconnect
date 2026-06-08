@@ -14,6 +14,32 @@ Perfis usados nos testes:
 
 ---
 
+> 📊 Versão em planilha para preencher resultados: **`QA-TESTES.xlsx`**
+> (abas: *Casos de Teste*, *Smoke Test*, *Resumo* — coluna Status com lista
+> Pendente/Passou/Falhou/Bloqueado/N/A e contadores automáticos no Resumo).
+
+## 0. Smoke Test (rodar a cada build, ~5 min) 🔴
+
+Se qualquer item abaixo falhar, **a build não segue** para os testes completos.
+
+1. Login PROF e ALUNO funciona.
+2. Fechar (matar) e reabrir: continua logado.
+3. Modo avião: continua logado (offline) e mostra treinos do cache.
+4. PROF: criar exercício aparece na lista na hora.
+5. PROF: excluir exercício **em uso** → aviso, **NÃO desloga**.
+6. PROF: criar treino **selecionando** exercício da lista.
+7. PROF: navegar Exercícios ↔ Criar Treino **sem crash** (FAB/Hero).
+8. ALUNO: ver treino, vídeo e descrição "Como executar".
+9. ALUNO: marcar feito e concluir treino; reabrir mantém concluído.
+10. ALUNO: desmarcar funciona.
+11. GIA: enviar pergunta e receber resposta.
+12. Alternar tema claro/escuro: tudo legível, mascote visível.
+13. Backend desligado: erro tratável, **sem logout**.
+14. Nenhum overflow / erro vermelho em nenhuma tela.
+15. **Nenhum logout indevido** (só 401/403 real).
+
+---
+
 ## 1. Autenticação e Sessão 🔴
 
 | # | Cenário | Passos | Resultado esperado |
