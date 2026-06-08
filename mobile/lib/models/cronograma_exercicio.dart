@@ -45,6 +45,17 @@ class CronogramaExercicio {
     );
   }
 
+  /// Serializa para o cache local (formato compatível com [fromJson]).
+  Map<String, dynamic> toJson() => {
+        if (idCronogramaExercicio != null)
+          'idCronogramaExercicio': idCronogramaExercicio,
+        if (exercicio != null) 'exercicio': exercicio!.toJson(),
+        'diaSemana': diaSemana?.value,
+        'serie': serie,
+        'repeticao': repeticao,
+        'carga': carga,
+      };
+
   CronogramaExercicio copyWith({int? idCronograma}) {
     return CronogramaExercicio(
       idCronogramaExercicio: idCronogramaExercicio,

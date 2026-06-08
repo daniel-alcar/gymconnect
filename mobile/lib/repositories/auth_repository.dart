@@ -1,22 +1,28 @@
+import '../models/session_model.dart';
 import '../models/tipo_usuario.dart';
 import '../models/usuario.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
+import 'session_local_repository.dart';
 
 /// Orquestra o fluxo de autenticação: login → token → /auth/me → persistência.
 class AuthRepository {
   final AuthService _authService;
   final StorageService _storage;
+  final SessionLocalRepository _sessionLocal;
 
-  AuthRepository(this._authService, this._storage);
+  AuthRepository(this._authService, this._storage, this._sessionLocal);
 
-  /// Faz login, persiste o token, busca o usuário e o persiste.
+  /// Faz login, persiste o token, busca o usuário e o persiste (storage + SQLite).
   Future<Usuario> login(String email, String senha) async {
     final loginResponse = await _authService.login(email, senha);
     await _storage.salvarToken(loginResponse.token);
 
     final usuario = await _authService.getCurrentUser();
     await _storage.salvarUsuario(usuario);
+    await _sessionLocal.saveSession(
+      SessionModel.fromUsuario(usuario, token: loginResponse.token),
+    );
     return usuario;
   }
 
@@ -34,15 +40,27 @@ class AuthRepository {
     );
   }
 
-  /// Revalida a sessão salva chamando `/auth/me`.
+  /// Revalida a sessão salva chamando `/auth/me` e atualiza os caches.
   Future<Usuario> revalidarSessao() async {
     final usuario = await _authService.getCurrentUser();
     await _storage.salvarUsuario(usuario);
+    final token = await _storage.lerToken();
+    if (token != null && token.isNotEmpty) {
+      await _sessionLocal.saveSession(
+        SessionModel.fromUsuario(usuario, token: token),
+      );
+    }
     return usuario;
   }
 
   Future<Usuario?> usuarioSalvo() => _storage.lerUsuario();
   Future<String?> tokenSalvo() => _storage.lerToken();
 
-  Future<void> logout() => _storage.limpar();
+  /// Sessão local (SQLite) para login offline.
+  Future<SessionModel?> sessaoLocal() => _sessionLocal.getSession();
+
+  Future<void> logout() async {
+    await _storage.limpar();
+    await _sessionLocal.clearSession();
+  }
 }

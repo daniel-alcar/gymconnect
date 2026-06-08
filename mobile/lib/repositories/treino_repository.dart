@@ -1,9 +1,13 @@
+import '../core/errors/app_exception.dart';
+import '../models/cronograma.dart';
 import '../models/cronograma_exercicio.dart';
 import '../models/dia_semana.dart';
 import '../models/status_execucao.dart';
+import '../services/connectivity_service.dart';
 import '../services/execucao_service.dart';
 import '../services/registro_service.dart';
 import '../services/treino_service.dart';
+import 'treino_cache_repository.dart';
 
 /// Agrupamento de exercícios por dia da semana (para a UI de treinos).
 class TreinoDia {
@@ -15,32 +19,63 @@ class TreinoDia {
 }
 
 /// Orquestra treinos: carrega cronogramas, agrupa por dia e registra conclusão.
+///
+/// Offline-First: quando online, busca no backend e atualiza o cache local;
+/// quando offline (ou em falha de rede), serve os treinos do cache SQLite.
 class TreinoRepository {
   final TreinoService _treinoService;
   final ExecucaoService _execucaoService;
   final RegistroService _registroService;
+  final TreinoCacheRepository _cache;
+  final ConnectivityService _connectivity;
 
   TreinoRepository(
     this._treinoService,
     this._execucaoService,
     this._registroService,
-  );
+    this._cache, [
+    ConnectivityService? connectivity,
+  ]) : _connectivity = connectivity ?? ConnectivityService();
 
   /// Carrega todos os exercícios do aluno agrupados por dia da semana.
   Future<List<TreinoDia>> carregarTreinos(int idAluno) async {
-    final cronogramas = await _treinoService.listarCronogramasPorAluno(idAluno);
+    final online = await _connectivity.isOnline();
 
+    if (online) {
+      try {
+        final cronogramas =
+            await _treinoService.listarCronogramasPorAluno(idAluno);
+        await _cache.salvarTreinos(idAluno, cronogramas);
+        return _agruparPorDia(cronogramas);
+      } on AppException catch (e) {
+        // Erro de autenticação propaga (logout). Falha de rede tenta o cache.
+        if (e.isAuthError) rethrow;
+        final cache = await _cache.lerTreinos(idAluno);
+        if (cache != null) return _agruparPorDia(cache);
+        rethrow;
+      }
+    }
+
+    // Offline: serve o cache local.
+    final cache = await _cache.lerTreinos(idAluno);
+    if (cache != null) return _agruparPorDia(cache);
+    throw const AppException(
+      'Você está offline e ainda não há treinos salvos neste dispositivo.',
+    );
+  }
+
+  /// Agrupa os exercícios de todos os cronogramas por dia da semana.
+  List<TreinoDia> _agruparPorDia(List<Cronograma> cronogramas) {
     final todos = <CronogramaExercicio>[
       for (final c in cronogramas) ...c.exercicios,
     ];
 
-    // Agrupa por dia da semana.
     final mapa = <DiaSemana?, List<CronogramaExercicio>>{};
     for (final ex in todos) {
       mapa.putIfAbsent(ex.diaSemana, () => []).add(ex);
     }
 
-    final dias = mapa.entries
+    return mapa.entries
         .map((e) => TreinoDia(dia: e.key, exercicios: e.value))
         .toList()
       ..sort((a, b) {
@@ -48,8 +83,6 @@ class TreinoRepository {
         final ob = b.dia?.ordem ?? 999;
         return oa.compareTo(ob);
       });
-
-    return dias;
   }
 
   /// Marca um exercício/treino como feito.
