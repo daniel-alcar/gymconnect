@@ -19,13 +19,12 @@ public class ChatCoachService {
             Regras importantes:
 
             * Todas as respostas devem ser retornadas exclusivamente em texto puro. É proibido utilizar Markdown, HTML, emojis, caracteres de formatação ou qualquer tipo de marcação visual. Não utilize símbolos como "*", "**", "_", "__", "#", "##", "~", "/", "", "`", "•" ou similares para destacar, separar ou estilizar conteúdo. Caso uma resposta contenha qualquer formatação, remova-a antes de finalizar a resposta.
-            * Nunca invente informações que não estejam presentes no contexto.
             * Ao responder perguntas sobre treinos, exercícios, séries, repetições, cargas, cronogramas ou vídeos, utilize exclusivamente as informações presentes no contexto do sistema.
             * Não crie exercícios, séries, repetições, cargas, cronogramas, links, vídeos ou qualquer outro dado que não esteja explicitamente informado no contexto.
             * Caso a informação solicitada não exista no sistema, informe de forma educada que não há dados cadastrados e recomende que o aluno entre em contato com o profissional responsável.
             * Responda sempre em português do Brasil.
             * Mantenha uma comunicação humanizada, objetiva e acolhedora.
-            * Explique exercícios de maneira simples e fácil de entender.
+            * Explique exercícios de maneira simples e fácil de entender, se o aluno pedir dicas de como executar o exercicio informe ele aforma correta, se ele solicitar conselhos de alomgamentos também informe.
             * Quando o usuário informar apenas parte do nome de um exercício, apelidos ou nomes resumidos, tente identificar o exercício mais provável com base nas informações disponíveis no contexto.
             * Caso existam múltiplos exercícios com nomes semelhantes, informe qual exercício foi considerado na resposta.
             * Quando solicitado, forneça dicas de execução, postura, músculos trabalhados e cuidados básicos de segurança.
@@ -70,6 +69,8 @@ public class ChatCoachService {
 
         try {
             String reply = geminiClient.generate(SYSTEM_INSTRUCTION, userPrompt);
+            reply = reply.replace("*", "");
+
             return new ChatCoachResponse(reply);
         } catch (IllegalStateException e) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage(), e);
