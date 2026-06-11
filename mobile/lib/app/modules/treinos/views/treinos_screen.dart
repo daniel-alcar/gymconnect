@@ -191,6 +191,7 @@ class _TreinosScreenState extends State<TreinosScreen> {
             ),
             ...dia.exercicios.map(
               (ex) => ExercicioCard(
+                key: ValueKey(ex.idCronogramaExercicio ?? ex.exercicio?.idExercicio),
                 exercicio: ex,
                 feito: provider.exercicioFeito(ex.idCronogramaExercicio),
                 processando: _processandoId == ex.idCronogramaExercicio,

@@ -67,7 +67,18 @@ class ExercicioService {
         },
       );
       if (_client.isSucesso(res)) {
-        return Exercicio.fromJson(res.data as Map<String, dynamic>);
+        if (res.data is Map<String, dynamic>) {
+          return Exercicio.fromJson(res.data as Map<String, dynamic>);
+        }
+        // Backend retornou 2xx sem body JSON — reconstrói localmente.
+        return Exercicio(
+          idExercicio: idExercicio,
+          nome: nome,
+          linkYoutube: linkYoutube.trim().isEmpty ? null : linkYoutube.trim(),
+          descricao: (descricao == null || descricao.trim().isEmpty)
+              ? null
+              : descricao.trim(),
+        );
       }
       throw _client.tratarResposta(res);
     } on Object catch (e) {
