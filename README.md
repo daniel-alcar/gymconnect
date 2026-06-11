@@ -22,12 +22,16 @@ Um **professor (Cliente)** monta cronogramas de treino para seus **alunos**, que
 
 ```
 gymconnect/
-├── backend/          # API Java (Spring Boot)
-│   └── API.md        # Documentação completa das rotas REST
-├── mobile/           # App Flutter (Android)
+├── backend/               # API Java (Spring Boot)
+├── mobile/                # App Flutter (Android)
+├── docs/
+│   ├── COMO-TESTAR.md     # Guia detalhado de execução e testes
+│   ├── API.md             # Documentação completa das rotas REST
+│   ├── ARQUITETURA.md     # Arquitetura do app mobile por módulo
+│   ├── QA-TESTES.md       # Roteiro de testes de QA
+│   └── QA-TESTES.xlsx     # Planilha de resultados de QA
 ├── docker-compose.yml
-├── .env.example      # Modelo de variáveis de ambiente
-├── COMO-TESTAR.md    # Guia detalhado de execução e testes
+├── .env.example           # Modelo de variáveis de ambiente
 └── README.md
 ```
 
@@ -99,5 +103,7 @@ flutter run --dart-define=API_BASE_URL=http://localhost:8080
 
 ## Documentação
 
-- **[COMO-TESTAR.md](COMO-TESTAR.md)** — guia completo: pré-requisitos, variáveis, backend, Flutter, fluxos de teste e troubleshooting
-- **[backend/API.md](backend/API.md)** — referência completa das rotas REST (payloads, autenticação JWT, códigos de retorno)
+- **[docs/COMO-TESTAR.md](docs/COMO-TESTAR.md)** — guia completo: pré-requisitos, variáveis, backend, Flutter, fluxos de teste e troubleshooting
+- **[docs/API.md](docs/API.md)** — referência completa das rotas REST (payloads, autenticação JWT, códigos de retorno)
+- **[docs/ARQUITETURA.md](docs/ARQUITETURA.md)** — arquitetura do app mobile por módulo
+- **[docs/QA-TESTES.md](docs/QA-TESTES.md)** — roteiro de testes de QA
