@@ -16,11 +16,12 @@ class CronogramaExecucao {
 
   factory CronogramaExecucao.fromJson(Map<String, dynamic> json) {
     final cronograma = json['cronograma'] as Map<String, dynamic>?;
+    final rawDate = json['dataExecucao'];
     return CronogramaExecucao(
       idExecucao: (json['idExecucao'] as num?)?.toInt(),
       idCronograma: (cronograma?['idCronograma'] as num?)?.toInt(),
       status: StatusExecucao.fromString(json['status'] as String?),
-      dataExecucao: json['dataExecucao'] as String?,
+      dataExecucao: rawDate is String ? rawDate : null,
     );
   }
 
