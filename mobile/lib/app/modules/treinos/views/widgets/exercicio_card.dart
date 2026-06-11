@@ -117,21 +117,6 @@ class _ExercicioCardState extends State<ExercicioCard> {
             ),
             const SizedBox(height: 16),
 
-            if (!widget.feito) ...[
-              TextField(
-                controller: _pesoController,
-                enabled: !widget.processando,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText: 'Peso Atual (kg)',
-                  hintText: 'opcional',
-                  errorText: _erroPeso,
-                  prefixIcon: const Icon(Icons.monitor_weight_outlined),
-                ),
-              ),
-              const SizedBox(height: 14),
-            ],
 
             SizedBox(
               width: double.infinity,
