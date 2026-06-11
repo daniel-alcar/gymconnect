@@ -9,7 +9,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-gymconnect}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-bmavKH4zHP03msP2omj6aZyX5Sq90Jn3}
     ports:
-      - "3399:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend/src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
