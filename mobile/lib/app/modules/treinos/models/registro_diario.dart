@@ -18,7 +18,7 @@ class RegistroDiario {
   /// Corpo para `POST /registrodiario/me`.
   static Map<String, dynamic> toCreateJson({
     required int idExecucao,
-    required double peso,
+    double? peso,
   }) =>
       {
         'execucao': {'idExecucao': idExecucao},
