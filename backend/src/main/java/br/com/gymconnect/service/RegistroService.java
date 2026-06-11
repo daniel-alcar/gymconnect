@@ -13,17 +13,14 @@ import br.com.gymconnect.repository.RegistroDiarioRepository;
 public class RegistroService {
     
     @Autowired
-    private ResponseModel rm;
-
-    @Autowired
     private RegistroDiarioRepository rdm;
 
     public ResponseEntity<?> cadastrar(RegistroDiarioModel rd){
-
-        if (rd.getExecucao() == null || rd.getPeso() == null){
+        if (rd.getExecucao() == null) {
+            ResponseModel rm = new ResponseModel();
+            rm.setMensagem("Execução obrigatória.");
             return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity<>(rdm.save(rd), HttpStatus.OK);
         }
+        return new ResponseEntity<>(rdm.save(rd), HttpStatus.OK);
     }
 }
