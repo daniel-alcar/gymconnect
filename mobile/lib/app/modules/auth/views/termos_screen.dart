@@ -31,13 +31,13 @@ class TermosScreen extends StatelessWidget {
                 style: TextStyle(color: context.c.textSecondary, fontSize: 13),
               ),
               const SizedBox(height: 24),
-              _Secao(
+              const _Secao(
                 titulo: '1. Aceitação dos Termos',
                 texto:
                     'Ao criar uma conta e utilizar o GymConnect, você concorda com estes Termos de Uso. '
                     'Se não concordar com qualquer parte destes termos, não utilize o aplicativo.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '2. Descrição do Serviço',
                 texto:
                     'O GymConnect é uma plataforma que conecta professores de educação física '
@@ -45,7 +45,7 @@ class TermosScreen extends StatelessWidget {
                     'O aplicativo oferece funcionalidades como cadastro de exercícios, montagem de '
                     'cronogramas semanais e acompanhamento de atividade física.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '3. Cadastro e Conta',
                 texto:
                     'Para utilizar o GymConnect, você deve criar uma conta fornecendo informações '
@@ -53,7 +53,7 @@ class TermosScreen extends StatelessWidget {
                     'confidencialidade da sua senha e por todas as atividades realizadas com sua conta. '
                     'Notifique-nos imediatamente em caso de uso não autorizado.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '4. Uso Adequado',
                 texto:
                     'Você concorda em utilizar o aplicativo apenas para fins lícitos e de acordo '
@@ -63,7 +63,7 @@ class TermosScreen extends StatelessWidget {
                     '(c) tentar acessar dados de outros usuários sem autorização; '
                     '(d) interferir no funcionamento do serviço.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '5. Saúde e Segurança',
                 texto:
                     'O GymConnect não substitui orientação médica ou de profissional de saúde qualificado. '
@@ -71,35 +71,35 @@ class TermosScreen extends StatelessWidget {
                     'O aplicativo não se responsabiliza por lesões ou problemas de saúde '
                     'decorrentes do uso das informações aqui disponibilizadas.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '6. Privacidade de Dados',
                 texto:
                     'Coletamos e utilizamos seus dados pessoais conforme nossa Política de Privacidade. '
                     'Seus dados são utilizados exclusivamente para a prestação do serviço e '
                     'não são compartilhados com terceiros sem seu consentimento, salvo obrigação legal.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '7. Propriedade Intelectual',
                 texto:
                     'Todo o conteúdo do GymConnect — incluindo textos, imagens, logotipos e código — '
                     'é de propriedade dos desenvolvedores ou licenciado por eles. '
                     'É proibida a reprodução, distribuição ou modificação sem autorização expressa.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '8. Limitação de Responsabilidade',
                 texto:
                     'O GymConnect é fornecido "como está", sem garantias de qualquer natureza. '
                     'Não nos responsabilizamos por danos indiretos, incidentais ou consequenciais '
                     'decorrentes do uso ou da impossibilidade de uso do serviço.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '9. Alterações nos Termos',
                 texto:
                     'Reservamo-nos o direito de modificar estes termos a qualquer momento. '
                     'Alterações significativas serão notificadas dentro do aplicativo. '
                     'O uso continuado do serviço após as alterações implica na aceitação dos novos termos.',
               ),
-              _Secao(
+              const _Secao(
                 titulo: '10. Contato',
                 texto:
                     'Dúvidas sobre estes Termos de Uso podem ser enviadas para o suporte '
