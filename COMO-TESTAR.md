@@ -122,7 +122,7 @@ curl -X POST http://localhost:8080/auth/login \
 ### 4.1 Criar o banco
 
 ```bash
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS teste_gymconnect CHARACTER SET utf8mb4;"
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS gymconnect CHARACTER SET utf8mb4;"
 ```
 
 > No Windows, se `mysql` não for reconhecido, use o caminho completo:
@@ -136,7 +136,7 @@ cd backend
 $env:SPRING_PROFILES_ACTIVE = "prod"
 $env:MYSQL_HOST             = "localhost"
 $env:MYSQL_PORT             = "3306"
-$env:MYSQL_DATABASE         = "teste_gymconnect"
+$env:MYSQL_DATABASE         = "gymconnect"
 $env:MYSQL_USER             = "root"
 $env:MYSQL_PASSWORD         = "sua_senha_do_root"
 $env:keigemini               = "sua_chave_gemini"

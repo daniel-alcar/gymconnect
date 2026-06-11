@@ -2,7 +2,7 @@
 #  GymConnect - Subir o backend SEM Docker (Windows / PowerShell)
 #  Uso:  .\run-backend-local.ps1   (na pasta backend)
 #
-#  Pre-requisitos: JDK 21 e MySQL 8 (banco 'teste_gymconnect').
+#  Pre-requisitos: JDK 21 e MySQL 8 (banco 'gymconnect').
 #  A chave do Gemini e lida do arquivo .env (um nivel acima desta pasta).
 # ============================================================
 
@@ -32,7 +32,7 @@ try { java -version } catch {
 # Perfil 'prod' usa estas variaveis para conectar ao MySQL local.
 $env:SPRING_PROFILES_ACTIVE = 'prod'
 $env:MYSQL_HOST = 'localhost'
-$env:MYSQL_DATABASE = 'teste_gymconnect'
+$env:MYSQL_DATABASE = 'gymconnect'
 $env:MYSQL_USER = 'root'
 $env:MYSQL_PASSWORD = $MYSQL_ROOT_PASSWORD
 $env:JWT_SECRET = 'my-secret-key'

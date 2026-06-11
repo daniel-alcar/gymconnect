@@ -66,13 +66,13 @@ A API estará disponível em `http://localhost:8080`.
 
 ```powershell
 # Crie o banco
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS teste_gymconnect;"
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS gymconnect;"
 
 # Suba a API (perfil prod com variáveis)
 cd backend
 $env:SPRING_PROFILES_ACTIVE="prod"
 $env:MYSQL_HOST="localhost"
-$env:MYSQL_DATABASE="teste_gymconnect"
+$env:MYSQL_DATABASE="gymconnect"
 $env:MYSQL_USER="root"
 $env:MYSQL_PASSWORD="sua_senha"
 $env:keigemini="sua_chave_gemini"
