@@ -24,7 +24,7 @@ public class PerfilService {
             return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
         } else if(pp.getDataNascimento() == null) {
             return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
-        } else if(pp.getObjetivo().isEmpty()){
+        } else if(pp.getObjetivo() == null || pp.getObjetivo().trim().isEmpty()){
             return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
         }else {
             return new ResponseEntity<>(pr.save(pp), HttpStatus.OK);

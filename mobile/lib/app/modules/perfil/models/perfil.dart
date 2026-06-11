@@ -16,9 +16,14 @@ class Perfil {
   });
 
   factory Perfil.fromJson(Map<String, dynamic> json) {
+    final rawDate = json['dataNascimento'];
     return Perfil(
       idPerfil: (json['idPerfil'] as num?)?.toInt(),
-      dataNascimento: json['dataNascimento'] as String?,
+      dataNascimento: rawDate is int
+          ? DateTime.fromMillisecondsSinceEpoch(rawDate, isUtc: true)
+              .toIso8601String()
+              .substring(0, 10)
+          : rawDate as String?,
       altura: (json['altura'] as num?)?.toDouble(),
       objetivo: json['objetivo'] as String?,
     );
