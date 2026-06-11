@@ -2,7 +2,7 @@
 #  GymConnect - Iniciar TUDO (backend + adb reverse + app Flutter)
 #  Uso:  .\iniciar-tudo.ps1   (na raiz do repositorio)
 #
-#  Pre-requisitos: JDK 21, MySQL 8 (banco 'teste_gymconnect', root/123456),
+#  Pre-requisitos: JDK 21, MySQL 8 (banco 'gymconnect', root/123456),
 #  Flutter e um celular/emulador Android conectado (flutter devices).
 #  Crie um arquivo .env (copie de .env.example) com a sua keigemini.
 # ============================================================

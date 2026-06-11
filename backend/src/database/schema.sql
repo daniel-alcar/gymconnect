@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS teste_gymconnect;
-USE teste_gymconnect;
+CREATE DATABASE IF NOT EXISTS gymconnect;
+USE gymconnect;
 
 CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario BIGINT AUTO_INCREMENT PRIMARY KEY,
