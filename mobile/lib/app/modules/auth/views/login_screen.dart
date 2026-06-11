@@ -40,10 +40,43 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       context.go(RouteNames.app);
     } on AppException catch (e) {
-      if (mounted) SnackbarHelper.erro(context, e.message);
+      if (!mounted) return;
+      final credenciaisInvalidas =
+          e.statusCode == 401 || e.statusCode == 403;
+      if (credenciaisInvalidas) {
+        _mostrarErroCadastro();
+      } else {
+        SnackbarHelper.erro(context, e.message);
+      }
     } catch (_) {
       if (mounted) SnackbarHelper.erro(context, 'Erro ao fazer login.');
     }
+  }
+
+  void _mostrarErroCadastro() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('E-mail ou senha incorretos'),
+        content: const Text(
+          'Não encontramos uma conta com essas credenciais.\n\n'
+          'Deseja criar uma conta agora?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Tentar novamente'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.go(RouteNames.cadastro);
+            },
+            child: const Text('Cadastrar'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

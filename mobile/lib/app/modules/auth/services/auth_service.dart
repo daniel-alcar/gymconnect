@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:gymconnect/app/modules/auth/models/login_response.dart';
 import 'package:gymconnect/app/modules/auth/models/tipo_usuario.dart';
 import 'package:gymconnect/app/modules/auth/models/usuario.dart';
@@ -14,6 +15,7 @@ class AuthService {
       final res = await _client.dio.post(
         '/auth/login',
         data: {'email': email, 'senha': senha},
+        options: Options(extra: {'skipUnauthorized': true}),
       );
       if (_client.isSucesso(res)) {
         return LoginResponse.fromJson(res.data as Map<String, dynamic>);

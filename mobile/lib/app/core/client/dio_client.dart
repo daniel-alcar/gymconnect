@@ -41,7 +41,8 @@ class DioClient {
         },
         onResponse: (response, handler) {
           final status = response.statusCode ?? 0;
-          if (status == 401 || status == 403) {
+          final skip = response.requestOptions.extra['skipUnauthorized'] == true;
+          if (!skip && (status == 401 || status == 403)) {
             onUnauthorized?.call();
           }
           handler.next(response);
