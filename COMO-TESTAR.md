@@ -1,204 +1,358 @@
-# 🏋️ GymConnect — Guia completo para testar
+# GymConnect — Guia completo para testar
 
-Este guia explica, do zero, como rodar o **backend (API Java)** e o **app mobile (Flutter/Android)**.
+Explica, do zero, como configurar o ambiente, subir o backend e executar o app Flutter — cobrindo Docker, dispositivo físico, emulador e cenários de teste.
 
-> Esta branch (`ryan`) contém a solução mobile, em duas pastas:
-> - **`backend/`** → API Java (Spring Boot) + MySQL.
-> - **`mobile/`** → app Flutter (Android).
+> Esta branch (`ryan`) contém a solução mobile:
+> - **`backend/`** → API Java (Spring Boot) + MySQL
+> - **`mobile/`** → app Flutter (Android)
 >
-> (O projeto web original em React não faz parte desta branch — a solução é o app mobile consumindo o backend.)
+> O projeto web original em React não faz parte desta branch.
 
 ---
 
-## ✅ Pré-requisitos
+## Sumário
 
-Instale antes de começar:
+1. [Pré-requisitos](#1-pré-requisitos)
+2. [Clonar e configurar o .env](#2-clonar-e-configurar-o-env)
+3. [Backend com Docker (recomendado)](#3-backend-com-docker-recomendado)
+4. [Backend sem Docker](#4-backend-sem-docker)
+5. [App Flutter](#5-app-flutter)
+6. [Fluxos de teste](#6-fluxos-de-teste)
+7. [Testes automatizados](#7-testes-automatizados)
+8. [Trocar de conta / reiniciar estado](#8-trocar-de-conta--reiniciar-estado)
+9. [Troubleshooting](#9-troubleshooting)
+10. [Stack técnica](#10-stack-técnica)
 
-| Ferramenta | Versão | Link |
+---
+
+## 1. Pré-requisitos
+
+| Ferramenta | Versão mínima | Observação |
 |---|---|---|
-| **Git** | qualquer | https://git-scm.com/downloads |
-| **JDK 21** | 21 | https://adoptium.net/temurin/releases/?version=21 (marque "Set JAVA_HOME" e "Add to PATH") |
-| **MySQL 8** | 8.x | https://dev.mysql.com/downloads/installer/ (porta 3306; anote a senha do root) |
-| **Flutter SDK** | 3.19+ | https://docs.flutter.dev/get-started/install |
-| **Android Studio** | atual | para o emulador e SDK Android (ou use um celular físico) |
-| Docker Desktop *(opcional)* | atual | só se for usar o caminho com Docker |
+| Git | qualquer | |
+| Docker Desktop | 4.x | para a opção Docker; modo Linux Containers |
+| Flutter SDK | 3.19.0 | [flutter.dev/get-started](https://docs.flutter.dev/get-started/install) |
+| Android Studio | atual | SDK Android + emulador |
+| JDK 21 | 21 | apenas para rodar o backend **sem** Docker |
+| MySQL 8 | 8.0 | apenas para rodar o backend **sem** Docker |
 
-Confirme no terminal:
+**Confirme as instalações:**
 ```bash
 git --version
-java -version      # precisa mostrar 21
 flutter --version
-flutter doctor      # resolva os itens marcados com [x]
+flutter doctor       # resolva todos os itens [✗] antes de continuar
+java -version        # precisa mostrar openjdk 21 (só se for usar sem Docker)
 ```
+
+**Flutter no Windows — se `flutter` não for reconhecido:**
+1. Localize onde está o SDK (ex.: `C:\flutter\bin`).
+2. Pesquise "Variáveis de Ambiente" no Painel de Controle → Variáveis do sistema → **Path** → **Editar** → adicione o caminho `C:\flutter\bin`.
+3. Feche e reabra todos os terminais.
 
 ---
 
-## 1️⃣ Obter o código
+## 2. Clonar e configurar o .env
 
-```bash
+```powershell
 git clone https://github.com/daniel-alcar/gymconnect.git
 cd gymconnect
 git checkout ryan
-```
 
----
-
-## 2️⃣ Configurar a chave do Gemini (para o Chat IA)
-
-A tela **Chat IA** conversa com o Gemini através do backend. Para isso, é
-preciso uma **chave de API do Google AI Studio** (é gratuita).
-
-### Como gerar a chave no Google AI Studio
-1. Acesse **https://aistudio.google.com/app/apikey** e faça login com uma conta Google.
-2. Clique em **"Create API key"** (Criar chave de API).
-3. Selecione um projeto do Google Cloud existente **ou** deixe criar um novo automaticamente.
-4. A chave será gerada no formato **`AIza...`** — clique para **copiar**.
-5. Guarde com segurança (trate como senha; não compartilhe nem suba para o Git).
-
-> O modelo usado é o `gemini-2.5-flash`, disponível no nível gratuito — suficiente para testes.
-
-### Coloque a chave no projeto
-Copie o modelo de variáveis e preencha:
-
-```bash
-# Windows (PowerShell)
+# Crie o .env a partir do modelo
 Copy-Item .env.example .env
-
-# Linux / macOS
-cp .env.example .env
+notepad .env   # ou code .env
 ```
 
-Abra o `.env` e coloque sua chave em `keigemini=`:
-```
+Edite o `.env` com os valores reais:
+
+```dotenv
+# Chave do Google AI Studio (Gemini) — gratuita em https://aistudio.google.com/app/apikey
 keigemini=AIzaSuaChaveAqui
+
+# Senha do usuário da aplicação no banco
+MYSQL_PASSWORD=sua_senha_app
+
+# Senha do root do MySQL
+MYSQL_ROOT_PASSWORD=sua_senha_root
+
+# JWT — pode deixar o padrão abaixo para desenvolvimento
+JWT_SECRET=my-secret-key-change-in-production
 ```
-> O `.env` está no `.gitignore` — sua chave não vai para o Git. Sem a chave, todo o resto funciona; só o Chat IA retorna erro.
+
+> **Importante:** o `.env` está no `.gitignore` — nunca o commite.
+> Sem `keigemini`, o app inteiro funciona normalmente; só o Chat IA retorna erro.
 
 ---
 
-## 3️⃣ Subir o backend (escolha A **ou** B)
+## 3. Backend com Docker (recomendado)
 
-### 🅰️ Opção A — Sem Docker (recomendada)
+> Docker Desktop deve estar aberto em modo **Linux Containers**.
 
-**1. Crie o banco de dados** (vai pedir a senha do root do MySQL):
-```bash
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS teste_gymconnect;"
+```powershell
+# Sobe MySQL (porta 3307) + API (porta 8080)
+docker compose up -d --build
+
+# Acompanhe até ver: "Started GymconnectApplication in X seconds"
+docker compose logs -f backend
 ```
-> As tabelas são criadas automaticamente pelo backend (Hibernate) na 1ª execução.
-> Se `mysql` não for reconhecido, use o caminho completo, ex.:
-> `"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p -e "CREATE DATABASE IF NOT EXISTS teste_gymconnect;"`
 
-**2. Suba a API.** O perfil padrão usa usuário `root` e senha `123456`.
+A API estará em `http://localhost:8080`. As tabelas são criadas automaticamente.
 
-- **Se a senha do seu root é `123456`** (Windows PowerShell):
-  ```powershell
-  cd backend
-  $env:keigemini="SUA_CHAVE_DO_GEMINI"
-  .\mvnw.cmd spring-boot:run
-  ```
-- **Se a senha do root é OUTRA**, rode no perfil `prod` informando as credenciais:
-  ```powershell
-  cd backend
-  $env:SPRING_PROFILES_ACTIVE="prod"
-  $env:MYSQL_HOST="localhost"
-  $env:MYSQL_DATABASE="teste_gymconnect"
-  $env:MYSQL_USER="root"
-  $env:MYSQL_PASSWORD="SUA_SENHA_DO_ROOT"
-  $env:JWT_SECRET="my-secret-key"
-  $env:keigemini="SUA_CHAVE_DO_GEMINI"
-  .\mvnw.cmd spring-boot:run
-  ```
-  > Linux/macOS: troque `$env:VAR="x"` por `export VAR=x` e use `./mvnw` no lugar de `.\mvnw.cmd`.
+**Comandos úteis:**
 
-**3. Aguarde** aparecer no log: **`Started GymconnectApplication in X seconds`**.
-A API está em `http://localhost:8080`. **Deixe esse terminal aberto.**
-
-### 🅱️ Opção B — Com Docker
-
-Com o `.env` preenchido (passo 2) e o Docker Desktop rodando (modo **Linux Containers**):
-```bash
-docker-compose up -d --build
-docker-compose logs -f backend     # aguarde "Started GymconnectApplication"
+```powershell
+docker compose ps                  # ver status dos containers
+docker compose restart backend     # reiniciar só a API (mantém o banco)
+docker compose down                # parar (preserva os dados)
+docker compose down -v             # parar e apagar o volume do banco
 ```
-Sobe **MySQL + backend**. A API fica em `http://localhost:8080` e o banco já é
-criado e inicializado automaticamente.
 
-> Se o Docker travar em "engine starting" (problema do ambiente, não do projeto),
-> use a **Opção A (sem Docker)**.
-
-**Testar se a API respondeu:**
+**Testar se a API está respondendo:**
 ```bash
-curl -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{}"
+curl -X POST http://localhost:8080/auth/login \
+     -H "Content-Type: application/json" \
+     -d "{}"
+# Qualquer resposta (mesmo 400/403) confirma que a API está no ar.
 ```
-Qualquer resposta (mesmo erro 400/403) significa que a API está no ar. ✅
 
 ---
 
-## 4️⃣ Rodar o app mobile (Flutter)
+## 4. Backend sem Docker
 
-Em **outro terminal** (deixe o backend rodando):
+### 4.1 Criar o banco
+
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS teste_gymconnect CHARACTER SET utf8mb4;"
+```
+
+> No Windows, se `mysql` não for reconhecido, use o caminho completo:
+> `"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe"`
+
+### 4.2 Iniciar a API
+
+```powershell
+cd backend
+
+$env:SPRING_PROFILES_ACTIVE = "prod"
+$env:MYSQL_HOST             = "localhost"
+$env:MYSQL_PORT             = "3306"
+$env:MYSQL_DATABASE         = "teste_gymconnect"
+$env:MYSQL_USER             = "root"
+$env:MYSQL_PASSWORD         = "sua_senha_do_root"
+$env:keigemini               = "sua_chave_gemini"
+$env:JWT_SECRET             = "my-secret-key-change-in-production"
+
+.\mvnw.cmd spring-boot:run
+```
+
+> **Linux / macOS:** substitua `$env:VAR="x"` por `export VAR=x` e use `./mvnw` no lugar de `.\mvnw.cmd`.
+
+Aguarde a mensagem `Started GymconnectApplication in X seconds`. A API fica em `http://localhost:8080`. **Deixe esse terminal aberto.**
+
+---
+
+## 5. App Flutter
+
+Em outro terminal (com o backend já rodando):
+
 ```bash
 cd mobile
 flutter pub get
-flutter devices      # confira se há emulador ou celular conectado
+flutter devices    # lista emuladores e dispositivos disponíveis
 ```
 
-### 📱 Opção 1 — Emulador Android
-Não precisa configurar URL (já usa `http://10.0.2.2:8080` = localhost do PC):
+### 5.1 Emulador Android
+
+Abra o Android Studio → **Device Manager** → inicie um AVD com API 26 ou superior.
+
 ```bash
 flutter run
 ```
 
-### 📱 Opção 2 — Celular físico (via cabo USB) — recomendado
-1. No celular: **Configurações → Sobre → Informações de software →** toque 7x em "Número da versão" para liberar o **Modo desenvolvedor**, depois ative a **Depuração USB**.
-2. Conecte o cabo e autorize o computador.
-3. Encaminhe a porta pelo cabo e rode apontando para `localhost`:
-   ```bash
-   adb reverse tcp:8080 tcp:8080
-   flutter run --dart-define=API_BASE_URL=http://localhost:8080
-   ```
+O emulador enxerga o host como `10.0.2.2`, então `http://10.0.2.2:8080` é o `localhost` do PC — o app já usa essa URL automaticamente.
 
-### 📱 Opção 3 — Celular físico (via Wi‑Fi)
-PC e celular na mesma rede. Descubra o IP do PC (`ipconfig` / `ifconfig`) e rode:
+### 5.2 Celular físico via USB
+
+1. **Opções do desenvolvedor** no celular (toque 7× em "Número da versão" se precisar liberar).
+2. Ative **Depuração USB**.
+3. Conecte o cabo e autorize o computador na tela do celular.
+
 ```bash
-flutter run --dart-define=API_BASE_URL=http://IP_DO_PC:8080
+adb reverse tcp:8080 tcp:8080        # encaminha a porta pelo cabo
+flutter run
 ```
+
+### 5.3 Celular físico via Wi-Fi
+
+> PC e celular devem estar na mesma rede.
+
+**Android 11+:**
+```bash
+# No celular: Opções do desenvolvedor → Depuração sem fio → Parear com código
+adb pair <IP_CELULAR>:<PORTA_EMPARELHAMENTO>
+adb connect <IP_CELULAR>:<PORTA_DEPURACAO>
+adb reverse tcp:8080 tcp:8080
+flutter run
+```
+
+**Android 10 ou inferior (com USB primeiro):**
+```bash
+adb tcpip 5555
+adb connect <IP_CELULAR>:5555
+# Desconecte o USB e encaminhe a porta
+adb reverse tcp:8080 tcp:8080
+flutter run
+```
+
+Descubra o IP do PC com `ipconfig` (Windows) ou `ifconfig` (Linux/macOS). Alternativamente, informe o IP direto:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://<IP_DO_PC>:8080
+```
+
 > Pode ser necessário liberar a porta 8080 no firewall do PC.
 
 ---
 
-## 5️⃣ Testar os fluxos
+## 6. Fluxos de teste
 
-### Como ALUNO
-1. **Cadastrar** → escolha o perfil **Aluno** → login automático.
-2. **Treinos**: veja o treino do dia, assista ao vídeo (embutido), informe o peso e toque em **Marcar como Feito**.
-3. **Perfil**: preencha data de nascimento, altura e objetivo → **Salvar**.
-4. **AI Chat**: pergunte sobre seu treino, ex.: *"Quantas séries de supino faço?"*.
+### 6.1 Perfil Aluno
 
-### Como CLIENTE (academia/professor)
-1. **Cadastrar** → escolha o perfil **Cliente**.
-2. **Exercícios**: cadastre exercícios na biblioteca (nome + link do YouTube).
-3. **Treinos → Criar Treino**: escolha um aluno, o dia da semana e adicione exercícios (séries, repetições, carga, vídeo) → **Salvar**.
-4. **Alunos**: veja e gerencie os alunos cadastrados.
+**Cadastro e login**
+1. Na tela de login, toque em **Cadastrar**.
+2. Preencha nome, e-mail, senha e selecione perfil **Aluno** → confirmar.
+3. Faça login — em caso de erro, o app exibe "E-mail ou senha incorretos" com opção de ir para o cadastro.
 
-> Dica: crie **uma conta Aluno** antes, para ela aparecer no dropdown de "Criar Treino".
+**Visualizar e concluir treinos**
+1. No dashboard, selecione o dia da semana.
+2. Os exercícios do dia aparecem com séries, repetições e carga.
+3. Toque na thumbnail do vídeo para abrir o player YouTube embutido.
+4. Expanda **"Como executar"** para ver a descrição do exercício.
+5. Toque em **Marcar como Feito** — o card muda para verde (Concluído).
+6. Toque em **Desmarcar** para reverter.
+
+**Chat IA**
+1. Acesse o ícone de chat no menu inferior.
+2. Envie uma pergunta sobre treino ou nutrição.
+3. A resposta é gerada pelo Gemini 2.5 Flash.
+
+**Perfil e logout**
+1. Acesse a aba **Perfil** e confirme seus dados.
+2. Toque em **Sair** — deve redirecionar para a tela de login.
+
+### 6.2 Perfil Cliente (professor)
+
+**Cadastro**
+1. Cadastre-se com perfil **Cliente**.
+
+**Gerenciar biblioteca de exercícios**
+1. Acesse a aba **Exercícios**.
+2. Crie um exercício: nome (obrigatório), link YouTube e descrição (opcionais).
+3. Edite um exercício existente (ícone de lápis) → confirme que as alterações persistem.
+4. Remova um exercício (ícone de lixeira) → confirme o diálogo e que some da lista.
+
+**Criar treino para múltiplos dias**
+1. Acesse a aba **Alunos** → selecione um aluno → **Criar Treino**.
+2. Selecione o aluno e o primeiro dia da semana.
+3. Adicione exercícios com séries, repetições e carga.
+4. Toque em **Adicionar dia** para incluir Segunda, Terça, etc. — tudo na mesma tela.
+5. Toque em **Salvar Treinos** — todos os dias são criados de uma vez.
+
+**Editar vínculo de exercício**
+1. Na lista de treinos de um aluno, toque em um exercício.
+2. Altere dia, séries, repetições ou carga → salvar.
+3. Confirme que a lista atualiza automaticamente (sem fechar e reabrir).
+
+**Remover vínculo**
+1. Na edição do vínculo, toque em **Remover**.
+2. O exercício deve sumir da lista do aluno.
+
+**Visualizar alunos**
+1. Na aba **Alunos**, a lista mostra todos os alunos cadastrados.
+2. Novos alunos aparecem automaticamente após auto-cadastro com perfil Aluno (sem ação do professor).
 
 ---
 
-## 🛠️ Problemas comuns
+## 7. Testes automatizados
 
-| Problema | Solução |
+### Análise estática (Flutter)
+
+```bash
+cd mobile
+flutter analyze
+```
+
+Zero erros é o esperado. Warnings de deprecação em versões abaixo de 3.33 podem aparecer.
+
+### Testes unitários e de widget (Flutter)
+
+```bash
+cd mobile
+flutter test
+```
+
+### Testes de integração (Flutter)
+
+```bash
+# Se houver arquivos em integration_test/
+cd mobile
+flutter test integration_test/
+```
+
+### Testes do backend (Maven)
+
+```bash
+cd backend
+.\mvnw.cmd test         # Windows
+./mvnw test             # Linux / macOS
+```
+
+Os testes de integração do Spring Boot exigem o banco disponível (Docker ou local).
+
+---
+
+## 8. Trocar de conta / reiniciar estado
+
+| Ação | Como fazer |
 |---|---|
-| App abre mas dá **"erro ao conectar ao servidor"** | Backend não está no ar **ou** URL errada. Confira o terminal do backend e, no celular físico, use `adb reverse` + `--dart-define=...localhost:8080`. |
-| `mysql` não reconhecido | Use o caminho completo do `mysql.exe` ou adicione a pasta `bin` do MySQL ao PATH. |
-| `java` não reconhecido / versão errada | Reinstale o JDK 21 marcando "Add to PATH" e reabra o terminal. |
-| Chat IA retorna **502** | A `keigemini` não está definida ou é inválida. Gere uma nova chave (formato `AIza...`) e ajuste o `.env` (ou a variável de ambiente, no modo sem Docker). |
-| Build do Android falha por **SDK** | Rode `flutter doctor` e instale o Android SDK indicado. |
-| Docker trava em "engine starting" | Use a **Opção A (sem Docker)**. |
+| Recarregar código sem perder estado | `r` no terminal (hot reload) |
+| Reiniciar o app do zero | `R` no terminal ou botão de hot restart no VS Code/Android Studio |
+| Fazer logout real | Aba **Perfil** → **Sair** (remove o token JWT) |
+| Limpar banco de dados | `docker compose down -v && docker compose up -d --build` |
+| Limpar cache Flutter | `flutter clean && flutter pub get` |
 
 ---
 
-## 📦 Tecnologias
+## 9. Troubleshooting
 
-**Mobile:** Flutter · Dart · Provider · Dio · GoRouter · SharedPreferences · youtube_player_flutter · Material 3
-**Backend:** Java 21 · Spring Boot · MySQL 8 · JWT · Gemini
+| Sintoma | Causa provável | Solução |
+|---|---|---|
+| `flutter: command not found` | Flutter fora do PATH | Adicione `C:\flutter\bin` ao PATH e reabra o terminal |
+| App trava na tela de login | Backend não iniciou | `docker compose logs backend` — verifique se apareceu "Started GymconnectApplication" |
+| `Connection refused` no celular físico | Porta não encaminhada | Execute `adb reverse tcp:8080 tcp:8080` |
+| Banco não conecta no Docker | Porta 3307 já ocupada | Mude `"3307:3306"` no `docker-compose.yml` para outra porta livre |
+| `MYSQL_ROOT_PASSWORD not set` | `.env` não foi criado | Copie `.env.example` para `.env` e preencha as variáveis |
+| Chat IA retorna 403/502 | Chave Gemini inválida ou ausente | Verifique `keigemini=` no `.env` (formato `AIza...`) e reinicie o backend |
+| `flutter pub get` falha | Pub cache corrompido | `flutter clean && flutter pub get` |
+| Emulador não aparece em `flutter devices` | AVD não iniciado | Android Studio → Device Manager → Start |
+| `adb: device not found` | USB debug desabilitado ou cabo | Ative "Depuração USB"; tente outro cabo USB |
+| `java` não reconhecido | JDK fora do PATH | Reinstale o JDK 21 marcando "Add to PATH" e reabra o terminal |
+| `mysql` não reconhecido | MySQL fora do PATH | Use o caminho completo `"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe"` |
+| Docker trava em "engine starting" | Problema do Docker Desktop | Use a opção sem Docker (seção 4) |
+
+---
+
+## 10. Stack técnica
+
+| Componente | Tecnologia |
+|---|---|
+| App Android | Flutter 3.19+ / Dart 3.3+ |
+| Gerenciamento de estado | Provider |
+| Navegação | GoRouter |
+| HTTP client | Dio |
+| UI | Material 3 |
+| Backend | Java 21 + Spring Boot 3 |
+| Autenticação | JWT (Spring Security) |
+| Banco de dados | MySQL 8 / JPA (Hibernate) |
+| IA | Google Gemini 2.5 Flash |
+| Infraestrutura | Docker + Docker Compose |
