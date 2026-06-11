@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymconnect/app/core/errors/app_exception.dart';
@@ -334,6 +335,10 @@ class _DiaSectionCard extends StatelessWidget {
                                 initialValue: form.series,
                                 enabled: habilitado,
                                 keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(2),
+                                ],
                                 onChanged: (v) => form.series = v,
                                 decoration: const InputDecoration(
                                     labelText: 'Séries', isDense: true),
@@ -345,6 +350,10 @@ class _DiaSectionCard extends StatelessWidget {
                                 initialValue: form.repeticoes,
                                 enabled: habilitado,
                                 keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(3),
+                                ],
                                 onChanged: (v) => form.repeticoes = v,
                                 decoration: const InputDecoration(
                                     labelText: 'Reps', isDense: true),
@@ -356,6 +365,10 @@ class _DiaSectionCard extends StatelessWidget {
                                 initialValue: form.carga,
                                 enabled: habilitado,
                                 keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(3),
+                                ],
                                 onChanged: (v) => form.carga = v,
                                 decoration: const InputDecoration(
                                     labelText: 'Carga (kg)', isDense: true),

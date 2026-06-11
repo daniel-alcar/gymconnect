@@ -87,7 +87,7 @@ class _TreinosScreenState extends State<TreinosScreen> {
     }
     await treinoProv.concluirDia(diaTitulo);
     if (mounted) {
-      SnackbarHelper.sucesso(context, 'Treino "$diaTitulo" concluído! 💪');
+      SnackbarHelper.sucesso(context, 'Treino "$diaTitulo" concluído!');
     }
   }
 
@@ -163,50 +163,65 @@ class _TreinosScreenState extends State<TreinosScreen> {
       itemCount: provider.dias.length,
       itemBuilder: (context, index) {
         final dia = provider.dias[index];
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(bottom: 4),
-              child: Text(
-                'TREINO DO DIA',
-                style: TextStyle(
-                  color: AppColors.amareloPressed,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1,
+        final concluido = provider.diaConcluido(dia.titulo);
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              initiallyExpanded: index == 0,
+              tilePadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              leading: CircleAvatar(
+                radius: 20,
+                backgroundColor: concluido
+                    ? AppColors.success.withValues(alpha: 0.15)
+                    : AppColors.amarelo.withValues(alpha: 0.18),
+                child: Icon(
+                  concluido
+                      ? Icons.check_circle
+                      : Icons.fitness_center,
+                  size: 18,
+                  color: concluido
+                      ? AppColors.success
+                      : AppColors.amareloPressed,
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(
+              title: Text(
                 dia.titulo,
                 style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
                   color: context.c.textPrimary,
                 ),
               ),
-            ),
-            ...dia.exercicios.map(
-              (ex) => ExercicioCard(
-                key: ValueKey(ex.idCronogramaExercicio ?? ex.exercicio?.idExercicio),
-                exercicio: ex,
-                feito: provider.exercicioFeito(ex.idCronogramaExercicio),
-                processando: _processandoId == ex.idCronogramaExercicio,
-                onMarcarFeito: (peso) => _marcarFeito(ex, peso),
-                onDesmarcar: () => _desmarcarExercicio(ex),
+              subtitle: Text(
+                '${dia.exercicios.length} exercício${dia.exercicios.length != 1 ? 's' : ''}',
+                style:
+                    TextStyle(color: context.c.textSecondary, fontSize: 13),
               ),
+              children: [
+                ...dia.exercicios.map(
+                  (ex) => ExercicioCard(
+                    key: ValueKey(
+                        ex.idCronogramaExercicio ?? ex.exercicio?.idExercicio),
+                    exercicio: ex,
+                    feito: provider.exercicioFeito(ex.idCronogramaExercicio),
+                    processando: _processandoId == ex.idCronogramaExercicio,
+                    onMarcarFeito: (peso) => _marcarFeito(ex, peso),
+                    onDesmarcar: () => _desmarcarExercicio(ex),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _BotaoConcluirTreino(
+                  concluido: concluido,
+                  onConcluir: () => _concluirTreino(dia.titulo),
+                  onDesmarcar: () => _desmarcarTreino(dia.titulo),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            _BotaoConcluirTreino(
-              concluido: provider.diaConcluido(dia.titulo),
-              onConcluir: () => _concluirTreino(dia.titulo),
-              onDesmarcar: () => _desmarcarTreino(dia.titulo),
-            ),
-            const SizedBox(height: 24),
-          ],
+          ),
         );
       },
     );
