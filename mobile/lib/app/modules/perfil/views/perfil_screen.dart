@@ -14,6 +14,7 @@ import 'package:gymconnect/app/routes/route_names.dart';
 import 'package:gymconnect/app/core/storage/storage_service.dart';
 import 'package:gymconnect/app/shared/utils/date_formatter.dart';
 import 'package:gymconnect/app/shared/utils/snackbar_helper.dart';
+import 'package:gymconnect/app/shared/utils/app_formatters.dart';
 import 'package:gymconnect/app/shared/utils/validators.dart';
 import 'package:gymconnect/app/shared/widgets/app_logo.dart';
 import 'package:gymconnect/app/modules/home/views/configuracoes_screen.dart';
@@ -325,6 +326,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   validator: Validators.altura,
+                  inputFormatters: [AppFormatters.noEmoji],
                   decoration: const InputDecoration(
                     labelText: 'Altura (m)',
                     hintText: 'ex.: 1.75',
@@ -337,6 +339,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   enabled: !salvando,
                   validator: (v) =>
                       Validators.obrigatorio(v, campo: 'Objetivo'),
+                  inputFormatters: [AppFormatters.noEmoji],
                   decoration: const InputDecoration(
                     labelText: 'Objetivo',
                     hintText: 'ex.: Hipertrofia',

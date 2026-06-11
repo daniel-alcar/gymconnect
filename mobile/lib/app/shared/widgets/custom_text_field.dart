@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:gymconnect/app/shared/utils/app_formatters.dart';
+
 /// Campo de texto padronizado com label, ícone e validação.
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -37,6 +39,7 @@ class CustomTextField extends StatelessWidget {
       validator: validator,
       textInputAction: textInputAction,
       onFieldSubmitted: onSubmitted,
+      inputFormatters: [AppFormatters.noEmoji],
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
