@@ -135,24 +135,28 @@ class _PerfilScreenState extends State<PerfilScreen> {
     final agora = DateTime.now();
     final data = await showDatePicker(
       context: context,
+      locale: const Locale('pt', 'BR'),
       initialDate: _dataNascimento ?? DateTime(agora.year - 20),
       firstDate: DateTime(1920),
       lastDate: agora,
-      helpText: 'Selecione a data de nascimento',
+      helpText: 'Data de nascimento',
+      fieldHintText: 'dd/mm/aaaa',
+      errorFormatText: 'Use o formato dd/mm/aaaa',
+      errorInvalidText: 'Data inválida ou fora do intervalo permitido',
     );
     if (data != null) setState(() => _dataNascimento = data);
   }
 
   Future<void> _salvar() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_dataNascimento == null) {
+      SnackbarHelper.erro(context, 'Selecione a data de nascimento.');
+      return;
+    }
     FocusScope.of(context).unfocus();
     final perfil = Perfil(
-      dataNascimento: _dataNascimento != null
-          ? DateFormatter.toIso(_dataNascimento!)
-          : null,
-      altura: _alturaController.text.trim().isEmpty
-          ? null
-          : double.tryParse(_alturaController.text.replaceAll(',', '.')),
+      dataNascimento: DateFormatter.toIso(_dataNascimento!),
+      altura: double.tryParse(_alturaController.text.replaceAll(',', '.')),
       objetivo: _objetivoController.text.trim().isEmpty
           ? null
           : _objetivoController.text.trim(),
@@ -163,7 +167,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
     } on AppException catch (e) {
       if (mounted) SnackbarHelper.erro(context, e.message);
     } catch (_) {
-      if (mounted) SnackbarHelper.erro(context, 'Erro ao salvar perfil.');
+      if (mounted) SnackbarHelper.erro(context, 'Erro ao salvar perfil. Verifique os dados e tente novamente.');
     }
   }
 
@@ -291,7 +295,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Todos os campos são opcionais.',
+                  'Todos os campos são obrigatórios.',
                   style: TextStyle(color: context.c.textSecondary, fontSize: 13),
                 ),
                 const SizedBox(height: 16),
@@ -320,7 +324,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   enabled: !salvando,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  validator: Validators.alturaOpcional,
+                  validator: Validators.altura,
                   decoration: const InputDecoration(
                     labelText: 'Altura (m)',
                     hintText: 'ex.: 1.75',
@@ -331,6 +335,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 TextFormField(
                   controller: _objetivoController,
                   enabled: !salvando,
+                  validator: (v) =>
+                      Validators.obrigatorio(v, campo: 'Objetivo'),
                   decoration: const InputDecoration(
                     labelText: 'Objetivo',
                     hintText: 'ex.: Hipertrofia',

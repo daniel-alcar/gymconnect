@@ -13,5 +13,5 @@ enum TipoUsuario {
     );
   }
 
-  String get label => this == TipoUsuario.cliente ? 'Academia' : 'Aluno';
+  String get label => this == TipoUsuario.cliente ? 'Professor' : 'Aluno';
 }

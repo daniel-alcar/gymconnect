@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymconnect/app/core/constants/app_constants.dart';
@@ -111,6 +112,13 @@ class _GymConnectAppState extends State<GymConnectApp> {
     // Logout automático quando o backend responde 401/403.
     _dioClient.onUnauthorized = _authProvider.sessaoExpirada;
 
+    // Limpa o histórico do chat ao fazer logout (qualquer origem).
+    _authProvider.addListener(() {
+      if (_authProvider.status == AuthStatus.naoAutenticado) {
+        _chatProvider.limpar();
+      }
+    });
+
     _appRouter = AppRouter(_authProvider);
 
     // Carrega a preferência de tema e a sessão salva (token + usuário).
@@ -146,6 +154,16 @@ class _GymConnectAppState extends State<GymConnectApp> {
         builder: (_, tema, __) => MaterialApp.router(
           title: AppConstants.appName,
           debugShowCheckedModeBanner: false,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('pt', 'BR'),
+            Locale('en', 'US'),
+          ],
+          locale: const Locale('pt', 'BR'),
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
           themeMode: tema.modo,

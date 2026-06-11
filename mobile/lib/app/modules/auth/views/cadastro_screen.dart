@@ -11,7 +11,6 @@ import 'package:gymconnect/app/shared/utils/snackbar_helper.dart';
 import 'package:gymconnect/app/shared/utils/validators.dart';
 import 'package:gymconnect/app/shared/widgets/app_logo.dart';
 
-/// TELA 3 – CADASTRO.
 class CadastroScreen extends StatefulWidget {
   const CadastroScreen({super.key});
 
@@ -26,10 +25,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
   final _senhaController = TextEditingController();
   final _confirmarController = TextEditingController();
   TipoUsuario _tipo = TipoUsuario.aluno;
-
-  // Controles INDEPENDENTES de visibilidade (item 1).
   bool _ocultarSenha = true;
   bool _ocultarConfirmar = true;
+  bool _aceitouTermos = false;
 
   @override
   void dispose() {
@@ -42,6 +40,11 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
   Future<void> _cadastrar() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!_aceitouTermos) {
+      SnackbarHelper.erro(
+          context, 'Aceite os Termos de Uso para continuar.');
+      return;
+    }
     FocusScope.of(context).unfocus();
     final auth = context.read<AuthProvider>();
     try {
@@ -66,9 +69,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
     final carregando = context.watch<AuthProvider>().carregando;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const AppLogo(height: 30),
-      ),
+      appBar: AppBar(title: const AppLogo(height: 30)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -123,7 +124,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        // Senha — toggle próprio
                         TextFormField(
                           controller: _senhaController,
                           enabled: !carregando,
@@ -132,6 +132,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           validator: Validators.senha,
                           decoration: InputDecoration(
                             labelText: 'Senha',
+                            hintText: 'Mín. 8 caracteres, letras e números',
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
                               icon: Icon(_ocultarSenha
@@ -143,7 +144,6 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        // Confirmar Senha — toggle INDEPENDENTE
                         TextFormField(
                           controller: _confirmarController,
                           enabled: !carregando,
@@ -191,8 +191,8 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: _PerfilOption(
-                                icone: Icons.business,
-                                titulo: 'Cliente',
+                                icone: Icons.fitness_center,
+                                titulo: 'Professor',
                                 selecionado: _tipo == TipoUsuario.cliente,
                                 onTap: carregando
                                     ? null
@@ -202,7 +202,47 @@ class _CadastroScreenState extends State<CadastroScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              value: _aceitouTermos,
+                              onChanged: carregando
+                                  ? null
+                                  : (v) => setState(
+                                      () => _aceitouTermos = v ?? false),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: Wrap(
+                                  children: [
+                                    Text(
+                                      'Li e aceito os ',
+                                      style: TextStyle(
+                                          color: context.c.textSecondary),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () =>
+                                          context.push(RouteNames.termos),
+                                      child: const Text(
+                                        'Termos de Uso',
+                                        style: TextStyle(
+                                          color: AppColors.amareloPressed,
+                                          fontWeight: FontWeight.w700,
+                                          decoration:
+                                              TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
                         FilledButton(
                           onPressed: carregando ? null : _cadastrar,
                           child: carregando

@@ -10,6 +10,8 @@ class RouteNames {
   /// Casca principal com a navigation bar (Dashboard/Treinos/Perfil/Chat).
   static const String app = '/app';
 
+  static const String termos = '/termos';
+
   /// Rotas acessíveis sem autenticação.
-  static const Set<String> publicas = {splash, inicial, login, cadastro};
+  static const Set<String> publicas = {splash, inicial, login, cadastro, termos};
 }

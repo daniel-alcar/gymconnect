@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gymconnect/app/modules/auth/providers/auth_provider.dart';
 import 'package:gymconnect/app/modules/auth/views/cadastro_screen.dart';
 import 'package:gymconnect/app/modules/auth/views/login_screen.dart';
+import 'package:gymconnect/app/modules/auth/views/termos_screen.dart';
 import 'package:gymconnect/app/modules/home/views/initial_screen.dart';
 import 'package:gymconnect/app/modules/home/views/main_shell.dart';
 import 'package:gymconnect/app/modules/home/views/splash_screen.dart';
@@ -63,6 +64,10 @@ class AppRouter {
       GoRoute(
         path: RouteNames.cadastro,
         builder: (_, __) => const CadastroScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.termos,
+        builder: (_, __) => const TermosScreen(),
       ),
       GoRoute(
         path: RouteNames.app,

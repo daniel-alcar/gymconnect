@@ -111,8 +111,19 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                           ? null
                           : () async {
                               if (!formKey.currentState!.validate()) return;
+                              final prov = context.read<ClienteProvider>();
+                              final nomeTrimmed = nomeController.text.trim().toLowerCase();
+                              final duplicado = prov.exercicios.any((e) =>
+                                  e.nome.trim().toLowerCase() == nomeTrimmed &&
+                                  e.idExercicio != existente?.idExercicio);
+                              if (duplicado) {
+                                if (ctx.mounted) {
+                                  SnackbarHelper.erro(ctx,
+                                      'Já existe um exercício com esse nome.');
+                                }
+                                return;
+                              }
                               try {
-                                final prov = context.read<ClienteProvider>();
                                 if (editando) {
                                   await prov.atualizarExercicio(
                                     existente.idExercicio!,

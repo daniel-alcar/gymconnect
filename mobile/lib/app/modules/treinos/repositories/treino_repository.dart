@@ -110,7 +110,7 @@ class TreinoRepository {
       status: StatusExecucao.feito,
     );
 
-    if (peso != null && execucao.idExecucao != null) {
+    if (execucao.idExecucao != null) {
       await _registroService.registrarPeso(
         idExecucao: execucao.idExecucao!,
         peso: peso,
