@@ -31,7 +31,7 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final p = context.read<ClienteProvider>();
       if (p.alunos.isEmpty) p.carregarAlunos();
-      if (p.exercicios.isEmpty) p.carregarExercicios();
+      p.carregarExercicios();
     });
   }
 

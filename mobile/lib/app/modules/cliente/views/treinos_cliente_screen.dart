@@ -272,6 +272,11 @@ Future<void> _abrirEdicaoVinculo(
   await Navigator.of(context).push(
     MaterialPageRoute(builder: (_) => EditarVinculoScreen(vinculo: ex)),
   );
+  if (!context.mounted) return;
+  final sel = context.read<ClienteProvider>().alunoSelecionado;
+  if (sel != null) {
+    context.read<ClienteProvider>().carregarTreinosDoAluno(sel);
+  }
 }
 
 /// Confirma e remove um vínculo de treino (DELETE /cronogramaexercicio/{id}).
