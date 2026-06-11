@@ -4,12 +4,12 @@ services:
     container_name: gymconnect-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-08072002}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-dUOCXi5bVhN5JEpG7wUim72xolJZbYjf}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-teste_gymconnect}
       MYSQL_USER: ${MYSQL_USER:-gymconnect}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-gymconnect123}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-bmavKH4zHP03msP2omj6aZyX5Sq90Jn3}
     ports:
-      - "3307:3306"
+      - "3399:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend/src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
@@ -41,7 +41,7 @@ services:
       MYSQL_HOST: mysql
       MYSQL_DATABASE: ${MYSQL_DATABASE:-teste_gymconnect}
       MYSQL_USER: ${MYSQL_USER:-gymconnect}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-gymconnect123}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-bmavKH4zHP03msP2omj6aZyX5Sq90Jn3}
       JWT_SECRET: ${JWT_SECRET:-my-secret-key-change-in-production}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       # Chave da API do Gemini (backend lê gemini.api-key=${keigemini})
