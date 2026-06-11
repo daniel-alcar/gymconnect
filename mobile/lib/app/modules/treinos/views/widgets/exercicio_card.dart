@@ -3,7 +3,6 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:gymconnect/app/core/theme/app_colors.dart';
 import 'package:gymconnect/app/modules/treinos/models/cronograma_exercicio.dart';
-import 'package:gymconnect/app/shared/utils/validators.dart';
 import 'package:gymconnect/app/modules/treinos/views/widgets/youtube_video_player.dart';
 
 /// Card de um exercício do treino: dados, vídeo embutido, peso e "marcar feito".
@@ -28,24 +27,10 @@ class ExercicioCard extends StatefulWidget {
 }
 
 class _ExercicioCardState extends State<ExercicioCard> {
-  final _pesoController = TextEditingController();
   bool _reproduzir = false;
-  String? _erroPeso;
-
-  @override
-  void dispose() {
-    _pesoController.dispose();
-    super.dispose();
-  }
 
   void _concluir() {
-    final texto = _pesoController.text.trim();
-    final erro = Validators.pesoOpcional(texto);
-    setState(() => _erroPeso = erro);
-    if (erro != null) return;
-    final peso =
-        texto.isEmpty ? null : double.tryParse(texto.replaceAll(',', '.'));
-    widget.onMarcarFeito(peso);
+    widget.onMarcarFeito(null);
   }
 
   @override

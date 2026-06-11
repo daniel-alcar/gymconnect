@@ -8,7 +8,7 @@ class RegistroService {
 
   Future<RegistroDiario> registrarPeso({
     required int idExecucao,
-    required double peso,
+    double? peso,
   }) async {
     try {
       final res = await _client.dio.post(
