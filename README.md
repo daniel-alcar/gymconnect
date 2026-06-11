@@ -1,82 +1,103 @@
 # GymConnect
 
-## Documentação da API (frontend / Flutter)
+Aplicativo mobile de treinos personalizados, desenvolvido como Projeto Integrador.
 
-Toda a referência de rotas, JSON de entrada/saída e autenticação JWT está em:
-
-**[backend/API.md](backend/API.md)**
-
+Um **professor (Cliente)** monta cronogramas de treino para seus **alunos**, que acompanham os exercícios, assistem aos vídeos e marcam cada série como concluída — tudo pelo app Android.
 
 ---
 
-# Como rodar o projeto com Docker Compose
+## Visão geral
 
-Siga os passos abaixo para configurar e executar o projeto GymConnect utilizando Docker Compose.
----
-
-## 1. Preparação do ambiente
-
-Caso você já tenha baixado alguma versão anterior do sistema:
-
-**Exclua completamente todas as pastas antigas do projeto.**
-
-Agora siga os passos:
-
-1. Crie uma nova pasta vazia para armazenar o projeto.  
-2. Abra o CMD do Windows como administrador.
+| Camada | Tecnologia |
+|--------|-----------|
+| Mobile (Android) | Flutter 3.19+ · Dart 3.3+ · Provider · Dio · GoRouter · Material 3 |
+| Backend (API REST) | Java 21 · Spring Boot 3 · Spring Security · JWT |
+| Banco de dados | MySQL 8 |
+| IA (Chat) | Google Gemini 2.5 Flash |
+| Infraestrutura | Docker · Docker Compose |
 
 ---
 
-## 2. Executando os comandos
+## Estrutura do repositório
 
-Execute os comandos abaixo na ordem indicada.
-
-### 1. Acesse a pasta criada
-
-```bash
-cd "CAMINHO-DA-SUA-PASTA"
+```
+gymconnect/
+├── backend/          # API Java (Spring Boot)
+│   └── API.md        # Documentação completa das rotas REST
+├── mobile/           # App Flutter (Android)
+├── docker-compose.yml
+├── .env.example      # Modelo de variáveis de ambiente
+├── COMO-TESTAR.md    # Guia detalhado de execução e testes
+└── README.md
 ```
 
-### 2. Clone o repositório
+> A pasta `old/mobile/` contém a versão anterior do app e pode ser ignorada.
 
-```bash
-git clone https://github.com/daniel-alcar/gymconnect.git gymconnect
-```
+---
 
-### 3. Entre no diretório do projeto
+## Início rápido (Docker)
 
-```bash
+> Pré-requisito: [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado e rodando em modo **Linux Containers**.
+
+```powershell
+# 1. Clone e entre na branch correta
+git clone https://github.com/daniel-alcar/gymconnect.git
 cd gymconnect
+git checkout ryan
+
+# 2. Crie o .env a partir do modelo
+Copy-Item .env.example .env
+# Edite o .env e preencha keigemini= com sua chave do Google AI Studio
+
+# 3. Suba MySQL + backend
+docker compose up -d --build
+
+# 4. Aguarde a API inicializar (~30s) e confirme
+docker compose logs -f backend   # aguarde "Started GymconnectApplication"
 ```
 
-### 4. Faça o build dos containers
+A API estará disponível em `http://localhost:8080`.
 
-```bash
-docker compose build
-```
+---
 
-Observação: Esta etapa pode demorar.  
-Quando finalizar, devem aparecer mensagens como:
+## Início rápido (sem Docker)
 
-```
-gymconnect-backend Built
-gymconnect-frontend Built
-```
+> Pré-requisitos: JDK 21 instalado e MySQL 8 rodando localmente.
 
-### 5. Inicie os serviços
+```powershell
+# Crie o banco
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS teste_gymconnect;"
 
-```bash
-docker compose up -d
+# Suba a API (perfil prod com variáveis)
+cd backend
+$env:SPRING_PROFILES_ACTIVE="prod"
+$env:MYSQL_HOST="localhost"
+$env:MYSQL_DATABASE="teste_gymconnect"
+$env:MYSQL_USER="root"
+$env:MYSQL_PASSWORD="sua_senha"
+$env:keigemini="sua_chave_gemini"
+.\mvnw.cmd spring-boot:run
 ```
 
 ---
 
-## 3. Acessando o sistema
+## App mobile
 
-Abra o navegador e acesse:
-
+```bash
+cd mobile
+flutter pub get
+flutter run        # emulador Android ou celular via USB
 ```
-http://localhost
+
+Para celular físico via USB, encaminhe a porta antes:
+```bash
+adb reverse tcp:8080 tcp:8080
+flutter run --dart-define=API_BASE_URL=http://localhost:8080
 ```
 
-O sistema estará disponível.
+---
+
+## Documentação
+
+- **[COMO-TESTAR.md](COMO-TESTAR.md)** — guia completo: pré-requisitos, variáveis, backend, Flutter, fluxos de teste e troubleshooting
+- **[backend/API.md](backend/API.md)** — referência completa das rotas REST (payloads, autenticação JWT, códigos de retorno)
