@@ -6,6 +6,7 @@ import 'package:gymconnect/app/core/theme/app_theme.dart';
 import 'package:gymconnect/app/modules/treinos/models/exercicio.dart';
 import 'package:gymconnect/app/modules/cliente/providers/cliente_provider.dart';
 import 'package:gymconnect/app/shared/utils/snackbar_helper.dart';
+import 'package:gymconnect/app/shared/utils/app_formatters.dart';
 import 'package:gymconnect/app/shared/utils/validators.dart';
 import 'package:gymconnect/app/shared/widgets/app_logo.dart';
 import 'package:gymconnect/app/shared/widgets/empty_state.dart';
@@ -75,6 +76,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                   TextFormField(
                     controller: nomeController,
                     validator: (v) => Validators.obrigatorio(v, campo: 'Nome'),
+                    inputFormatters: [AppFormatters.noEmoji],
                     decoration: const InputDecoration(
                       labelText: 'Nome do exercício',
                       prefixIcon: Icon(Icons.fitness_center),
@@ -84,6 +86,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                   TextFormField(
                     controller: linkController,
                     keyboardType: TextInputType.url,
+                    inputFormatters: [AppFormatters.noEmoji],
                     decoration: const InputDecoration(
                       labelText: 'Link do YouTube (opcional)',
                       hintText: 'https://youtube.com/watch?v=...',
@@ -96,6 +99,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                     minLines: 3,
                     maxLines: 6,
                     textInputAction: TextInputAction.newline,
+                    inputFormatters: [AppFormatters.noEmoji],
                     decoration: const InputDecoration(
                       labelText: 'Descrição / execução (opcional)',
                       hintText: 'Ex.: Mantenha a coluna neutra, desça '

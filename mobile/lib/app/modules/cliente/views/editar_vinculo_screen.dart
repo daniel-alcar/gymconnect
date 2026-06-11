@@ -7,6 +7,7 @@ import 'package:gymconnect/app/modules/treinos/models/cronograma_exercicio.dart'
 import 'package:gymconnect/app/modules/treinos/models/dia_semana.dart';
 import 'package:gymconnect/app/modules/treinos/models/exercicio.dart';
 import 'package:gymconnect/app/modules/cliente/providers/cliente_provider.dart';
+import 'package:gymconnect/app/shared/utils/app_formatters.dart';
 import 'package:gymconnect/app/shared/utils/snackbar_helper.dart';
 
 /// CLIENTE – Edita um exercício do treino (PUT /cronogramaexercicio/{id}).
@@ -154,6 +155,7 @@ class _EditarVinculoScreenState extends State<EditarVinculoScreen> {
                       controller: _serieController,
                       enabled: !_salvando,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [AppFormatters.noEmoji],
                       decoration: const InputDecoration(labelText: 'Séries'),
                     ),
                   ),
@@ -163,6 +165,7 @@ class _EditarVinculoScreenState extends State<EditarVinculoScreen> {
                       controller: _repController,
                       enabled: !_salvando,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [AppFormatters.noEmoji],
                       decoration:
                           const InputDecoration(labelText: 'Repetições'),
                     ),
@@ -174,6 +177,7 @@ class _EditarVinculoScreenState extends State<EditarVinculoScreen> {
                 controller: _cargaController,
                 enabled: !_salvando,
                 keyboardType: TextInputType.number,
+                inputFormatters: [AppFormatters.noEmoji],
                 decoration: const InputDecoration(labelText: 'Carga (kg)'),
               ),
               const SizedBox(height: 28),

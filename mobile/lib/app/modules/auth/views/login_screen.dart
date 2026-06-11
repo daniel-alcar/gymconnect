@@ -7,6 +7,7 @@ import 'package:gymconnect/app/core/theme/app_theme.dart';
 import 'package:gymconnect/app/modules/auth/providers/auth_provider.dart';
 import 'package:gymconnect/app/routes/route_names.dart';
 import 'package:gymconnect/app/shared/utils/snackbar_helper.dart';
+import 'package:gymconnect/app/shared/utils/app_formatters.dart';
 import 'package:gymconnect/app/shared/utils/validators.dart';
 import 'package:gymconnect/app/shared/widgets/app_logo.dart';
 
@@ -98,6 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           validator: Validators.email,
+                          inputFormatters: [AppFormatters.noEmoji],
                           onChanged: (_) {
                             if (_erroCredenciais != null) {
                               setState(() => _erroCredenciais = null);
@@ -119,6 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onFieldSubmitted: (_) => _entrar(),
                           validator: (v) =>
                               Validators.obrigatorio(v, campo: 'Senha'),
+                          inputFormatters: [AppFormatters.noEmoji],
                           onChanged: (_) {
                             if (_erroCredenciais != null) {
                               setState(() => _erroCredenciais = null);

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:gymconnect/app/core/theme/app_theme.dart';
 import 'package:gymconnect/app/modules/chat/providers/chat_provider.dart';
+import 'package:gymconnect/app/shared/utils/app_formatters.dart';
 import 'package:gymconnect/app/shared/widgets/app_logo.dart';
 import 'package:gymconnect/app/modules/chat/views/widgets/chat_bubble.dart';
 
@@ -115,6 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
               maxLines: 4,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => enviando ? null : _enviar(),
+              inputFormatters: [AppFormatters.noEmoji],
               decoration: const InputDecoration(
                 hintText: 'Digite sua mensagem...',
                 isDense: true,
