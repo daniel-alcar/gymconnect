@@ -10,7 +10,6 @@ import 'package:gymconnect/app/modules/auth/models/usuario.dart';
 import 'package:gymconnect/app/modules/cliente/providers/cliente_provider.dart';
 import 'package:gymconnect/app/shared/utils/snackbar_helper.dart';
 
-/// CLIENTE – Formulário de criação de treino para um aluno.
 class CriarTreinoScreen extends StatefulWidget {
   const CriarTreinoScreen({super.key});
 
@@ -21,13 +20,11 @@ class CriarTreinoScreen extends StatefulWidget {
 class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
   final _formKey = GlobalKey<FormState>();
   int? _alunoId;
-  DiaSemana? _dia;
-  final List<ExercicioForm> _exercicios = [ExercicioForm()];
+  final List<_DiaSection> _dias = [_DiaSection()];
 
   @override
   void initState() {
     super.initState();
-    // Garante alunos e a biblioteca de exercícios carregados.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final p = context.read<ClienteProvider>();
       if (p.alunos.isEmpty) p.carregarAlunos();
@@ -35,12 +32,19 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
     });
   }
 
-  void _adicionarExercicio() =>
-      setState(() => _exercicios.add(ExercicioForm()));
+  void _adicionarDia() => setState(() => _dias.add(_DiaSection()));
 
-  void _removerExercicio(int i) {
-    if (_exercicios.length == 1) return;
-    setState(() => _exercicios.removeAt(i));
+  void _removerDia(int i) {
+    if (_dias.length == 1) return;
+    setState(() => _dias.removeAt(i));
+  }
+
+  void _adicionarExercicio(int diaIndex) =>
+      setState(() => _dias[diaIndex].exercicios.add(ExercicioForm()));
+
+  void _removerExercicio(int diaIndex, int exIndex) {
+    if (_dias[diaIndex].exercicios.length == 1) return;
+    setState(() => _dias[diaIndex].exercicios.removeAt(exIndex));
   }
 
   Future<void> _salvar() async {
@@ -49,26 +53,28 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
       SnackbarHelper.erro(context, 'Selecione um aluno.');
       return;
     }
-    if (_dia == null) {
-      SnackbarHelper.erro(context, 'Selecione o dia da semana.');
-      return;
-    }
     FocusScope.of(context).unfocus();
 
     try {
-      await context.read<ClienteProvider>().criarTreino(
+      await context.read<ClienteProvider>().criarTreinoMultiplosDias(
             idAluno: _alunoId!,
-            diaSemana: _dia!,
-            exercicios: _exercicios,
+            dias: _dias
+                .map((d) => (dia: d.dia!, exercicios: d.exercicios))
+                .toList(),
           );
       if (mounted) {
-        SnackbarHelper.sucesso(context, 'Treino criado com sucesso!');
+        SnackbarHelper.sucesso(
+          context,
+          _dias.length == 1
+              ? 'Treino criado com sucesso!'
+              : '${_dias.length} treinos criados com sucesso!',
+        );
         Navigator.of(context).pop();
       }
     } on AppException catch (e) {
       if (mounted) SnackbarHelper.erro(context, e.message);
     } catch (_) {
-      if (mounted) SnackbarHelper.erro(context, 'Erro ao criar treino.');
+      if (mounted) SnackbarHelper.erro(context, 'Erro ao criar treinos.');
     }
   }
 
@@ -85,7 +91,6 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              // Aluno
               DropdownButtonFormField<int>(
                 initialValue: _alunoId,
                 isExpanded: true,
@@ -106,54 +111,11 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
                     salvando ? null : (v) => setState(() => _alunoId = v),
                 validator: (v) => v == null ? 'Selecione um aluno' : null,
               ),
-              const SizedBox(height: 16),
-
-              // Dia da semana
-              DropdownButtonFormField<DiaSemana>(
-                initialValue: _dia,
-                isExpanded: true,
-                dropdownColor: context.c.surface,
-                decoration: const InputDecoration(
-                  labelText: 'Dia da semana *',
-                  prefixIcon: Icon(Icons.calendar_today_outlined),
-                ),
-                hint: const Text('Selecione...'),
-                items: DiaSemana.values
-                    .map((d) => DropdownMenuItem(
-                          value: d,
-                          child: Text(d.label,
-                              style: TextStyle(color: context.c.textPrimary)),
-                        ))
-                    .toList(),
-                onChanged: salvando ? null : (v) => setState(() => _dia = v),
-                validator: (v) => v == null ? 'Selecione o dia' : null,
-              ),
               const SizedBox(height: 24),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Exercícios',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: context.c.textPrimary,
-                    ),
-                  ),
-                  TextButton.icon(
-                    onPressed: (salvando || provider.exercicios.isEmpty)
-                        ? null
-                        : _adicionarExercicio,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Adicionar'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              if (provider.exercicios.isEmpty)
+              if (provider.exercicios.isEmpty && !provider.carregandoExercicios)
                 Card(
+                  margin: const EdgeInsets.only(bottom: 16),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
@@ -171,22 +133,34 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
                       ],
                     ),
                   ),
-                )
-              else
-                ..._exercicios.asMap().entries.map(
-                      (entry) => _ExercicioFormCard(
-                        indice: entry.key,
-                        form: entry.value,
-                        exerciciosBiblioteca: provider.exercicios,
-                        podeRemover: _exercicios.length > 1,
-                        habilitado: !salvando,
-                        onRemover: () => _removerExercicio(entry.key),
-                        onSelecionar: (id) =>
-                            setState(() => entry.value.idExercicio = id),
-                      ),
-                    ),
+                ),
 
+              ...List.generate(
+                _dias.length,
+                (i) => _DiaSectionCard(
+                  key: ValueKey(i),
+                  indice: i,
+                  section: _dias[i],
+                  exerciciosBiblioteca: provider.exercicios,
+                  podeRemover: _dias.length > 1,
+                  habilitado: !salvando,
+                  onRemoverDia: () => _removerDia(i),
+                  onAdicionarExercicio: () => _adicionarExercicio(i),
+                  onRemoverExercicio: (exIdx) => _removerExercicio(i, exIdx),
+                  onSelecionarDia: (dia) =>
+                      setState(() => _dias[i].dia = dia),
+                  onSelecionarExercicio: (exIdx, id) =>
+                      setState(() => _dias[i].exercicios[exIdx].idExercicio = id),
+                ),
+              ),
+
+              OutlinedButton.icon(
+                onPressed: salvando ? null : _adicionarDia,
+                icon: const Icon(Icons.add),
+                label: const Text('Adicionar dia'),
+              ),
               const SizedBox(height: 16),
+
               FilledButton(
                 onPressed: salvando ? null : _salvar,
                 child: salvando
@@ -196,7 +170,7 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2.5, color: AppColors.onAmarelo),
                       )
-                    : const Text('Salvar Treino'),
+                    : const Text('Salvar Treinos'),
               ),
             ],
           ),
@@ -206,107 +180,200 @@ class _CriarTreinoScreenState extends State<CriarTreinoScreen> {
   }
 }
 
-class _ExercicioFormCard extends StatelessWidget {
+class _DiaSection {
+  DiaSemana? dia;
+  final List<ExercicioForm> exercicios;
+  _DiaSection() : exercicios = [ExercicioForm()];
+}
+
+class _DiaSectionCard extends StatelessWidget {
   final int indice;
-  final ExercicioForm form;
+  final _DiaSection section;
   final List<Exercicio> exerciciosBiblioteca;
   final bool podeRemover;
   final bool habilitado;
-  final VoidCallback onRemover;
-  final ValueChanged<int?> onSelecionar;
+  final VoidCallback onRemoverDia;
+  final VoidCallback onAdicionarExercicio;
+  final ValueChanged<int> onRemoverExercicio;
+  final ValueChanged<DiaSemana?> onSelecionarDia;
+  final void Function(int exIdx, int? id) onSelecionarExercicio;
 
-  const _ExercicioFormCard({
+  const _DiaSectionCard({
+    super.key,
     required this.indice,
-    required this.form,
+    required this.section,
     required this.exerciciosBiblioteca,
     required this.podeRemover,
     required this.habilitado,
-    required this.onRemover,
-    required this.onSelecionar,
+    required this.onRemoverDia,
+    required this.onAdicionarExercicio,
+    required this.onRemoverExercicio,
+    required this.onSelecionarDia,
+    required this.onSelecionarExercicio,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Garante que o valor selecionado ainda existe na lista.
-    final ids = exerciciosBiblioteca.map((e) => e.idExercicio).toSet();
-    final valorAtual = ids.contains(form.idExercicio) ? form.idExercicio : null;
-
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Exercício ${indice + 1}',
-                    style: const TextStyle(
-                        color: AppColors.amareloPressed,
-                        fontWeight: FontWeight.w700)),
+                Text(
+                  'Dia ${indice + 1}',
+                  style: const TextStyle(
+                    color: AppColors.amareloPressed,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+                const Spacer(),
                 if (podeRemover)
                   IconButton(
-                    icon: const Icon(Icons.delete_outline,
-                        color: AppColors.danger),
-                    onPressed: habilitado ? onRemover : null,
+                    icon: const Icon(Icons.close, color: AppColors.danger),
+                    onPressed: habilitado ? onRemoverDia : null,
+                    tooltip: 'Remover dia',
                   ),
               ],
             ),
-            DropdownButtonFormField<int>(
-              initialValue: valorAtual,
+            const SizedBox(height: 8),
+            DropdownButtonFormField<DiaSemana>(
+              initialValue: section.dia,
               isExpanded: true,
               dropdownColor: context.c.surface,
               decoration: const InputDecoration(
-                labelText: 'Exercício *',
-                prefixIcon: Icon(Icons.fitness_center),
+                labelText: 'Dia da semana *',
+                prefixIcon: Icon(Icons.calendar_today_outlined),
               ),
-              hint: const Text('Selecione um exercício'),
-              items: exerciciosBiblioteca
-                  .map((e) => DropdownMenuItem(
-                        value: e.idExercicio,
-                        child: Text(
-                          e.nome,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: context.c.textPrimary),
-                        ),
+              hint: const Text('Selecione...'),
+              items: DiaSemana.values
+                  .map((d) => DropdownMenuItem(
+                        value: d,
+                        child: Text(d.label,
+                            style: TextStyle(color: context.c.textPrimary)),
                       ))
                   .toList(),
-              onChanged: habilitado ? onSelecionar : null,
-              validator: (v) => v == null ? 'Selecione um exercício' : null,
+              onChanged: habilitado ? onSelecionarDia : null,
+              validator: (v) => v == null ? 'Selecione o dia' : null,
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    initialValue: form.series,
-                    enabled: habilitado,
-                    keyboardType: TextInputType.number,
-                    onChanged: (v) => form.series = v,
-                    decoration: const InputDecoration(labelText: 'Séries'),
+            const SizedBox(height: 16),
+
+            if (exerciciosBiblioteca.isEmpty)
+              Text(
+                'Cadastre exercícios na aba "Exercícios" para adicioná-los aqui.',
+                style: TextStyle(color: context.c.textSecondary, fontSize: 13),
+              )
+            else ...[
+              ...section.exercicios.asMap().entries.map((entry) {
+                final exIdx = entry.key;
+                final form = entry.value;
+                final ids =
+                    exerciciosBiblioteca.map((e) => e.idExercicio).toSet();
+                final valorAtual =
+                    ids.contains(form.idExercicio) ? form.idExercicio : null;
+
+                return Card(
+                  color: context.c.surfaceAlt,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField<int>(
+                                initialValue: valorAtual,
+                                isExpanded: true,
+                                dropdownColor: context.c.surface,
+                                decoration: InputDecoration(
+                                  labelText: 'Exercício ${exIdx + 1} *',
+                                  prefixIcon:
+                                      const Icon(Icons.fitness_center),
+                                  isDense: true,
+                                ),
+                                hint: const Text('Selecione'),
+                                items: exerciciosBiblioteca
+                                    .map((e) => DropdownMenuItem(
+                                          value: e.idExercicio,
+                                          child: Text(
+                                            e.nome,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                color: context.c.textPrimary),
+                                          ),
+                                        ))
+                                    .toList(),
+                                onChanged: habilitado
+                                    ? (id) => onSelecionarExercicio(exIdx, id)
+                                    : null,
+                                validator: (v) => v == null
+                                    ? 'Selecione um exercício'
+                                    : null,
+                              ),
+                            ),
+                            if (section.exercicios.length > 1)
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline,
+                                    color: AppColors.danger, size: 20),
+                                onPressed: habilitado
+                                    ? () => onRemoverExercicio(exIdx)
+                                    : null,
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: form.series,
+                                enabled: habilitado,
+                                keyboardType: TextInputType.number,
+                                onChanged: (v) => form.series = v,
+                                decoration: const InputDecoration(
+                                    labelText: 'Séries', isDense: true),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: form.repeticoes,
+                                enabled: habilitado,
+                                keyboardType: TextInputType.number,
+                                onChanged: (v) => form.repeticoes = v,
+                                decoration: const InputDecoration(
+                                    labelText: 'Reps', isDense: true),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: form.carga,
+                                enabled: habilitado,
+                                keyboardType: TextInputType.number,
+                                onChanged: (v) => form.carga = v,
+                                decoration: const InputDecoration(
+                                    labelText: 'Carga (kg)', isDense: true),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextFormField(
-                    initialValue: form.repeticoes,
-                    enabled: habilitado,
-                    keyboardType: TextInputType.number,
-                    onChanged: (v) => form.repeticoes = v,
-                    decoration: const InputDecoration(labelText: 'Repetições'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              initialValue: form.carga,
-              enabled: habilitado,
-              keyboardType: TextInputType.number,
-              onChanged: (v) => form.carga = v,
-              decoration: const InputDecoration(labelText: 'Carga (kg)'),
-            ),
+                );
+              }),
+              TextButton.icon(
+                onPressed: habilitado ? onAdicionarExercicio : null,
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Adicionar exercício'),
+              ),
+            ],
           ],
         ),
       ),

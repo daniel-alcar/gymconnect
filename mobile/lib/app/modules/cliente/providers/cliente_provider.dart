@@ -195,7 +195,27 @@ class ClienteProvider extends ChangeNotifier {
         diaSemana: diaSemana,
         exercicios: exercicios,
       );
-      // Recarrega a biblioteca (pode ter ganho exercícios novos).
+      _exercicios = await _repository.listarExercicios();
+    } finally {
+      _salvando = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> criarTreinoMultiplosDias({
+    required int idAluno,
+    required List<({DiaSemana dia, List<ExercicioForm> exercicios})> dias,
+  }) async {
+    _salvando = true;
+    notifyListeners();
+    try {
+      for (final d in dias) {
+        await _repository.criarTreino(
+          idAluno: idAluno,
+          diaSemana: d.dia,
+          exercicios: d.exercicios,
+        );
+      }
       _exercicios = await _repository.listarExercicios();
     } finally {
       _salvando = false;
