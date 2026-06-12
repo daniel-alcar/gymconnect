@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -99,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           validator: Validators.email,
-                          inputFormatters: [AppFormatters.noEmoji],
+                          inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(150)],
                           onChanged: (_) {
                             if (_erroCredenciais != null) {
                               setState(() => _erroCredenciais = null);
@@ -121,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onFieldSubmitted: (_) => _entrar(),
                           validator: (v) =>
                               Validators.obrigatorio(v, campo: 'Senha'),
-                          inputFormatters: [AppFormatters.noEmoji],
+                          inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(72)],
                           onChanged: (_) {
                             if (_erroCredenciais != null) {
                               setState(() => _erroCredenciais = null);

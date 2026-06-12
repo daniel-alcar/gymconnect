@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -326,7 +328,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   validator: Validators.altura,
-                  inputFormatters: [AppFormatters.noEmoji],
+                  inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(5)],
                   decoration: const InputDecoration(
                     labelText: 'Altura (m)',
                     hintText: 'ex.: 1.75',
@@ -339,7 +341,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   enabled: !salvando,
                   validator: (v) =>
                       Validators.obrigatorio(v, campo: 'Objetivo'),
-                  inputFormatters: [AppFormatters.noEmoji],
+                  inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(50)],
                   decoration: const InputDecoration(
                     labelText: 'Objetivo',
                     hintText: 'ex.: Hipertrofia',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymconnect/app/core/theme/app_theme.dart';
@@ -116,7 +117,7 @@ class _ChatScreenState extends State<ChatScreen> {
               maxLines: 4,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => enviando ? null : _enviar(),
-              inputFormatters: [AppFormatters.noEmoji],
+              inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(1000)],
               decoration: const InputDecoration(
                 hintText: 'Digite sua mensagem...',
                 isDense: true,

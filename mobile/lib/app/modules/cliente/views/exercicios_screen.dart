@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gymconnect/app/core/errors/app_exception.dart';
@@ -76,7 +77,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                   TextFormField(
                     controller: nomeController,
                     validator: (v) => Validators.obrigatorio(v, campo: 'Nome'),
-                    inputFormatters: [AppFormatters.noEmoji],
+                    inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(150)],
                     decoration: const InputDecoration(
                       labelText: 'Nome do exercício',
                       prefixIcon: Icon(Icons.fitness_center),
@@ -86,7 +87,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                   TextFormField(
                     controller: linkController,
                     keyboardType: TextInputType.url,
-                    inputFormatters: [AppFormatters.noEmoji],
+                    inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(264)],
                     decoration: const InputDecoration(
                       labelText: 'Link do YouTube (opcional)',
                       hintText: 'https://youtube.com/watch?v=...',
@@ -99,7 +100,7 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
                     minLines: 3,
                     maxLines: 6,
                     textInputAction: TextInputAction.newline,
-                    inputFormatters: [AppFormatters.noEmoji],
+                    inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(2000)],
                     decoration: const InputDecoration(
                       labelText: 'Descrição / execução (opcional)',
                       hintText: 'Ex.: Mantenha a coluna neutra, desça '
