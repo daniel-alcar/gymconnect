@@ -26,4 +26,40 @@ class AppFormatters {
       unicode: true,
     ),
   );
+
+  /// Máscara de altura em metros: digitar "175" exibe "1,75".
+  ///
+  /// Aceita até 3 dígitos (máx. "2,20") e insere a vírgula automaticamente.
+  /// O valor bruto do controller já usa vírgula como separador decimal;
+  /// o validator/parser substitui por ponto antes de chamar [double.tryParse].
+  static final TextInputFormatter alturaMask = _AlturaMaskFormatter();
+}
+
+class _AlturaMaskFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Extrai apenas os dígitos digitados.
+    final digits = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+
+    // Limita a 3 dígitos (representam no máximo "2,20" → 2.20 m).
+    final d = digits.length > 3 ? digits.substring(0, 3) : digits;
+
+    final String formatted;
+    if (d.isEmpty) {
+      formatted = '';
+    } else if (d.length == 1) {
+      formatted = d; // "1"
+    } else {
+      // Ex.: "17" → "1,7" | "175" → "1,75"
+      formatted = '${d[0]},${d.substring(1)}';
+    }
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
 }

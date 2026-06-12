@@ -325,13 +325,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 TextFormField(
                   controller: _alturaController,
                   enabled: !salvando,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: TextInputType.number,
                   validator: Validators.altura,
-                  inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(5)],
+                  inputFormatters: [AppFormatters.alturaMask],
                   decoration: const InputDecoration(
                     labelText: 'Altura (m)',
-                    hintText: 'ex.: 1.75',
+                    hintText: 'ex.: 1,75',
                     prefixIcon: Icon(Icons.height),
                   ),
                 ),

@@ -41,7 +41,7 @@ class Validators {
   static String? altura(String? value) {
     if (value == null || value.trim().isEmpty) return 'Altura é obrigatória';
     final v = double.tryParse(value.replaceAll(',', '.'));
-    if (v == null || v <= 0) return 'Altura inválida (ex.: 1.75)';
+    if (v == null || v <= 0) return 'Altura inválida (ex.: 1,75)';
     if (v > 2.20) return 'Altura deve ser menor que 2,20 m';
     return null;
   }
