@@ -108,7 +108,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           textInputAction: TextInputAction.next,
                           validator: (v) =>
                               Validators.obrigatorio(v, campo: 'Nome'),
-                          inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(150)],
+                          inputFormatters: [AppFormatters.apenasLetras, LengthLimitingTextInputFormatter(150)],
                           decoration: const InputDecoration(
                             labelText: 'Nome completo',
                             prefixIcon: Icon(Icons.person_outline),

@@ -27,6 +27,11 @@ class AppFormatters {
     ),
   );
 
+  /// Permite apenas letras (incluindo acentos) e espaços — ideal para nome completo.
+  static final TextInputFormatter apenasLetras = FilteringTextInputFormatter.allow(
+    RegExp(r'[\p{L}\s]', unicode: true),
+  );
+
   /// Máscara de altura em metros: digitar "175" exibe "1,75".
   ///
   /// Aceita até 3 dígitos (máx. "2,20") e insere a vírgula automaticamente.
