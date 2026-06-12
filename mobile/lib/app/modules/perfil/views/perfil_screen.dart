@@ -374,7 +374,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   enabled: !salvando,
                   validator: (v) =>
                       Validators.obrigatorio(v, campo: 'Objetivo'),
-                  inputFormatters: [AppFormatters.apenasLetras, LengthLimitingTextInputFormatter(50)],
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[\p{L}\s,]', unicode: true)),
+                    LengthLimitingTextInputFormatter(50),
+                  ],
                   decoration: const InputDecoration(
                     labelText: 'Objetivo',
                     hintText: 'ex.: Hipertrofia',
