@@ -30,9 +30,36 @@ class AppFormatters {
   /// Máscara de altura em metros: digitar "175" exibe "1,75".
   ///
   /// Aceita até 3 dígitos (máx. "2,20") e insere a vírgula automaticamente.
-  /// O valor bruto do controller já usa vírgula como separador decimal;
-  /// o validator/parser substitui por ponto antes de chamar [double.tryParse].
   static final TextInputFormatter alturaMask = _AlturaMaskFormatter();
+
+  /// Máscara de data no formato dd/mm/aaaa.
+  ///
+  /// As barras são inseridas automaticamente ao digitar:
+  /// "1506" → "15/06" | "15062000" → "15/06/2000".
+  static final TextInputFormatter dataMask = _DataMaskFormatter();
+}
+
+class _DataMaskFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    final d = digits.length > 8 ? digits.substring(0, 8) : digits;
+
+    final buf = StringBuffer();
+    for (int i = 0; i < d.length; i++) {
+      if (i == 2 || i == 4) buf.write('/');
+      buf.write(d[i]);
+    }
+
+    final formatted = buf.toString();
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
 }
 
 class _AlturaMaskFormatter extends TextInputFormatter {
