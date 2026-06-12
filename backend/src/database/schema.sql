@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     CPF CHAR(11),
     id_cliente BIGINT NULL,
     CONSTRAINT CHK_DOCUMENTO CHECK (
-        (CNPJ IS NULL AND CPF IS NULL) OR 
+        (CNPJ IS NULL AND CPF IS NULL) OR
         (CPF IS NULL AND CNPJ IS NULL)
     ),
     UNIQUE(CNPJ),
@@ -20,26 +20,20 @@ CREATE TABLE IF NOT EXISTS usuarios (
     FOREIGN KEY (id_cliente) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
-create TABLE IF NOT EXISTS perfil (
+CREATE TABLE IF NOT EXISTS perfil (
     id_perfil BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_usuario BIGINT UNIQUE NOT NULL,
     dataNascimento DATE,
     altura DOUBLE,
     objetivo VARCHAR(50),
-    Foreign Key (id_usuario) REFERENCES usuarios (id_usuario) ON DELETE CASCADE
-)
-
-CREATE TABLE IF NOT EXISTS registro_diario(
-    id_registro BIGINT AUTO_INCREMENT PRIMARY KEY,
-    id_execucao BIGINT NOT NULL,
-    peso DOUBLE,
-    Foreign Key (id_execucao) REFERENCES cronograma_execucao(id_execucao) ON DELETE CASCADE
-)
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS exercicios (
     id_exercicio BIGINT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
-    link_youtube VARCHAR(264) NOT NULL
+    link_youtube VARCHAR(264) NOT NULL,
+    descricao VARCHAR(2000)
 );
 
 CREATE TABLE IF NOT EXISTS cronograma (
@@ -65,6 +59,13 @@ CREATE TABLE IF NOT EXISTS cronograma_execucao (
     id_execucao BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_cronograma BIGINT NOT NULL,
     status ENUM('FEITO', 'NAO FEITO'),
-    dataExecucao DATE DEFAULT(CURRENT_DATE),
+    dataExecucao DATE DEFAULT (CURRENT_DATE),
     FOREIGN KEY (id_cronograma) REFERENCES cronograma(id_cronograma) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS registro_diario (
+    id_registro BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_execucao BIGINT NOT NULL,
+    peso DOUBLE,
+    FOREIGN KEY (id_execucao) REFERENCES cronograma_execucao(id_execucao) ON DELETE CASCADE
 );
