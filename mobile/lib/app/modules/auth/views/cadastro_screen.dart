@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -107,7 +108,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           textInputAction: TextInputAction.next,
                           validator: (v) =>
                               Validators.obrigatorio(v, campo: 'Nome'),
-                          inputFormatters: [AppFormatters.noEmoji],
+                          inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(150)],
                           decoration: const InputDecoration(
                             labelText: 'Nome completo',
                             prefixIcon: Icon(Icons.person_outline),
@@ -120,7 +121,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           validator: Validators.email,
-                          inputFormatters: [AppFormatters.noEmoji],
+                          inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(150)],
                           decoration: const InputDecoration(
                             labelText: 'E-mail',
                             prefixIcon: Icon(Icons.email_outlined),
@@ -133,7 +134,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           obscureText: _ocultarSenha,
                           textInputAction: TextInputAction.next,
                           validator: Validators.senha,
-                          inputFormatters: [AppFormatters.noEmoji],
+                          inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(72)],
                           decoration: InputDecoration(
                             labelText: 'Senha',
                             hintText: 'Mín. 8 caracteres, letras e números',
@@ -155,7 +156,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                           textInputAction: TextInputAction.done,
                           validator: (v) => Validators.confirmarSenha(
                               v, _senhaController.text),
-                          inputFormatters: [AppFormatters.noEmoji],
+                          inputFormatters: [AppFormatters.noEmoji, LengthLimitingTextInputFormatter(72)],
                           decoration: InputDecoration(
                             labelText: 'Confirmar senha',
                             prefixIcon: const Icon(Icons.lock_reset_outlined),
