@@ -11,4 +11,6 @@ import br.com.gymconnect.model.Cronograma;
 public interface CronogramaRepository extends JpaRepository<Cronograma, Long>{
     
     List<Cronograma> findByAlunoIdUsuario(Long idUsuario);
+
+    boolean existsByAlunoIdUsuario(Long idUsuario);
 }
