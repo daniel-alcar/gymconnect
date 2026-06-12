@@ -33,6 +33,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   final _formKey = GlobalKey<FormState>();
   final _alturaController = TextEditingController();
   final _objetivoController = TextEditingController();
+  final _dataController = TextEditingController();
   final _storage = StorageService();
   final _picker = ImagePicker();
 
@@ -50,6 +51,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   void dispose() {
     _alturaController.dispose();
     _objetivoController.dispose();
+    _dataController.dispose();
     super.dispose();
   }
 
@@ -143,11 +145,44 @@ class _PerfilScreenState extends State<PerfilScreen> {
       firstDate: DateTime(1920),
       lastDate: agora,
       helpText: 'Data de nascimento',
-      fieldHintText: 'dd/mm/aaaa',
-      errorFormatText: 'Use o formato dd/mm/aaaa',
-      errorInvalidText: 'Data inválida ou fora do intervalo permitido',
     );
-    if (data != null) setState(() => _dataNascimento = data);
+    if (data != null) {
+      setState(() {
+        _dataNascimento = data;
+        _dataController.text = DateFormatter.toBr(data);
+      });
+    }
+  }
+
+  void _onDataChanged(String value) {
+    final parsed = _parseDataBr(value);
+    setState(() => _dataNascimento = parsed);
+  }
+
+  String? _validarData(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Data de nascimento é obrigatória';
+    }
+    if (value.length < 10) return 'Use o formato dd/mm/aaaa';
+    final parsed = _parseDataBr(value);
+    if (parsed == null) return 'Data inválida';
+    if (parsed.isAfter(DateTime.now())) return 'Data não pode ser no futuro';
+    return null;
+  }
+
+  static DateTime? _parseDataBr(String value) {
+    final parts = value.split('/');
+    if (parts.length != 3) return null;
+    final day = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    final year = int.tryParse(parts[2]);
+    if (day == null || month == null || year == null) return null;
+    if (year < 1920 || month < 1 || month > 12 || day < 1 || day > 31) {
+      return null;
+    }
+    final date = DateTime(year, month, day);
+    if (date.month != month || date.day != day) return null;
+    return date;
   }
 
   Future<void> _salvar() async {
@@ -302,22 +337,21 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   style: TextStyle(color: context.c.textSecondary, fontSize: 13),
                 ),
                 const SizedBox(height: 16),
-                InkWell(
-                  onTap: salvando ? null : _selecionarData,
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Data de nascimento',
-                      prefixIcon: Icon(Icons.cake_outlined),
-                    ),
-                    child: Text(
-                      _dataNascimento != null
-                          ? DateFormatter.toBr(_dataNascimento!)
-                          : 'Selecionar data',
-                      style: TextStyle(
-                        color: _dataNascimento != null
-                            ? context.c.textPrimary
-                            : context.c.textSecondary,
-                      ),
+                TextFormField(
+                  controller: _dataController,
+                  enabled: !salvando,
+                  keyboardType: TextInputType.number,
+                  validator: _validarData,
+                  onChanged: _onDataChanged,
+                  inputFormatters: [AppFormatters.dataMask],
+                  decoration: InputDecoration(
+                    labelText: 'Data de nascimento',
+                    hintText: 'dd/mm/aaaa',
+                    prefixIcon: const Icon(Icons.cake_outlined),
+                    suffixIcon: IconButton(
+                      tooltip: 'Abrir calendário',
+                      icon: const Icon(Icons.calendar_today_outlined),
+                      onPressed: salvando ? null : _selecionarData,
                     ),
                   ),
                 ),
