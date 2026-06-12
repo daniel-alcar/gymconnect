@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:gymconnect/app/core/constants/app_constants.dart';
 import 'package:gymconnect/app/modules/auth/models/usuario.dart';
+import 'package:gymconnect/app/modules/chat/models/chat_message.dart';
 
 /// Abstrai a persistência local (SharedPreferences) do token JWT e do usuário.
 class StorageService {
@@ -104,6 +105,28 @@ class StorageService {
   Future<String?> lerDiasConcluidos(int idUsuario) async {
     final prefs = await _instance;
     return prefs.getString('${AppConstants.diasConcluidosPrefix}$idUsuario');
+  }
+
+  // ----- Histórico do chat (por usuário, máx. 200 mensagens) -----
+  Future<void> salvarHistoricoChat(int idUsuario, List<ChatMessage> mensagens) async {
+    final prefs = await _instance;
+    final recentes = mensagens.length > 200 ? mensagens.sublist(mensagens.length - 200) : mensagens;
+    await prefs.setString(
+      '${AppConstants.chatHistoricoPrefix}$idUsuario',
+      jsonEncode(recentes.map((m) => m.toJson()).toList()),
+    );
+  }
+
+  Future<List<ChatMessage>> lerHistoricoChat(int idUsuario) async {
+    final prefs = await _instance;
+    final raw = prefs.getString('${AppConstants.chatHistoricoPrefix}$idUsuario');
+    if (raw == null) return [];
+    try {
+      final list = jsonDecode(raw) as List;
+      return list.map((e) => ChatMessage.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   // ----- Limpeza (logout) — preserva a preferência de tema -----

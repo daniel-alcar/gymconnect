@@ -50,6 +50,7 @@ public class SecurityConfigurations {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth/cadastrar").permitAll()
                 .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()

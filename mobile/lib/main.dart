@@ -104,7 +104,7 @@ class _GymConnectAppState extends State<GymConnectApp> {
     _authProvider = AuthProvider(authRepo);
     _treinoProvider = TreinoProvider(treinoRepo, _storage);
     _perfilProvider = PerfilProvider(perfilRepo);
-    _chatProvider = ChatProvider(chatRepo);
+    _chatProvider = ChatProvider(chatRepo, _storage);
     _clienteProvider = ClienteProvider(clienteRepo);
     _themeProvider = ThemeProvider(_storage);
     _atividadeProvider = AtividadeProvider(_storage);
@@ -112,10 +112,13 @@ class _GymConnectAppState extends State<GymConnectApp> {
     // Logout automático quando o backend responde 401/403.
     _dioClient.onUnauthorized = _authProvider.sessaoExpirada;
 
-    // Limpa o histórico do chat ao fazer logout (qualquer origem).
+    // Carrega/limpa o histórico do chat conforme a sessão do usuário.
     _authProvider.addListener(() {
       if (_authProvider.status == AuthStatus.naoAutenticado) {
         _chatProvider.limpar();
+      } else if (_authProvider.status == AuthStatus.autenticado &&
+          _authProvider.usuario != null) {
+        _chatProvider.inicializar(_authProvider.usuario!.idUsuario);
       }
     });
 
