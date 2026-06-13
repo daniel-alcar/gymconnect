@@ -12,45 +12,40 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.gymconnect.dto.ApiMessageResponse;
+import br.com.gymconnect.dto.ExercicioRequestDTO;
 import br.com.gymconnect.model.Exercicio;
-import br.com.gymconnect.model.ResponseModel;
 import br.com.gymconnect.service.ExercicioService;
-
-
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/exercicios")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://localhost"})
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:3000", "http://localhost" })
 public class ExercicioController {
-    
+
     @Autowired
     private ExercicioService es;
 
     @GetMapping
-    public ResponseEntity<?> listar(){
-
-        return es.listar();
-        
+    public ResponseEntity<Iterable<Exercicio>> listar() {
+        return ResponseEntity.ok(es.listar());
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody Exercicio ex) {
-
-        return es.cadastrar(ex);
-
+    public ResponseEntity<Exercicio> cadastrar(@RequestBody @Valid ExercicioRequestDTO dto) {
+        return ResponseEntity.ok(es.cadastrar(dto));
     }
 
     @PutMapping("{idExercicio}")
-    public ResponseEntity<?> atualizar(@PathVariable Long idExercicio, @RequestBody Exercicio ex) {
-
-        return es.atualizar(idExercicio, ex);
-
+    public ResponseEntity<Exercicio> atualizar(
+            @PathVariable Long idExercicio,
+            @RequestBody @Valid ExercicioRequestDTO dto) {
+        return ResponseEntity.ok(es.atualizar(idExercicio, dto));
     }
 
     @DeleteMapping("{idExercicio}")
-    public ResponseEntity<ResponseModel> remover (@PathVariable Long idExercicio){
-
-        return es.remover(idExercicio);
+    public ResponseEntity<ApiMessageResponse> remover(@PathVariable Long idExercicio) {
+        es.remover(idExercicio);
+        return ResponseEntity.ok(new ApiMessageResponse("Exercicio deletado"));
     }
-    
 }

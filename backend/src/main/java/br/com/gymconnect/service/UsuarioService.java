@@ -1,11 +1,13 @@
 package br.com.gymconnect.service;
 
+import java.util.List;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import br.com.gymconnect.model.ResponseModel;
-import br.com.gymconnect.model.Usuario;
+
+import br.com.gymconnect.dto.UsuarioResponseDTO;
+import br.com.gymconnect.exception.ConflictException;
 import br.com.gymconnect.repository.CronogramaRepository;
 import br.com.gymconnect.repository.PerfilRepository;
 import br.com.gymconnect.repository.UsuarioRepository;
@@ -22,24 +24,18 @@ public class UsuarioService {
     @Autowired
     private PerfilRepository pr;
 
-    public Iterable<Usuario> listar(){
-        return ur.findAll();
+    public List<UsuarioResponseDTO> listar() {
+        return StreamSupport.stream(ur.findAll().spliterator(), false)
+                .map(UsuarioResponseDTO::from)
+                .toList();
     }
 
-    public ResponseEntity<ResponseModel> remover(Long idUsuario){
-        ResponseModel rm = new ResponseModel();
-
+    public void remover(Long idUsuario) {
         if (cr.existsByAlunoIdUsuario(idUsuario)) {
-            rm.setMensagem("Não é possível remover este aluno pois ele possui treinos ou registros associados.");
-            return new ResponseEntity<>(rm, HttpStatus.CONFLICT);
+            throw new ConflictException(
+                    "Não é possível remover este aluno pois ele possui treinos ou registros associados.");
         }
-
-        // Perfil tem FK para usuarios — deve ser removido antes
         pr.findByUsuario_IdUsuario(idUsuario).ifPresent(pr::delete);
-
         ur.deleteById(idUsuario);
-        rm.setMensagem("O aluno foi removido com sucesso!");
-        return new ResponseEntity<>(rm, HttpStatus.OK);
     }
-
 }
