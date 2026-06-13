@@ -12,42 +12,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.gymconnect.dto.ApiMessageResponse;
 import br.com.gymconnect.model.CronogramaExercicio;
 import br.com.gymconnect.service.CronogramaExercicioService;
 
 @RestController
 @RequestMapping("/cronogramaexercicio")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://localhost"})
-
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:3000", "http://localhost" })
 public class CronogramaExercicioController {
-    
+
     @Autowired
     private CronogramaExercicioService ces;
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody CronogramaExercicio cronogExerc) {
-
-        return ces.cadastrar(cronogExerc);
-
+    public ResponseEntity<CronogramaExercicio> cadastrar(@RequestBody CronogramaExercicio cronogExerc) {
+        return ResponseEntity.ok(ces.cadastrar(cronogExerc));
     }
 
     @PutMapping("/{idCronogramaExercicio}")
-    public ResponseEntity<?> atualizar(
+    public ResponseEntity<CronogramaExercicio> atualizar(
             @PathVariable Long idCronogramaExercicio,
             @RequestBody CronogramaExercicio cronogExerc) {
-        return ces.atualizar(idCronogramaExercicio, cronogExerc);
+        return ResponseEntity.ok(ces.atualizar(idCronogramaExercicio, cronogExerc));
     }
 
     @DeleteMapping("/{idCronogramaExercicio}")
-    public ResponseEntity<?> remover(@PathVariable Long idCronogramaExercicio) {
-
-        return ces.remover(idCronogramaExercicio);
+    public ResponseEntity<ApiMessageResponse> remover(@PathVariable Long idCronogramaExercicio) {
+        ces.remover(idCronogramaExercicio);
+        return ResponseEntity.ok(new ApiMessageResponse("Cronograma deletado"));
     }
 
     @GetMapping("/aluno/{idAluno}")
-    public ResponseEntity<?> listarPorAluno(@PathVariable Long idAluno) {
-
-        return ces.listar(idAluno);
-
+    public ResponseEntity<Iterable<CronogramaExercicio>> listarPorAluno(@PathVariable Long idAluno) {
+        return ResponseEntity.ok(ces.listar(idAluno));
     }
 }

@@ -1,14 +1,16 @@
 package br.com.gymconnect.service;
 
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import br.com.gymconnect.dto.ExercicioRequestDTO;
+import br.com.gymconnect.dto.UsuarioResponseDTO;
+import br.com.gymconnect.exception.ConflictException;
+import br.com.gymconnect.exception.ResourceNotFoundException;
 import br.com.gymconnect.model.Exercicio;
-import br.com.gymconnect.model.ResponseModel;
 import br.com.gymconnect.repository.CronogramaExercicioRepository;
 import br.com.gymconnect.repository.ExercicioRepository;
 
@@ -16,75 +18,48 @@ import br.com.gymconnect.repository.ExercicioRepository;
 public class ExercicioService {
 
     @Autowired
-    private ResponseModel rm;
-
-    @Autowired
     private ExercicioRepository er;
 
     @Autowired
     private CronogramaExercicioRepository cer;
 
-    public ResponseEntity<?> cadastrar(Exercicio ex){
-
-        if (ex.getNome().equals("")) {
-            rm.setMensagem("O campo nome exercicio precisa ser preenchido!");
-            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
-        } else if (ex.getLinkYoutube() == null || ex.getLinkYoutube().isBlank()) {
-            rm.setMensagem("O campo Link não foi preenchido!");
-            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
-        } else {
-            return new ResponseEntity<>(er.save(ex), HttpStatus.OK);
-        }
-
+    public List<Exercicio> listar() {
+        return er.findAll();
     }
 
-    public ResponseEntity<?> atualizar(Long idExercicio, Exercicio dados){
-
-        if (dados.getNome() == null || dados.getNome().isBlank()) {
-            rm.setMensagem("O campo nome exercicio precisa ser preenchido!");
-            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
-        }
-        if (dados.getLinkYoutube() == null || dados.getLinkYoutube().isBlank()) {
-            rm.setMensagem("O campo Link não foi preenchido!");
-            return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
-        }
-
-        var opt = er.findById(idExercicio);
-        if (opt.isEmpty()) {
-            rm.setMensagem("Exercicio não encontrado");
-            return new ResponseEntity<>(rm, HttpStatus.NOT_FOUND);
-        }
-
-        Exercicio ex = opt.get();
-        ex.setNome(dados.getNome());
-        ex.setLinkYoutube(dados.getLinkYoutube());
-        ex.setDescricao(dados.getDescricao());
-        return new ResponseEntity<>(er.save(ex), HttpStatus.OK);
+    public Exercicio cadastrar(ExercicioRequestDTO dto) {
+        Exercicio ex = toEntity(dto);
+        return er.save(ex);
     }
 
-    public ResponseEntity<ResponseModel> remover(Long idExercicio){
+    public Exercicio atualizar(Long idExercicio, ExercicioRequestDTO dto) {
+        Exercicio ex = er.findById(idExercicio)
+                .orElseThrow(() -> new ResourceNotFoundException("Exercicio não encontrado"));
+        applyDto(ex, dto);
+        return er.save(ex);
+    }
 
-        // Evita violar a FK: exercicio em uso em algum treino nao pode ser
-        // removido (retorna mensagem amigavel em vez de estourar erro -> 403).
+    public void remover(Long idExercicio) {
+        if (!er.existsById(idExercicio)) {
+            throw new ResourceNotFoundException("Exercicio não encontrado");
+        }
         if (cer.existsByExercicio_IdExercicio(idExercicio)) {
-            rm.setMensagem(
-                "Nao e possivel excluir: este exercicio esta em uso em um ou "
-                + "mais treinos. Remova-o dos treinos primeiro.");
-            return new ResponseEntity<>(rm, HttpStatus.CONFLICT);
+            throw new ConflictException(
+                    "Nao e possivel excluir: este exercicio esta em uso em um ou "
+                            + "mais treinos. Remova-o dos treinos primeiro.");
         }
-
         er.deleteById(idExercicio);
-
-        rm.setMensagem("Exercicio deletado");
-        return new ResponseEntity<>(rm, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> listar() {
-
-        List<Exercicio> exercicios = er.findAll();
-
-        return ResponseEntity.ok(exercicios);
+    private static Exercicio toEntity(ExercicioRequestDTO dto) {
+        Exercicio ex = new Exercicio();
+        applyDto(ex, dto);
+        return ex;
     }
 
-    
+    private static void applyDto(Exercicio ex, ExercicioRequestDTO dto) {
+        ex.setNome(dto.nome());
+        ex.setLinkYoutube(dto.linkYoutube());
+        ex.setDescricao(dto.descricao());
+    }
 }
