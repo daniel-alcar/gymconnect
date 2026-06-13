@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.gymconnect.exception.UnauthorizedException;
 import br.com.gymconnect.model.CronogramaExecucao;
 import br.com.gymconnect.model.StatusExecucao;
 import br.com.gymconnect.model.Usuario;
 import br.com.gymconnect.service.CronogramaExecucaoService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/cronogramaexecucao")
@@ -27,46 +30,37 @@ public class CronogramaExecucaoController {
     private CronogramaExecucaoService cronogramaExecucaoService;
 
     @PostMapping("/me")
-    public ResponseEntity<?> cadastrar(@RequestBody CronogramaExecucao execucao) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof Usuario)) {
-            return ResponseEntity.status(401).build();
-        }
-
-        Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
+    public ResponseEntity<CronogramaExecucao> cadastrar(@RequestBody CronogramaExecucao execucao) {
+        Usuario usuarioLogado = requireUsuarioLogado();
         execucao.setIdExecucao(null);
-        return cronogramaExecucaoService.cadastrar(execucao, usuarioLogado.getIdUsuario());
+        return ResponseEntity.ok(cronogramaExecucaoService.cadastrar(execucao, usuarioLogado.getIdUsuario()));
     }
 
     @PutMapping("/me/{idExecucao}")
-    public ResponseEntity<?> atualizarStatus(@PathVariable Long idExecucao, @RequestBody AtualizarStatusDTO body) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof Usuario)) {
-            return ResponseEntity.status(401).build();
-        }
-
-        if (body == null || body.status() == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
-        return cronogramaExecucaoService.atualizarStatus(idExecucao, body.status(), usuarioLogado.getIdUsuario());
+    public ResponseEntity<CronogramaExecucao> atualizarStatus(
+            @PathVariable Long idExecucao,
+            @RequestBody @Valid AtualizarStatusDTO body) {
+        Usuario usuarioLogado = requireUsuarioLogado();
+        return ResponseEntity.ok(
+                cronogramaExecucaoService.atualizarStatus(idExecucao, body.status(), usuarioLogado.getIdUsuario()));
     }
 
     @GetMapping("/me/cronograma/{idCronograma}")
-    public ResponseEntity<?> listarPorCronograma(@PathVariable Long idCronograma) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof Usuario)) {
-            return ResponseEntity.status(401).build();
-        }
-
-        Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
-        return cronogramaExecucaoService.listarPorCronograma(idCronograma, usuarioLogado.getIdUsuario());
+    public ResponseEntity<Iterable<CronogramaExecucao>> listarPorCronograma(@PathVariable Long idCronograma) {
+        Usuario usuarioLogado = requireUsuarioLogado();
+        return ResponseEntity.ok(
+                cronogramaExecucaoService.listarPorCronograma(idCronograma, usuarioLogado.getIdUsuario()));
     }
 
-    public record AtualizarStatusDTO(StatusExecucao status) {
+    private Usuario requireUsuarioLogado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || !(authentication.getPrincipal() instanceof Usuario usuarioLogado)) {
+            throw new UnauthorizedException("Usuário não autenticado.");
+        }
+        return usuarioLogado;
+    }
+
+    public record AtualizarStatusDTO(@NotNull(message = "Status obrigatório.") StatusExecucao status) {
     }
 }

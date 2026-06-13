@@ -1,16 +1,15 @@
 package br.com.gymconnect.model;
 
-import org.springframework.stereotype.Component;
-
 import lombok.Getter;
 import lombok.Setter;
 
-@Component
-
+/**
+ * @deprecated Use {@link br.com.gymconnect.dto.ApiMessageResponse} (record imutável).
+ */
+@Deprecated
 @Getter
 @Setter
 public class ResponseModel {
-    
-    private String mensagem;
 
+    private String mensagem;
 }
