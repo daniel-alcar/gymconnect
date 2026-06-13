@@ -1,10 +1,10 @@
 package br.com.gymconnect.service;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import br.com.gymconnect.dto.ChatCoachResponse;
+import br.com.gymconnect.exception.BadRequestException;
+import br.com.gymconnect.exception.GatewayException;
 import br.com.gymconnect.model.Usuario;
 
 @Service
@@ -58,7 +58,7 @@ public class ChatCoachService {
 
     public ChatCoachResponse responder(Usuario usuarioLogado, String message) {
         if (message == null || message.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Campo message é obrigatório.");
+            throw new BadRequestException("Campo message é obrigatório.");
         }
 
         String contextoMysql = treinoContextoService.montarResumoParaPrompt(usuarioLogado);
@@ -73,7 +73,7 @@ public class ChatCoachService {
 
             return new ChatCoachResponse(reply);
         } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage(), e);
+            throw new GatewayException(e.getMessage(), e);
         }
     }
 }

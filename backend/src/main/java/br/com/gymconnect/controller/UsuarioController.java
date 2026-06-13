@@ -9,29 +9,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.gymconnect.model.ResponseModel;
-import br.com.gymconnect.model.Usuario;
+import br.com.gymconnect.dto.ApiMessageResponse;
+import br.com.gymconnect.dto.UsuarioResponseDTO;
 import br.com.gymconnect.service.UsuarioService;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://localhost"})
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:3000", "http://localhost" })
 public class UsuarioController {
 
     @Autowired
     private UsuarioService us;
 
     @DeleteMapping("/{idUsuario}")
-    public ResponseEntity<ResponseModel> remover(@PathVariable long idUsuario){
-        return us.remover(idUsuario);
+    public ResponseEntity<ApiMessageResponse> remover(@PathVariable long idUsuario) {
+        us.remover(idUsuario);
+        return ResponseEntity.ok(new ApiMessageResponse("O aluno foi removido com sucesso!"));
     }
 
     @GetMapping
-    public Iterable<Usuario> listar() {
-        return us.listar();
+    public ResponseEntity<Iterable<UsuarioResponseDTO>> listar() {
+        return ResponseEntity.ok(us.listar());
     }
-    
-
-    
-
 }
