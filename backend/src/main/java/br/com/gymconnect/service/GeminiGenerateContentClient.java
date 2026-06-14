@@ -72,9 +72,14 @@ public class GeminiGenerateContentClient {
 
             return extrairTexto(json);
         } catch (RestClientResponseException e) {
+            int status = e.getStatusCode().value();
+            if (status == 503) {
+                throw new IllegalStateException(
+                        "A GIA está temporariamente indisponível devido à alta demanda. " +
+                        "Por favor, tente novamente em alguns instantes.");
+            }
             throw new IllegalStateException(
-                    "Falha ao chamar Gemini (" + e.getStatusCode().value() + "): " + e.getResponseBodyAsString(),
-                    e);
+                    "Não foi possível conectar à GIA. Tente novamente mais tarde.");
         }
     }
 

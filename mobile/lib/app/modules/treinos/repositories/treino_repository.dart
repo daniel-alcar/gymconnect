@@ -5,7 +5,6 @@ import 'package:gymconnect/app/modules/treinos/models/dia_semana.dart';
 import 'package:gymconnect/app/modules/treinos/models/status_execucao.dart';
 import 'package:gymconnect/app/core/network/connectivity_service.dart';
 import 'package:gymconnect/app/modules/treinos/services/execucao_service.dart';
-import 'package:gymconnect/app/modules/treinos/services/registro_service.dart';
 import 'package:gymconnect/app/modules/treinos/services/treino_service.dart';
 import 'package:gymconnect/app/modules/treinos/repositories/treino_cache_repository.dart';
 
@@ -25,14 +24,12 @@ class TreinoDia {
 class TreinoRepository {
   final TreinoService _treinoService;
   final ExecucaoService _execucaoService;
-  final RegistroService _registroService;
   final TreinoCacheRepository _cache;
   final ConnectivityService _connectivity;
 
   TreinoRepository(
     this._treinoService,
     this._execucaoService,
-    this._registroService,
     this._cache, [
     ConnectivityService? connectivity,
   ]) : _connectivity = connectivity ?? ConnectivityService();
@@ -97,24 +94,11 @@ class TreinoRepository {
       });
   }
 
-  /// Marca um exercício/treino como feito.
-  ///
-  /// Regra (alinhada à API): cria uma execução `FEITO` para o cronograma do
-  /// exercício e, se houver peso informado, grava o registro diário.
-  Future<void> marcarComoFeito({
-    required int idCronograma,
-    double? peso,
-  }) async {
-    final execucao = await _execucaoService.criar(
+  /// Marca um exercício/treino como feito criando uma execução `FEITO`.
+  Future<void> marcarComoFeito({required int idCronograma}) async {
+    await _execucaoService.criar(
       idCronograma: idCronograma,
       status: StatusExecucao.feito,
     );
-
-    if (execucao.idExecucao != null) {
-      await _registroService.registrarPeso(
-        idExecucao: execucao.idExecucao!,
-        peso: peso,
-      );
-    }
   }
 }

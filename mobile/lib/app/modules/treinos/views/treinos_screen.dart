@@ -38,7 +38,7 @@ class _TreinosScreenState extends State<TreinosScreen> {
     }
   }
 
-  Future<void> _marcarFeito(CronogramaExercicio ex, double? peso) async {
+  Future<void> _marcarFeito(CronogramaExercicio ex) async {
     if (ex.idCronograma == null || ex.idCronogramaExercicio == null) {
       SnackbarHelper.erro(context, 'Treino sem cronograma associado.');
       return;
@@ -48,7 +48,6 @@ class _TreinosScreenState extends State<TreinosScreen> {
       await context.read<TreinoProvider>().marcarComoFeito(
             idCronogramaExercicio: ex.idCronogramaExercicio!,
             idCronograma: ex.idCronograma!,
-            peso: peso,
           );
       if (mounted) {
         // Registra no histórico "Atividade Recente".
@@ -56,18 +55,10 @@ class _TreinosScreenState extends State<TreinosScreen> {
         if (id != null) {
           context.read<AtividadeProvider>().registrar(
                 id,
-                Atividade.exercicio(
-                  ex.exercicio?.nome ?? 'Exercício',
-                  peso: peso,
-                ),
+                Atividade.exercicio(ex.exercicio?.nome ?? 'Exercício'),
               );
         }
-        SnackbarHelper.sucesso(
-          context,
-          peso != null
-              ? 'Exercício concluído e peso registrado!'
-              : 'Exercício marcado como feito!',
-        );
+        SnackbarHelper.sucesso(context, 'Exercício marcado como feito!');
       }
     } on AppException catch (e) {
       if (mounted) SnackbarHelper.erro(context, e.message);
@@ -209,7 +200,7 @@ class _TreinosScreenState extends State<TreinosScreen> {
                     exercicio: ex,
                     feito: provider.exercicioFeito(ex.idCronogramaExercicio),
                     processando: _processandoId == ex.idCronogramaExercicio,
-                    onMarcarFeito: (peso) => _marcarFeito(ex, peso),
+                    onMarcarFeito: () => _marcarFeito(ex),
                     onDesmarcar: () => _desmarcarExercicio(ex),
                   ),
                 ),

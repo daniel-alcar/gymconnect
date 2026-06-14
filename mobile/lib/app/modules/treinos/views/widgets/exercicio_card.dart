@@ -5,12 +5,12 @@ import 'package:gymconnect/app/core/theme/app_colors.dart';
 import 'package:gymconnect/app/modules/treinos/models/cronograma_exercicio.dart';
 import 'package:gymconnect/app/modules/treinos/views/widgets/youtube_video_player.dart';
 
-/// Card de um exercício do treino: dados, vídeo embutido, peso e "marcar feito".
+/// Card de um exercício do treino: dados, vídeo embutido e "marcar feito".
 class ExercicioCard extends StatefulWidget {
   final CronogramaExercicio exercicio;
   final bool feito;
   final bool processando;
-  final Future<void> Function(double? peso) onMarcarFeito;
+  final Future<void> Function() onMarcarFeito;
   final VoidCallback? onDesmarcar;
 
   const ExercicioCard({
@@ -30,7 +30,7 @@ class _ExercicioCardState extends State<ExercicioCard> {
   bool _reproduzir = false;
 
   void _concluir() {
-    widget.onMarcarFeito(null);
+    widget.onMarcarFeito();
   }
 
   @override

@@ -6,12 +6,12 @@ Referência para integração do frontend (Flutter, web, etc.) com o backend Spr
 
 ## URL base
 
-| Ambiente | URL base                                           |
-|----------|----------------------------------------------------|
-| Desenvolvimento local (Spring Boot) | `http://localhost:8080` |
-| Docker Compose (`docker-compose.yml`) | `http://localhost:8080` |
+| Ambiente | URL base |
+|---|---|
+| Desenvolvimento local | `http://localhost:8080` |
+| Docker Compose | `http://localhost:8080` |
 
-- Todas as rotas abaixo são relativas à URL base (ex.: login = `POST http://localhost:8080/auth/login`).
+- Todas as rotas abaixo são relativas à URL base.
 - **Content-Type** das requisições com corpo: `application/json`.
 - **Accept** recomendado: `application/json`.
 
@@ -27,7 +27,7 @@ A API usa **JWT** (stateless). Não há cookie de sessão.
 POST /auth/login
 ```
 
-**Body (enviar):**
+**Body:**
 
 ```json
 {
@@ -36,7 +36,7 @@ POST /auth/login
 }
 ```
 
-**Resposta 200 (receber):**
+**Resposta 200:**
 
 ```json
 {
@@ -44,26 +44,24 @@ POST /auth/login
 }
 ```
 
-Em caso de credenciais inválidas: **401 Unauthorized**.
+Credenciais inválidas: **401 Unauthorized**.
 
 ### 2. Usar o token nas demais rotas
-
-Inclua o header em **todas** as requisições protegidas:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-O filtro remove o prefixo `Bearer ` e valida o JWT. Token inválido ou ausente em rota protegida: **401** ou **403** (conforme regra de perfil).
+Token inválido ou ausente em rota protegida retorna **401** ou **403**.
 
 ### 3. Perfis (roles)
 
-| Valor em `tipo` (cadastro) | Authority no token | Uso típico |
-|----------------------------|-------------------|---------------------------------------------------------------|
-| `CLIENTE`                  | `CLIENTE`         | Personal: cadastra exercícios, cronogramas, lista usuários      |
-| `ALUNO`                    | `ALUNO`           | Aluno: executa treino, perfil, registro diário, chat |
+| Valor em `tipo` | Papel | Uso típico |
+|---|---|---|
+| `CLIENTE` | Instrutor | Cadastra exercícios, cronogramas e gerencia alunos |
+| `ALUNO` | Aluno | Executa treinos, registra perfil e usa o chat |
 
-Algumas rotas exigem `CLIENTE`; outras aceitam qualquer usuário **autenticado**.
+> O valor enviado/recebido na API continua sendo `CLIENTE` — "Instrutor" é apenas o rótulo legível.
 
 ### 4. Usuário logado
 
@@ -82,13 +80,14 @@ Authorization: Bearer <token>
   "tipo": "ALUNO"
 }
 ```
+
 ---
 
 ## Enums e tipos comuns
 
 ### `TipoUsuario`
 
-`CLIENTE` | `ALUNO`
+`CLIENTE` (Instrutor) | `ALUNO`
 
 ### `DiaSemana`
 
@@ -96,9 +95,9 @@ Authorization: Bearer <token>
 
 ### `StatusExecucao`
 
-`FEITO` | `NAO_FEITO`
+`FEITO` | `NAO FEITO`
 
-### `ResponseModel` (mensagens de erro/sucesso)
+### `ApiMessageResponse` (respostas de texto)
 
 ```json
 {
@@ -110,33 +109,31 @@ Authorization: Bearer <token>
 
 ## Resumo de rotas
 
-```markdown
-| Método | Rota                                                        | Auth | Perfil         |
-|--------|--------------------------------------------------------------|------|-----------------|
-| POST   | `/auth/login`                                               | Não | —               |
-| POST   | `/auth/cadastrar`                                           | Não | —               |
-| GET    | `/auth/me`                                                  | Sim | Qualquer        |
-| GET    | `/usuarios`                                                 | Sim | CLIENTE         |
-| DELETE | `/usuarios/{idUsuario}`                                     | Sim | Autenticado*    |
-| GET    | `/exercicios`                                               | Sim | CLIENTE         |
-| POST   | `/exercicios`                                               | Sim | CLIENTE         |
-| DELETE | `/exercicios/{idExercicio}`                                 | Sim | CLIENTE         |
-| POST   | `/cronograma`                                               | Sim | CLIENTE         |
-| PUT    | `/cronograma/{idCronograma}`                                | Sim | CLIENTE         |
-| DELETE | `/cronograma/{idCronograma}`                                | Sim | CLIENTE         |
-| GET    | `/cronograma/{idAluno}`                                     | Sim | Qualquer        |
-| POST   | `/cronogramaexercicio`                                      | Sim | CLIENTE         |
-| PUT    | `/cronogramaexercicio/{idCronogramaExercicio}`              | Sim | CLIENTE         |
-| DELETE | `/cronogramaexercicio/{idCronogramaExercicio}`              | Sim | CLIENTE         |
-| GET    | `/cronogramaexercicio/aluno/{idAluno}`                      | Sim | Qualquer        |
-| POST   | `/cronogramaexecucao/me`                                    | Sim | Qualquer        |
-| PUT    | `/cronogramaexecucao/me/{idExecucao}`                       | Sim | Qualquer        |
-| GET    | `/cronogramaexecucao/me/cronograma/{idCronograma}`          | Sim | Qualquer        |
-| POST   | `/perfil/me`                                                | Sim | Qualquer        |
-| POST   | `/registrodiario/me`                                        | Sim | Qualquer        |
-| POST   | `/chat/coach`                                               | Sim | Qualquer        |
-```
-
+| Método | Rota | Auth | Perfil |
+|---|---|---|---|
+| POST | `/auth/login` | Não | — |
+| POST | `/auth/cadastrar` | Não | — |
+| GET | `/auth/me` | Sim | Qualquer |
+| GET | `/usuarios` | Sim | PROFESSOR |
+| DELETE | `/usuarios/{idUsuario}` | Sim | PROFESSOR |
+| GET | `/exercicios` | Sim | PROFESSOR |
+| POST | `/exercicios` | Sim | PROFESSOR |
+| PUT | `/exercicios/{idExercicio}` | Sim | PROFESSOR |
+| DELETE | `/exercicios/{idExercicio}` | Sim | PROFESSOR |
+| POST | `/cronograma` | Sim | PROFESSOR |
+| PUT | `/cronograma/{idCronograma}` | Sim | PROFESSOR |
+| DELETE | `/cronograma/{idCronograma}` | Sim | PROFESSOR |
+| GET | `/cronograma/{idAluno}` | Sim | Qualquer |
+| POST | `/cronogramaexercicio` | Sim | PROFESSOR |
+| PUT | `/cronogramaexercicio/{idCronogramaExercicio}` | Sim | PROFESSOR |
+| DELETE | `/cronogramaexercicio/{idCronogramaExercicio}` | Sim | PROFESSOR |
+| GET | `/cronogramaexercicio/aluno/{idAluno}` | Sim | Qualquer |
+| POST | `/cronogramaexecucao/me` | Sim | Qualquer |
+| PUT | `/cronogramaexecucao/me/{idExecucao}` | Sim | Qualquer |
+| GET | `/cronogramaexecucao/me/cronograma/{idCronograma}` | Sim | Qualquer |
+| POST | `/perfil/me` | Sim | Qualquer |
+| POST | `/registrodiario/me` | Sim | Qualquer |
+| POST | `/chat/coach` | Sim | Qualquer |
 
 ---
 
@@ -158,130 +155,156 @@ Cadastro público (sem token).
 ```
 
 | Campo | Tipo | Obrigatório |
-|-------|------|-------------|
+|---|---|---|
 | nome | string | sim |
 | email | string | sim |
 | senha | string | sim |
-| tipo | `CLIENTE`/ `ALUNO` | sim |
+| tipo | `CLIENTE` / `ALUNO` | sim |
 
 **Receber:**
 
 | Status | Corpo |
-|--------|--------|
+|---|---|
 | 200 | vazio |
-| 400 | vazio (e-mail já existe) |
+| 400 | e-mail já cadastrado |
 
 ---
 
 ### GET `/usuarios`
 
-Lista todos os usuários (**somente CLIENTE**).
+Lista todos os alunos e clientes. **Somente PROFESSOR.**
 
-**Enviar:** sem body.
-
-**Receber 200:** array de `Usuario` (atenção: pode incluir campo `senha` hash — não exibir na UI).
+**Receber 200:**
 
 ```json
 [
   {
-    "idUsuario": 1,
-    "uuidUsuario": "a1b2c3d4e5f67890",
-    "nome": "Personal",
-    "email": "cliente@email.com",
-    "senha": "$2a$10$...",
-    "tipo": "CLIENTE",
-    "cliente": null
+    "idUsuario": 2,
+    "nome": "Alves Aluno",
+    "email": "alves@gmail.com",
+    "tipo": "ALUNO"
   }
 ]
 ```
+
+> Senha **nunca** é retornada nesta rota.
 
 ---
 
 ### DELETE `/usuarios/{idUsuario}`
 
-Remove usuário por ID.
+Remove um aluno por ID. **Somente PROFESSOR.**
 
-**Enviar:** sem body. Path: `idUsuario` (number).
+**Receber:**
 
-**Receber 200:**
-
-```json
-{
-  "mensagem": "O Usuario foi removido com sucesso!"
-}
-```
+| Status | Corpo |
+|---|---|
+| 200 | `{ "mensagem": "O aluno foi removido com sucesso!" }` |
+| 409 | `{ "mensagem": "Não é possível remover este aluno pois ele possui treinos ou registros associados." }` |
 
 ---
 
 ## Exercícios
 
-Entidade base cadastrada pelo personal (biblioteca de exercícios).
+Biblioteca de exercícios gerenciada pelo personal.
 
 ### GET `/exercicios`
 
-**Perfil:** CLIENTE.
+**Perfil:** PROFESSOR.
 
-**Receber 200:** array
+**Receber 200:**
 
 ```json
 [
   {
     "idExercicio": 1,
     "nome": "Supino reto",
-    "linkYoutube": "https://www.youtube.com/watch?v=..."
+    "linkYoutube": "https://www.youtube.com/watch?v=...",
+    "descricao": "Deite no banco, segure a barra na largura dos ombros..."
   }
 ]
 ```
+
+> `descricao` pode ser `null` se não foi preenchida.
 
 ---
 
 ### POST `/exercicios`
 
-**Perfil:** CLIENTE.
+**Perfil:** PROFESSOR.
 
 **Enviar:**
 
 ```json
 {
   "nome": "Agachamento livre",
-  "linkYoutube": "https://www.youtube.com/watch?v=..."
+  "linkYoutube": "https://www.youtube.com/watch?v=...",
+  "descricao": "Posicione os pés na largura dos ombros..."
 }
 ```
 
-Não envie `idExercicio` no cadastro (gerado pelo banco).
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| nome | string (máx 150) | sim |
+| linkYoutube | string (máx 264) | sim |
+| descricao | string (máx 2000) | não |
 
 **Receber:**
 
 | Status | Corpo |
-|--------|--------|
+|---|---|
 | 200 | objeto `Exercicio` salvo (com `idExercicio`) |
 | 400 | `{ "mensagem": "O campo nome exercicio precisa ser preenchido!" }` ou link vazio |
 
 ---
 
-### DELETE `/exercicios/{idExercicio}`
+### PUT `/exercicios/{idExercicio}`
 
-**Perfil:** CLIENTE.
+Atualiza nome, link ou descrição de um exercício existente. **Perfil:** PROFESSOR.
 
-**Receber 200:**
+**Enviar** (mesmo formato do POST, sem `idExercicio` no body):
 
 ```json
 {
-  "mensagem": "Exercicio deletado"
+  "nome": "Agachamento livre",
+  "linkYoutube": "https://www.youtube.com/watch?v=...",
+  "descricao": "Descrição atualizada."
 }
 ```
+
+**Receber:**
+
+| Status | Corpo |
+|---|---|
+| 200 | objeto `Exercicio` atualizado |
+| 400 | validação (nome/link vazios) |
+| 404 | `{ "mensagem": "Exercicio não encontrado" }` |
+
+---
+
+### DELETE `/exercicios/{idExercicio}`
+
+**Perfil:** PROFESSOR.
+
+**Receber:**
+
+| Status | Corpo |
+|---|---|
+| 200 | `{ "mensagem": "Exercicio deletado" }` |
+| 404 | `{ "mensagem": "Exercicio não encontrado" }` |
+| 409 | `{ "mensagem": "Nao e possivel excluir: este exercicio esta em uso em um ou mais treinos. Remova-o dos treinos primeiro." }` |
 
 ---
 
 ## Cronograma
 
-Plano de treino vinculado a um **aluno**.
+Plano de treino vinculado a um aluno.
 
 ### POST `/cronograma`
 
-**Perfil:** CLIENTE.
+**Perfil:** PROFESSOR.
 
-*.*Enviar:**
+**Enviar:**
 
 ```json
 {
@@ -294,24 +317,24 @@ Plano de treino vinculado a um **aluno**.
 ```
 
 | Campo | Tipo | Obrigatório |
-|-------|------|-------------|
+|---|---|---|
 | aluno.idUsuario | long | sim |
 | diasTotais | int | não |
-| exercicio | array | não (pode cadastrar depois via `/cronogramaexercicio`) |
+| exercicio | array | não (adicionar depois via `/cronogramaexercicio`) |
 
 **Receber:**
 
 | Status | Corpo |
-|--------|--------|
+|---|---|
 | 200 | `Cronograma` salvo |
 | 404 | `{ "mensagem": "Aluno não cadastrado!" }` |
 
-**Exemplo de resposta 200:**
+**Exemplo 200:**
 
 ```json
 {
   "idCronograma": 1,
-  "aluno": { "idUsuario": 2, "nome": "...", "email": "...", "tipo": "ALUNO", ... },
+  "aluno": { "idUsuario": 2, "nome": "...", "email": "...", "tipo": "ALUNO" },
   "diasTotais": 30,
   "exercicio": []
 }
@@ -321,11 +344,9 @@ Plano de treino vinculado a um **aluno**.
 
 ### PUT `/cronograma/{idCronograma}`
 
-Atualiza um cronograma existente. O `idCronograma` da URL não muda; os vínculos exercício–cronograma são editados em `/cronogramaexercicio/{id}`.
+**Perfil:** PROFESSOR.
 
-**Perfil:** CLIENTE.
-
-**Enviar** (mesmo formato do POST, sem `idCronograma` no body):
+**Enviar:**
 
 ```json
 {
@@ -336,15 +357,10 @@ Atualiza um cronograma existente. O `idCronograma` da URL não muda; os vínculo
 }
 ```
 
-| Campo | Tipo | Editável |
-|-------|------|----------|
-| aluno.idUsuario | long | sim |
-| diasTotais | int | sim (pode ser `null`) |
-
 **Receber:**
 
 | Status | Corpo |
-|--------|--------|
+|---|---|
 | 200 | `Cronograma` atualizado |
 | 400 | `{ "mensagem": "Aluno obrigatório." }` |
 | 404 | cronograma ou aluno não encontrado |
@@ -355,9 +371,7 @@ Atualiza um cronograma existente. O `idCronograma` da URL não muda; os vínculo
 
 Lista cronogramas do aluno.
 
-**Enviar:** `idAluno` na URL.
-
-**Receber 200:** array de `Cronograma` (com lista `exercicio` aninhada quando houver).
+**Receber 200:** array de `Cronograma` (com lista `exercicio` aninhada).
 
 **Receber 404:** `{ "mensagem": "Cronograma não encontrado!" }` (aluno inexistente).
 
@@ -365,12 +379,12 @@ Lista cronogramas do aluno.
 
 ### DELETE `/cronograma/{idCronograma}`
 
-**Perfil:** CLIENTE.
+**Perfil:** PROFESSOR.
 
 **Receber:**
 
 | Status | Corpo |
-|--------|--------|
+|---|---|
 | 200 | `{ "mensagem": "Cronograma deletado" }` |
 | 404 | `{ "mensagem": "Cronograma não encontrado!" }` |
 
@@ -382,7 +396,7 @@ Vincula um exercício da biblioteca a um dia/série do cronograma.
 
 ### POST `/cronogramaexercicio`
 
-**Perfil:** CLIENTE.
+**Perfil:** PROFESSOR.
 
 **Enviar:**
 
@@ -402,7 +416,7 @@ Vincula um exercício da biblioteca a um dia/série do cronograma.
 ```
 
 | Campo | Tipo | Obrigatório |
-|-------|------|-------------|
+|---|---|---|
 | cronograma.idCronograma | long | sim |
 | exercicio.idExercicio | long | sim |
 | diaSemana | `DiaSemana` | não |
@@ -410,7 +424,7 @@ Vincula um exercício da biblioteca a um dia/série do cronograma.
 | repeticao | int | não |
 | carga | int | não |
 
-**Receber 200:** objeto `CronogramaExercicio` salvo (campo `cronograma` pode vir omitido por `@JsonBackReference`).
+**Receber 200:** objeto `CronogramaExercicio` salvo.
 
 **Receber 400:** `{ "mensagem": "Campo cronograma precisa ser preenchido!" }` ou exercício inválido.
 
@@ -418,51 +432,23 @@ Vincula um exercício da biblioteca a um dia/série do cronograma.
 
 ### PUT `/cronogramaexercicio/{idCronogramaExercicio}`
 
-Atualiza um vínculo exercício–cronograma. O `idCronogramaExercicio` da URL não muda.
-
-**Perfil:** CLIENTE.
-
-**Enviar** (mesmo formato do POST, sem `idCronogramaExercicio` no body):
-
-```json
-{
-  "cronograma": {
-    "idCronograma": 1
-  },
-  "exercicio": {
-    "idExercicio": 3
-  },
-  "diaSemana": "Terca",
-  "serie": 3,
-  "repeticao": 10,
-  "carga": 50
-}
-```
-
-| Campo | Tipo | Editável |
-|-------|------|----------|
-| cronograma.idCronograma | long | sim |
-| exercicio.idExercicio | long | sim |
-| diaSemana | `DiaSemana` | sim |
-| serie | int | sim |
-| repeticao | int | sim |
-| carga | int | sim |
+**Perfil:** PROFESSOR. Mesmo formato do POST.
 
 **Receber:**
 
 | Status | Corpo |
-|--------|--------|
+|---|---|
 | 200 | `CronogramaExercicio` atualizado |
-| 400 | validação (cronograma/exercício inválido) |
+| 400 | validação |
 | 404 | vínculo não encontrado |
 
 ---
 
 ### GET `/cronogramaexercicio/aluno/{idAluno}`
 
-Lista todos os vínculos cronograma–exercício dos cronogramas daquele aluno.
+Lista todos os vínculos cronograma–exercício dos cronogramas do aluno.
 
-**Receber 200:** array (pode ser `[]`).
+**Receber 200:**
 
 ```json
 [
@@ -471,7 +457,8 @@ Lista todos os vínculos cronograma–exercício dos cronogramas daquele aluno.
     "exercicio": {
       "idExercicio": 3,
       "nome": "Supino",
-      "linkYoutube": "https://..."
+      "linkYoutube": "https://...",
+      "descricao": null
     },
     "diaSemana": "Segunda",
     "serie": 4,
@@ -485,20 +472,24 @@ Lista todos os vínculos cronograma–exercício dos cronogramas daquele aluno.
 
 ### DELETE `/cronogramaexercicio/{idCronogramaExercicio}`
 
-**Perfil:** CLIENTE.
+**Perfil:** PROFESSOR.
 
-**Receber 200:** `{ "mensagem": "Cronograma deletado" }`  
-**Receber 400:** não encontrado.
+**Receber:**
+
+| Status | Corpo |
+|---|---|
+| 200 | `{ "mensagem": "Cronograma deletado" }` |
+| 404 | vínculo não encontrado |
 
 ---
 
-## Execução do cronograma (aluno)
+## Execução do cronograma
 
-Registro de cada “dia/sessão” de treino do aluno.
+Registro de cada sessão de treino do aluno.
 
 ### POST `/cronogramaexecucao/me`
 
-Cria execução para o **usuário logado** (token). O aluno do cronograma deve ser o mesmo do token.
+Cria execução para o **usuário logado** (via token). O aluno do cronograma deve ser o mesmo do token.
 
 **Enviar:**
 
@@ -507,29 +498,27 @@ Cria execução para o **usuário logado** (token). O aluno do cronograma deve s
   "cronograma": {
     "idCronograma": 1
   },
-  "status": "NAO_FEITO"
+  "status": "FEITO"
 }
 ```
 
 | Campo | Tipo | Obrigatório |
-|-------|------|-------------|
+|---|---|---|
 | cronograma.idCronograma | long | sim |
-| status | `FEITO` \| `NAO_FEITO` | sim |
-
-Não envie `idExecucao` (gerado no servidor).
+| status | `FEITO` \| `NAO FEITO` | sim |
 
 **Receber 200:**
 
 ```json
 {
   "idExecucao": 10,
-  "cronograma": { "idCronograma": 1, ... },
-  "status": "NAO_FEITO",
-  "dataExecucao": null
+  "cronograma": { "idCronograma": 1 },
+  "status": "FEITO",
+  "dataExecucao": "2025-06-14"
 }
 ```
 
-Quando `status` = `FEITO`, `dataExecucao` é preenchida automaticamente (`YYYY-MM-DD`).
+> Quando `status = FEITO`, `dataExecucao` é preenchida automaticamente com a data atual.
 
 **Erros:** 400 (validação), 403 (cronograma de outro aluno), 404 (cronograma inexistente).
 
@@ -549,13 +538,13 @@ Atualiza status de uma execução do usuário logado.
 
 **Receber 200:** `CronogramaExecucao` atualizado.
 
-**Erros:** 400 (body/status nulo), 403, 404.
+**Erros:** 400 (status nulo), 403, 404.
 
 ---
 
 ### GET `/cronogramaexecucao/me/cronograma/{idCronograma}`
 
-Lista execuções de um cronograma, se pertencer ao aluno logado.
+Lista execuções de um cronograma pertencente ao aluno logado.
 
 **Receber 200:** array de `CronogramaExecucao`.
 
@@ -565,7 +554,7 @@ Lista execuções de um cronograma, se pertencer ao aluno logado.
 
 ### POST `/perfil/me`
 
-Cria perfil **uma vez** para o usuário logado.
+Cria ou atualiza o perfil do usuário logado.
 
 **Enviar:**
 
@@ -577,40 +566,36 @@ Cria perfil **uma vez** para o usuário logado.
 }
 ```
 
-| Campo | Tipo | Obrigatório (regra de negócio) |
-|-------|------|--------------------------------|
-| dataNascimento | string (data ISO `YYYY-MM-DD`) | sim |
+| Campo | Tipo | Obrigatório |
+|---|---|---|
+| dataNascimento | string ISO `YYYY-MM-DD` | sim |
 | altura | number (> 0) | sim |
-| objetivo | string (não vazio) | sim |
-
-Não envie `usuario` nem `idPerfil` — o backend associa ao token.
+| objetivo | string (máx 50, letras, espaços e vírgulas) | sim |
 
 **Receber:**
 
 | Status | Corpo |
-|--------|--------|
-| 200 | `PerfilModel` salvo |
-| 400 | perfil já existe: `"Usuario ja possui perfil cadastrado."` ou validação de campos |
+|---|---|
+| 200 | `Perfil` salvo |
+| 400 | validação de campos |
 
 **Exemplo 200:**
 
 ```json
 {
   "idPerfil": 1,
-  "usuario": { "idUsuario": 2, ... },
+  "usuario": { "idUsuario": 2 },
   "dataNascimento": "2000-05-15",
   "altura": 1.75,
   "objetivo": "Hipertrofia"
 }
 ```
 
-> Não há GET/PUT/DELETE de perfil exposto no controller atual.
-
 ---
 
 ## Registro diário
 
-Peso/registro ligado a uma execução de treino.
+Vincula um registro opcional à execução de treino. Campo `peso` é opcional.
 
 ### POST `/registrodiario/me`
 
@@ -626,18 +611,18 @@ Peso/registro ligado a uma execução de treino.
 ```
 
 | Campo | Tipo | Obrigatório |
-|-------|------|-------------|
+|---|---|---|
 | execucao.idExecucao | long | sim |
-| peso | number | sim |
+| peso | number (> 0) | não |
 
 A execução deve pertencer ao aluno logado.
 
 **Receber:**
 
 | Status | Corpo |
-|--------|--------|
-| 200 | `RegistroDiarioModel` salvo |
-| 400 | `"id_execucao obrigatorio."` / execução não encontrada / peso nulo |
+|---|---|
+| 200 | `RegistroDiario` salvo |
+| 400 | `"id_execucao obrigatorio."` / peso negativo ou zero |
 | 403 | execução de outro usuário |
 
 **Exemplo 200:**
@@ -645,18 +630,18 @@ A execução deve pertencer ao aluno logado.
 ```json
 {
   "idRegistro": 1,
-  "execucao": { "idExecucao": 10, ... },
+  "execucao": { "idExecucao": 10 },
   "peso": 72.5
 }
 ```
 
 ---
 
-## Chat (coach IA — Gemini)
+## Chat (GIA — Gemini)
 
 ### POST `/chat/coach`
 
-Envia pergunta; o backend monta contexto do cronograma do aluno (MySQL) e chama o Gemini.
+Envia uma pergunta; o backend monta o contexto do cronograma do aluno (banco de dados) e chama o Gemini para gerar a resposta.
 
 **Enviar:**
 
@@ -670,19 +655,22 @@ Envia pergunta; o backend monta contexto do cronograma do aluno (MySQL) e chama 
 
 ```json
 {
-  "reply": "Texto da resposta gerada..."
+  "reply": "Você realiza 4 séries de 12 repetições no Supino reto..."
 }
 ```
 
 **Erros:**
 
 | Status | Situação |
-|--------|----------|
-| 400 | `message` vazio |
+|---|---|
+| 400 | `message` vazio ou nulo |
 | 401 | sem token / token inválido |
-| 502 | falha na API Gemini ou chave não configurada (`GEMINI_API_KEY`) |
+| 502 | falha na API Gemini (chave não configurada ou erro inesperado): `"Não foi possível conectar à GIA. Tente novamente mais tarde."` |
+| 502 | serviço Gemini indisponível (503 upstream): `"A GIA está temporariamente indisponível devido à alta demanda. Por favor, tente novamente em alguns instantes."` |
 
-Requer variável de ambiente `GEMINI_API_KEY` no servidor.
+> Requer a variável de ambiente `GEMINI_API_KEY` no servidor.  
+> O backend nunca expõe o JSON bruto de erros da API Gemini ao cliente.  
+> O histórico de conversa é mantido localmente no app (não persistido no servidor).
 
 ---
 
@@ -692,23 +680,25 @@ Requer variável de ambiente `GEMINI_API_KEY` no servidor.
 sequenceDiagram
     participant App
     participant API
-  App->>API: POST /auth/login
-  API-->>App: { token }
-  App->>API: GET /auth/me (Bearer token)
-  API-->>App: { idUsuario, tipo, ... }
-  alt CLIENTE
-    App->>API: GET /exercicios, POST /cronograma, ...
-  else ALUNO
-    App->>API: GET /cronograma/{idUsuario}
-    App->>API: POST /cronogramaexecucao/me
-    App->>API: POST /chat/coach
-  end
+    App->>API: POST /auth/login
+    API-->>App: { token }
+    App->>API: GET /auth/me (Bearer token)
+    API-->>App: { idUsuario, tipo, ... }
+    alt PROFESSOR
+      App->>API: GET /exercicios
+      App->>API: POST /cronograma
+      App->>API: POST /cronogramaexercicio
+    else ALUNO
+      App->>API: GET /cronograma/{idUsuario}
+      App->>API: POST /cronogramaexecucao/me
+      App->>API: POST /chat/coach
+    end
 ```
 
 1. Login → guardar `token`.
 2. `GET /auth/me` → saber `tipo` e `idUsuario`.
-3. **CLIENTE:** exercícios, cronogramas, vínculos.
-4. **ALUNO:** listar cronograma, execuções, registro diário, perfil, chat.
+3. **PROFESSOR:** exercícios, cronogramas, vínculos, gestão de alunos.
+4. **ALUNO:** listar cronograma, registrar execuções, perfil, chat.
 
 ---
 
@@ -720,32 +710,28 @@ Origens permitidas pelo backend:
 - `http://localhost:3000`
 - `http://localhost`
 
-Para Flutter web ou outro host, será necessário incluir a origem em `SecurityConfigurations` / `@CrossOrigin`.
+Para Flutter web ou outro host, inclua a origem em `SecurityConfigurations`.
 
 ---
 
 ## Códigos HTTP usados
 
-| Código | Significado comum nesta API |
-|--------|-----------------------------|
+| Código | Significado nesta API |
+|---|---|
 | 200 | Sucesso |
 | 400 | Validação / regra de negócio |
 | 401 | Não autenticado |
 | 403 | Sem permissão (ex.: recurso de outro aluno) |
 | 404 | Recurso não encontrado |
-| 405 | Método HTTP incorreto |
+| 409 | Conflito (ex.: aluno com treinos, exercício em uso) |
 | 502 | Erro ao chamar Gemini (`/chat/coach`) |
 
 ---
 
 ## Observações para implementação
 
-1. **Senha na listagem de usuários:** `GET /usuarios` pode retornar o hash em `senha` — ignore na interface.
-2. **Referências aninhadas:** em POSTs, envie só os IDs necessários dentro de objetos (`aluno`, `cronograma`, `exercicio`, `execucao`).
-3. **Datas:** formato ISO `YYYY-MM-DD` para `dataNascimento` e `dataExecucao`.
-4. **Chat:** não persiste histórico; cada chamada é independente.
-5. **Docker:** API em `8080`; frontend em `http://localhost` (porta 80) usa `VITE_API_URL=http://localhost:8080` no build.
-
----
-
-*Documentação API GymConnect.*
+1. **Referências aninhadas:** em POSTs e PUTs, envie somente os IDs necessários dentro de objetos (`aluno`, `cronograma`, `exercicio`, `execucao`).
+2. **Datas:** formato ISO `YYYY-MM-DD` para `dataNascimento` e `dataExecucao`.
+3. **Exclusão com dependências:** DELETE de usuário com treinos retorna **409**; DELETE de exercício em uso retorna **409**. Trate esses casos na UI antes de tentar remover.
+4. **Chat:** o servidor não persiste histórico — cada chamada a `/chat/coach` é independente. O app mantém o histórico localmente por usuário (SharedPreferences).
+5. **Docker:** API em `8080`; para testar no dispositivo físico via USB, execute `adb reverse tcp:8080 tcp:8080` antes de iniciar o app.

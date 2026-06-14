@@ -27,12 +27,10 @@ class Atividade {
     DateTime? data,
   }) : data = data ?? DateTime.now();
 
-  factory Atividade.exercicio(String nome, {double? peso}) => Atividade(
+  factory Atividade.exercicio(String nome) => Atividade(
         tipo: AtividadeTipo.exercicio,
         titulo: nome,
-        subtitulo: peso != null
-            ? 'Exercício concluído • ${peso.toStringAsFixed(peso.truncateToDouble() == peso ? 0 : 1)} kg'
-            : 'Exercício concluído',
+        subtitulo: 'Exercício concluído',
       );
 
   factory Atividade.treino(String dia) => Atividade(
