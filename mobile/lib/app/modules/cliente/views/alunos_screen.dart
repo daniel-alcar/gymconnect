@@ -19,15 +19,53 @@ class AlunosScreen extends StatefulWidget {
 }
 
 class _AlunosScreenState extends State<AlunosScreen> {
+  final _searchController = TextEditingController();
+  String _query = '';
+
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(
+      () => setState(() => _query = _searchController.text.toLowerCase().trim()),
+    );
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => context.read<ClienteProvider>().carregarAlunos(),
     );
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _carregar() => context.read<ClienteProvider>().carregarAlunos();
+
+  List<Usuario> _filtrados(List<Usuario> todos) => _query.isEmpty
+      ? todos
+      : todos
+          .where((a) =>
+              a.nome.toLowerCase().contains(_query) ||
+              a.email.toLowerCase().contains(_query))
+          .toList();
+
+  Widget _searchBar() => TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Buscar aluno...',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: _query.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () => _searchController.clear(),
+                )
+              : null,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+          isDense: true,
+        ),
+      );
 
   Future<void> _confirmarRemover(Usuario aluno) async {
     final confirmar = await showDialog<bool>(
@@ -119,35 +157,61 @@ class _AlunosScreenState extends State<AlunosScreen> {
       ]);
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      itemCount: provider.alunos.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemBuilder: (_, i) {
-        final aluno = provider.alunos[i];
-        return Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: AppColors.amarelo,
-              child: Text(
-                aluno.nome.isNotEmpty ? aluno.nome[0].toUpperCase() : '?',
-                style: const TextStyle(
-                    color: AppColors.onAmarelo, fontWeight: FontWeight.w700),
-              ),
-            ),
-            title: Text(aluno.nome,
-                style: TextStyle(
-                    color: context.c.textPrimary,
-                    fontWeight: FontWeight.w600)),
-            subtitle: Text(aluno.email,
-                style: TextStyle(color: context.c.textSecondary)),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppColors.danger),
-              onPressed: () => _confirmarRemover(aluno),
-            ),
-          ),
-        );
-      },
+    final filtrados = _filtrados(provider.alunos);
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: _searchBar(),
+        ),
+        Expanded(
+          child: filtrados.isEmpty
+              ? ListView(children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.16),
+                  EmptyState(
+                    icone: Icons.search_off,
+                    titulo: 'Nenhum resultado',
+                    descricao: 'Nenhum aluno encontrado para "$_query".',
+                  ),
+                ])
+              : ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                  itemCount: filtrados.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) {
+                    final aluno = filtrados[i];
+                    return Card(
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.amarelo,
+                          child: Text(
+                            aluno.nome.isNotEmpty
+                                ? aluno.nome[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                                color: AppColors.onAmarelo,
+                                fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                        title: Text(aluno.nome,
+                            style: TextStyle(
+                                color: context.c.textPrimary,
+                                fontWeight: FontWeight.w600)),
+                        subtitle: Text(aluno.email,
+                            style:
+                                TextStyle(color: context.c.textSecondary)),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline,
+                              color: AppColors.danger),
+                          onPressed: () => _confirmarRemover(aluno),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 }

@@ -22,16 +22,50 @@ class ExerciciosScreen extends StatefulWidget {
 }
 
 class _ExerciciosScreenState extends State<ExerciciosScreen> {
+  final _searchController = TextEditingController();
+  String _query = '';
+
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(
+      () => setState(() => _query = _searchController.text.toLowerCase().trim()),
+    );
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => context.read<ClienteProvider>().carregarExercicios(),
     );
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _carregar() =>
       context.read<ClienteProvider>().carregarExercicios();
+
+  List<Exercicio> _filtrados(List<Exercicio> todos) => _query.isEmpty
+      ? todos
+      : todos.where((e) => e.nome.toLowerCase().contains(_query)).toList();
+
+  Widget _searchBar() => TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Buscar exercício...',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: _query.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () => _searchController.clear(),
+                )
+              : null,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+          isDense: true,
+        ),
+      );
 
   /// Abre o formulário para criar (existente == null) ou editar um exercício.
   Future<void> _abrirFormulario([Exercicio? existente]) async {
@@ -276,12 +310,31 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
       ]);
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-      itemCount: provider.exercicios.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemBuilder: (_, i) {
-        final ex = provider.exercicios[i];
+    final filtrados = _filtrados(provider.exercicios);
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: _searchBar(),
+        ),
+        Expanded(
+          child: filtrados.isEmpty
+              ? ListView(children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.16),
+                  EmptyState(
+                    icone: Icons.search_off,
+                    titulo: 'Nenhum resultado',
+                    descricao:
+                        'Nenhum exercício encontrado para "$_query".',
+                  ),
+                ])
+              : ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
+                  itemCount: filtrados.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) {
+                    final ex = filtrados[i];
         final infos = <String>[
           ex.temVideo ? 'Com vídeo' : 'Sem vídeo',
           if (ex.temDescricao) 'Com descrição',
@@ -333,7 +386,10 @@ class _ExerciciosScreenState extends State<ExerciciosScreen> {
             ),
           ),
         );
-      },
-    );
+                  },
+                ),
+          ),
+        ],
+      );
   }
 }
