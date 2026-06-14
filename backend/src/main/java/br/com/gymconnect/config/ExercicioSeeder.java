@@ -29,13 +29,13 @@ public class ExercicioSeeder implements CommandLineRunner {
 
         List<Exercicio> base = List.of(
             criar("Supino reto com barra",
-                "https://www.youtube.com/watch?v=rT7DgCr-3pg",
+                "https://www.youtube.com/watch?v=fG_03xSzT2s",
                 "Deite no banco com os pes apoiados no chao. Segure a barra um pouco mais que a largura dos ombros. Desca a barra ate a linha do peito controlando o movimento e empurre de volta sem travar os cotovelos."),
             criar("Agachamento livre",
                 "https://youtu.be/4L5nBs8Eq7g?is=l2ohml3xBGvl1vB0",
                 "Pes na largura dos ombros, barra apoiada no trapezio. Desca flexionando quadril e joelhos mantendo a coluna neutra ate as coxas ficarem paralelas ao chao e suba empurrando pelos calcanhares."),
             criar("Levantamento terra",
-                "https://www.youtube.com/watch?v=op9kVnSso6Q",
+                "https://www.youtube.com/watch?v=8NpZd19SlpY",
                 "Barra rente as canelas, pegada na largura dos ombros. Mantenha a coluna reta, peito aberto e suba estendendo quadril e joelhos ao mesmo tempo. Desca controlando, sem arredondar as costas."),
             criar("Rosca direta com barra",
                 "https://youtu.be/FHyZEuRpSg4?is=mI57N1Viwn5ErfGO",
