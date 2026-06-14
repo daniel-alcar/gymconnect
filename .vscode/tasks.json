@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "flutter-test-unit",
+      "type": "shell",
+      "command": "flutter",
+      "args": ["test", "test/unit/", "--reporter=expanded"],
+      "options": {
+        "cwd": "${workspaceFolder}/mobile"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "adb-reverse",
+      "type": "shell",
+      "command": "adb",
+      "args": ["reverse", "tcp:8080", "tcp:8080"],
+      "dependsOn": ["flutter-test-unit"],
+      "dependsOrder": "sequence",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
