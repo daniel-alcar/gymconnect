@@ -5,6 +5,12 @@
 
 USE gymconnect;
 
+UPDATE exercicios SET link_youtube = 'https://www.youtube.com/watch?v=fG_03xSzT2s'
+WHERE LOWER(TRIM(nome)) = 'supino reto com barra';
+
+UPDATE exercicios SET link_youtube = 'https://www.youtube.com/watch?v=8NpZd19SlpY'
+WHERE LOWER(TRIM(nome)) = 'levantamento terra';
+
 UPDATE exercicios SET link_youtube = 'https://youtu.be/4L5nBs8Eq7g?is=l2ohml3xBGvl1vB0'
 WHERE LOWER(TRIM(nome)) = 'agachamento livre';
 
