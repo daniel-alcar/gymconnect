@@ -57,9 +57,8 @@ class TreinoProvider extends ChangeNotifier {
   Future<void> marcarComoFeito({
     required int idCronogramaExercicio,
     required int idCronograma,
-    double? peso,
   }) async {
-    await _repository.marcarComoFeito(idCronograma: idCronograma, peso: peso);
+    await _repository.marcarComoFeito(idCronograma: idCronograma);
     _exerciciosFeitos.add(idCronogramaExercicio);
     await _persistirExercicios();
     notifyListeners();

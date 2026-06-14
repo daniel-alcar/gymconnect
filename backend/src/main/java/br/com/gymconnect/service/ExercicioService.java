@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.gymconnect.dto.ExercicioRequestDTO;
-import br.com.gymconnect.dto.UsuarioResponseDTO;
 import br.com.gymconnect.exception.ConflictException;
 import br.com.gymconnect.exception.ResourceNotFoundException;
 import br.com.gymconnect.model.Exercicio;

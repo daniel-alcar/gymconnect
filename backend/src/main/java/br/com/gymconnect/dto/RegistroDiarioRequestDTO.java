@@ -9,7 +9,6 @@ public record RegistroDiarioRequestDTO(
         @Valid
         ExecucaoRef execucao,
 
-        @NotNull(message = "Peso obrigatório.")
         @Positive(message = "Peso deve ser maior que zero.")
         Double peso) {
 

@@ -26,7 +26,6 @@ import 'package:gymconnect/app/modules/treinos/services/execucao_service.dart';
 import 'package:gymconnect/app/modules/cliente/services/exercicio_service.dart';
 import 'package:gymconnect/app/modules/cliente/services/gestao_service.dart';
 import 'package:gymconnect/app/modules/perfil/services/perfil_service.dart';
-import 'package:gymconnect/app/modules/treinos/services/registro_service.dart';
 import 'package:gymconnect/app/core/storage/storage_service.dart';
 import 'package:gymconnect/app/modules/treinos/services/treino_service.dart';
 import 'package:gymconnect/app/modules/cliente/services/usuario_service.dart';
@@ -72,7 +71,6 @@ class _GymConnectAppState extends State<GymConnectApp> {
     final authService = AuthService(_dioClient);
     final treinoService = TreinoService(_dioClient);
     final execucaoService = ExecucaoService(_dioClient);
-    final registroService = RegistroService(_dioClient);
     final perfilService = PerfilService(_dioClient);
     final chatService = ChatService(_dioClient);
     final usuarioService = UsuarioService(_dioClient);
@@ -88,7 +86,6 @@ class _GymConnectAppState extends State<GymConnectApp> {
     final treinoRepo = TreinoRepository(
       treinoService,
       execucaoService,
-      registroService,
       treinoCacheRepo,
     );
     final perfilRepo = PerfilRepository(perfilService);
