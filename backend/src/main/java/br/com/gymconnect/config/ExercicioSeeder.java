@@ -57,7 +57,22 @@ public class ExercicioSeeder implements CommandLineRunner {
                 "Pes na plataforma na largura dos ombros. Desca flexionando os joelhos ate cerca de 90 graus sem tirar o quadril do apoio e empurre de volta sem travar os joelhos."),
             criar("Cadeira extensora",
                 "https://youtu.be/I_uBK4DDflU?is=YUv_0XUTzfpQyMCj",
-                "Sentado, tornozelos atras do apoio. Estenda os joelhos ate quase a extensao total contraindo o quadriceps e retorne controlando o peso.")
+                "Sentado, tornozelos atras do apoio. Estenda os joelhos ate quase a extensao total contraindo o quadriceps e retorne controlando o peso."),
+            criar("Rosca martelo com halteres",
+                "https://www.youtube.com/watch?v=J_I6MVH2v4E",
+                "Em pe, halteres em posicao neutra com o polegar para cima. Flexione os cotovelos elevando os halteres sem girar os antebracos, mantendo os cotovelos junto ao corpo. Contraia biceps e braquiorradial no topo e desca devagar resistindo ao peso."),
+            criar("Elevacao lateral com halteres",
+                "https://www.youtube.com/watch?v=me3p7ZQ3ok8",
+                "Em pe ou sentado, halteres ao lado do corpo com leve flexao nos cotovelos. Eleve os bracos lateralmente ate a altura dos ombros sem usar impulso do tronco. Concentre na contracao do deltoide lateral e retorne controlando a descida."),
+            criar("Supino inclinado com halteres",
+                "https://www.youtube.com/watch?v=-iRqhXSx15M",
+                "Banco entre 30 e 45 graus. Halteres na altura dos ombros com cotovelos levemente abertos. Empurre os halteres para cima aproximando-os no topo sem travar os cotovelos. Desca controlando ate o nivel do peitoral superior, sentindo o alongamento."),
+            criar("Crucifixo na maquina (voador)",
+                "https://www.youtube.com/watch?v=J1YnmuweOkM",
+                "Ajuste o banco e os apoios na altura dos ombros. Com cotovelos levemente flexionados, una os bracos a frente do peito contraindo o peitoral no encontro dos apoios. Retorne controlando sem deixar o peso bater no fim do movimento."),
+            criar("Cadeira flexora",
+                "https://www.youtube.com/watch?v=RYCqCZhHh74",
+                "Ajuste o eixo da maquina alinhado com os joelhos e sente com costas apoiadas. Coloque os tornozelos atras do apoio e flexione os joelhos trazendo os calcanhares em direcao aos gluetos, contraindo o posterior de coxa no final. Retorne controlando sem travar os joelhos.")
         );
 
         Map<String, Exercicio> existentesPorNome = er.findAll().stream()
