@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:gymconnect/app/shared/widgets/app_logo.dart';
 import 'package:gymconnect/app/modules/chat/views/chat_screen.dart';
 import 'package:gymconnect/app/modules/home/views/dashboard_screen.dart';
 import 'package:gymconnect/app/modules/perfil/views/perfil_screen.dart';
 import 'package:gymconnect/app/modules/treinos/views/treinos_screen.dart';
+
+/// Expõe o índice de aba atual do [AlunoShell] para a subárvore.
+/// Usado por [ExercicioCard] para pausar vídeos ao sair da aba Treinos.
+class AlunoTabNotifier extends ValueNotifier<int> {
+  AlunoTabNotifier(super.value);
+  bool get treinosAtiva => value == 1;
+}
 
 /// Casca do perfil ALUNO com a NavigationBar inferior (4 abas).
 class AlunoShell extends StatefulWidget {
@@ -17,8 +25,18 @@ class AlunoShell extends StatefulWidget {
 
 class _AlunoShellState extends State<AlunoShell> {
   late int _indice = widget.abaInicial;
+  late final AlunoTabNotifier _tabNotifier = AlunoTabNotifier(widget.abaInicial);
 
-  void _irParaAba(int i) => setState(() => _indice = i);
+  void _irParaAba(int i) {
+    _tabNotifier.value = i;
+    setState(() => _indice = i);
+  }
+
+  @override
+  void dispose() {
+    _tabNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +47,9 @@ class _AlunoShellState extends State<AlunoShell> {
       const ChatScreen(),
     ];
 
-    return Scaffold(
+    return ChangeNotifierProvider<AlunoTabNotifier>.value(
+      value: _tabNotifier,
+      child: Scaffold(
       body: IndexedStack(index: _indice, children: telas),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _indice,
@@ -60,6 +80,7 @@ class _AlunoShellState extends State<AlunoShell> {
           ),
         ],
       ),
+    ),
     );
   }
 }
