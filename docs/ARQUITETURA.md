@@ -52,6 +52,14 @@ Cada módulo subdivide em `models/ services/ repositories/ providers/ views/`.
   só informa séries/repetições/carga. Biblioteca pré-populada (seed no backend).
 - **Aluno**: vídeo + descrição de execução; marcar/desmarcar exercício e treino
   com estado persistente.
-
-> A única diferença para `mobile/` é a localização dos arquivos e os `import`
-> (`package:gymconnect/app/...`). Nenhuma regra de negócio muda.
+- **Pausa de vídeo por aba**: `AlunoTabNotifier` (em `home/views/aluno_shell.dart`)
+  é um `ValueNotifier<int>` injetado via `ChangeNotifierProvider`. `ExercicioCard`
+  registra um listener e pausa o player ao sair da aba Treinos, salvando a posição
+  atual (`inSeconds`); ao pressionar play novamente o vídeo retoma do mesmo ponto
+  via `YoutubePlayerFlags.startAt`.
+- **Chat IA (GIA)**: histórico de mensagens persistido localmente por usuário via
+  `StorageService.salvarHistoricoChat` (SharedPreferences + JSON). O backend é
+  stateless — cada POST `/chat/coach` recebe apenas a mensagem atual + contexto
+  de treino montado no servidor.
+- **Tema**: `app_theme.dart` re-exporta `app_colors.dart`; as telas importam
+  somente `app_theme.dart` e acessam `AppColors` sem import adicional.

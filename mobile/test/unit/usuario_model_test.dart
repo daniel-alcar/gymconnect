@@ -57,7 +57,7 @@ void main() {
 
   group('Usuario.toJson', () {
     test('serializa corretamente', () {
-      final usuario = const Usuario(
+      const usuario = Usuario(
         idUsuario: 7,
         nome: 'João',
         email: 'joao@email.com',

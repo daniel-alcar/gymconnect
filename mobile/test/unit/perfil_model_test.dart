@@ -57,7 +57,7 @@ void main() {
 
   group('Perfil.toCreateJson', () {
     test('não inclui idPerfil no payload de criação', () {
-      final perfil = Perfil(
+      const perfil = Perfil(
         idPerfil: 42,
         dataNascimento: '2000-01-01',
         altura: 1.75,

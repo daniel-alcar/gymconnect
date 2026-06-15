@@ -101,6 +101,7 @@ Qualquer outro erro (rede, 404, 409, 500) **não** pode deslogar.
 | 4.6 | Editar vínculo (carga/rep/dia) | Atualiza e reflete na visão do aluno |
 | 4.7 | Excluir vínculo de treino | Remove só aquele item |
 | 4.8 | Editar/excluir aparecem no menu (⋮) | Ambas as opções visíveis |
+| 4.9 | **Remover aluno e voltar à tela de criação de treino** | Aluno removido não aparece no dropdown; sem crash de "item inválido selecionado" |
 
 ---
 
@@ -117,6 +118,9 @@ Qualquer outro erro (rede, 404, 409, 500) **não** pode deslogar.
 | 5.7 | Marcar com peso | Registra peso; com vírgula e ponto (1,5 / 1.5) |
 | 5.8 | Concluir treino do dia | Vira selo "Treino concluído"; persiste |
 | 5.9 | Conclusão é por usuário | Concluído do ALUNO A não aparece para o ALUNO B |
+| 5.10 | **Vídeo pausa ao trocar de aba** | Iniciar reprodução → trocar para Dashboard/Perfil/GIA → áudio/vídeo para automaticamente; **sem crash** |
+| 5.11 | **Vídeo retoma da posição salva** | Após pausar (5.10), voltar à aba Treinos → pressionar play → vídeo começa no ponto em que parou (não do início) |
+| 5.12 | Trocar de aba sem vídeo aberto | Sem erro ou crash; `_videoStartAt` permanece 0 |
 
 ---
 
