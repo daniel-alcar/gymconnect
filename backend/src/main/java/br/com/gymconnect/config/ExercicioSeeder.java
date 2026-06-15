@@ -44,7 +44,7 @@ public class ExercicioSeeder implements CommandLineRunner {
                 "https://youtu.be/cQ5ae1dHTAQ?is=UVCEJjpnx9_Gmu3q",
                 "De frente para a polia alta, cotovelos fixos ao lado do corpo. Estenda os antebracos para baixo abrindo a corda no final e retorne controlando."),
             criar("Desenvolvimento de ombros com halteres",
-                "https://youtu.be/rH-ns_GJM3U?is=LMonwsrgSSjKUlmH",
+                "https://youtube.com/shorts/X3gv1x7ICw8?is=ezdvJTOFQCh7oAEW",
                 "Sentado com as costas apoiadas, halteres na altura dos ombros. Empurre para cima ate quase estender os cotovelos e desca controlando ate a linha das orelhas."),
             criar("Puxada frontal (pulldown)",
                 "https://youtu.be/YywSCu4Y360?is=i8N3s_AN9Bj_YPSB",
