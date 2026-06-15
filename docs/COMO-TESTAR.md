@@ -227,9 +227,11 @@ flutter run --dart-define=API_BASE_URL=http://<IP_DO_PC>:8080
 1. No dashboard, selecione o dia da semana.
 2. Os exercícios do dia aparecem com séries, repetições e carga.
 3. Toque na thumbnail do vídeo para abrir o player YouTube embutido.
-4. Expanda **"Como executar"** para ver a descrição do exercício.
-5. Toque em **Marcar como Feito** — o card muda para verde (Concluído).
-6. Toque em **Desmarcar** para reverter.
+4. Com o vídeo reproduzindo, troque para outra aba (Dashboard, Perfil ou GIA) — o vídeo deve **pausar automaticamente**.
+5. Volte para a aba Treinos — a thumbnail aparece novamente. Toque em play — o vídeo deve **retomar do ponto em que parou** (não do início).
+6. Expanda **"Como executar"** para ver a descrição do exercício.
+7. Toque em **Marcar como Feito** — o card muda para verde (Concluído).
+8. Toque em **Desmarcar** para reverter.
 
 **Chat IA**
 1. Acesse o ícone de chat no menu inferior.
