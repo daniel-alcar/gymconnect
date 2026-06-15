@@ -58,7 +58,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final usuario = context.watch<AuthProvider>().usuario;
-    final atividades = context.watch<AtividadeProvider>().itens;
+    final atividadeProv = context.watch<AtividadeProvider>();
+    final atividades = atividadeProv.carregadoPara == usuario?.idUsuario
+        ? atividadeProv.itens
+        : const <Atividade>[];
     final primeiroNome = (usuario?.nome ?? 'Atleta').split(' ').first;
 
     return Scaffold(

@@ -16,12 +16,15 @@ class AtividadeProvider extends ChangeNotifier {
   List<Atividade> _itens = [];
 
   List<Atividade> get itens => List.unmodifiable(_itens);
+  int? get carregadoPara => _carregadoPara;
   bool get vazio => _itens.isEmpty;
 
   /// Carrega o histórico do usuário (uma vez por id).
   Future<void> carregar(int idUsuario) async {
     if (_carregadoPara == idUsuario) return;
+    _itens = [];
     _carregadoPara = idUsuario;
+    notifyListeners();
     final raw = await _storage.lerAtividades(idUsuario);
     _itens = _decodificar(raw);
     notifyListeners();
