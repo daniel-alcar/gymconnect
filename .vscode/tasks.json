@@ -19,25 +19,11 @@
       "problemMatcher": []
     },
     {
-      "label": "backend-test",
-      "type": "shell",
-      "command": "powershell",
-      "args": ["-NonInteractive", "-File", "${workspaceFolder}\\run-backend-tests.ps1"],
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared",
-        "clear": true
-      },
-      "problemMatcher": "$java"
-    },
-    {
       "label": "adb-reverse",
       "type": "shell",
       "command": "adb",
       "args": ["reverse", "tcp:8080", "tcp:8080"],
-      "dependsOn": ["backend-test", "flutter-test-unit"],
+      "dependsOn": ["flutter-test-unit"],
       "dependsOrder": "sequence",
       "presentation": {
         "reveal": "silent",
