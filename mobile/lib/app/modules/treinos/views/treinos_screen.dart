@@ -8,6 +8,7 @@ import 'package:gymconnect/app/modules/treinos/models/cronograma_exercicio.dart'
 import 'package:gymconnect/app/modules/home/providers/atividade_provider.dart';
 import 'package:gymconnect/app/modules/auth/providers/auth_provider.dart';
 import 'package:gymconnect/app/modules/treinos/providers/treino_provider.dart';
+import 'package:gymconnect/app/modules/treinos/repositories/treino_repository.dart';
 import 'package:gymconnect/app/shared/utils/snackbar_helper.dart';
 import 'package:gymconnect/app/shared/widgets/app_logo.dart';
 import 'package:gymconnect/app/shared/widgets/empty_state.dart';
@@ -38,7 +39,7 @@ class _TreinosScreenState extends State<TreinosScreen> {
     }
   }
 
-  Future<void> _marcarFeito(CronogramaExercicio ex) async {
+  Future<void> _marcarFeito(CronogramaExercicio ex, TreinoDia dia) async {
     if (ex.idCronograma == null || ex.idCronogramaExercicio == null) {
       SnackbarHelper.erro(context, 'Treino sem cronograma associado.');
       return;
@@ -59,6 +60,14 @@ class _TreinosScreenState extends State<TreinosScreen> {
               );
         }
         SnackbarHelper.sucesso(context, 'Exercício marcado como feito!');
+
+        // Auto-conclui o dia quando todos os exercícios estiverem feitos.
+        final provider = context.read<TreinoProvider>();
+        final todosFeitosNoDia = dia.exercicios
+            .every((e) => provider.exercicioFeito(e.idCronogramaExercicio));
+        if (todosFeitosNoDia && !provider.diaConcluido(dia.titulo)) {
+          await _concluirTreino(dia.titulo);
+        }
       }
     } on AppException catch (e) {
       if (mounted) SnackbarHelper.erro(context, e.message);
@@ -70,13 +79,32 @@ class _TreinosScreenState extends State<TreinosScreen> {
   }
 
   Future<void> _concluirTreino(String diaTitulo) async {
+    final provider = context.read<TreinoProvider>();
     final id = context.read<AuthProvider>().usuario?.idUsuario;
     final atividadeProv = context.read<AtividadeProvider>();
-    final treinoProv = context.read<TreinoProvider>();
+
+    // Marca os exercícios ainda não feitos neste dia.
+    final dia = provider.dias.firstWhere(
+      (d) => d.titulo == diaTitulo,
+      orElse: () => const TreinoDia(dia: null, exercicios: []),
+    );
+    for (final ex in dia.exercicios) {
+      if (!provider.exercicioFeito(ex.idCronogramaExercicio) &&
+          ex.idCronograma != null &&
+          ex.idCronogramaExercicio != null) {
+        try {
+          await provider.marcarComoFeito(
+            idCronogramaExercicio: ex.idCronogramaExercicio!,
+            idCronograma: ex.idCronograma!,
+          );
+        } catch (_) {/* silencioso: não bloqueia a conclusão do dia */}
+      }
+    }
+
     if (id != null) {
       await atividadeProv.registrar(id, Atividade.treino(diaTitulo));
     }
-    await treinoProv.concluirDia(diaTitulo);
+    await provider.concluirDia(diaTitulo);
     if (mounted) {
       SnackbarHelper.sucesso(context, 'Treino "$diaTitulo" concluído!');
     }
@@ -86,11 +114,14 @@ class _TreinosScreenState extends State<TreinosScreen> {
     await context.read<TreinoProvider>().desmarcarDia(diaTitulo);
   }
 
-  Future<void> _desmarcarExercicio(CronogramaExercicio ex) async {
+  Future<void> _desmarcarExercicio(CronogramaExercicio ex, TreinoDia dia) async {
     if (ex.idCronogramaExercicio == null) return;
     await context
         .read<TreinoProvider>()
         .desmarcarExercicio(ex.idCronogramaExercicio!);
+    if (mounted && context.read<TreinoProvider>().diaConcluido(dia.titulo)) {
+      await _desmarcarTreino(dia.titulo);
+    }
   }
 
   @override
@@ -200,8 +231,8 @@ class _TreinosScreenState extends State<TreinosScreen> {
                     exercicio: ex,
                     feito: provider.exercicioFeito(ex.idCronogramaExercicio),
                     processando: _processandoId == ex.idCronogramaExercicio,
-                    onMarcarFeito: () => _marcarFeito(ex),
-                    onDesmarcar: () => _desmarcarExercicio(ex),
+                    onMarcarFeito: () => _marcarFeito(ex, dia),
+                    onDesmarcar: () => _desmarcarExercicio(ex, dia),
                   ),
                 ),
                 const SizedBox(height: 8),
