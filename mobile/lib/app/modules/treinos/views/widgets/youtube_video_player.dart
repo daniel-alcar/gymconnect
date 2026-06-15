@@ -50,6 +50,14 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!TickerMode.valuesOf(context).enabled) {
+      _controller?.pause();
+    }
+  }
+
+  @override
   void dispose() {
     _controller?.dispose();
     super.dispose();
