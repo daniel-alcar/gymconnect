@@ -10,19 +10,10 @@ class YoutubeVideoPlayer extends StatefulWidget {
   /// Inicia a reprodução automaticamente ao montar (UX de 1 clique).
   final bool autoPlay;
 
-  /// Posição inicial (usada ao retomar após troca de aba).
-  final Duration? initialPosition;
-
-  /// Chamado quando a aba fica inativa, passando a posição atual.
-  /// O pai deve usar isso para desmontar o player e salvar a posição.
-  final void Function(Duration position)? onNeedsPause;
-
   const YoutubeVideoPlayer({
     super.key,
     required this.url,
     this.autoPlay = false,
-    this.initialPosition,
-    this.onNeedsPause,
   });
 
   @override
@@ -52,21 +43,9 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
         initialVideoId: _videoId!,
         flags: YoutubePlayerFlags(
           autoPlay: widget.autoPlay,
-          startAt: widget.initialPosition?.inSeconds ?? 0,
           mute: false,
         ),
       );
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!TickerMode.valuesOf(context).enabled && widget.onNeedsPause != null) {
-      final pos = _controller?.value.position ?? Duration.zero;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) widget.onNeedsPause?.call(pos);
-      });
     }
   }
 

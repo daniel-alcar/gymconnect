@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:gymconnect/app/core/theme/app_colors.dart';
+import 'package:gymconnect/app/modules/home/views/aluno_shell.dart';
 import 'package:gymconnect/app/modules/treinos/models/cronograma_exercicio.dart';
 import 'package:gymconnect/app/modules/treinos/views/widgets/youtube_video_player.dart';
 
@@ -28,7 +30,30 @@ class ExercicioCard extends StatefulWidget {
 
 class _ExercicioCardState extends State<ExercicioCard> {
   bool _reproduzir = false;
-  Duration? _videoPosition;
+  AlunoTabNotifier? _tabNotifier;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final notifier = context.read<AlunoTabNotifier>();
+    if (_tabNotifier != notifier) {
+      _tabNotifier?.removeListener(_onTabChange);
+      _tabNotifier = notifier;
+      notifier.addListener(_onTabChange);
+    }
+  }
+
+  void _onTabChange() {
+    if (_tabNotifier?.treinosAtiva == false && _reproduzir) {
+      setState(() => _reproduzir = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabNotifier?.removeListener(_onTabChange);
+    super.dispose();
+  }
 
   void _concluir() {
     widget.onMarcarFeito();
@@ -67,15 +92,7 @@ class _ExercicioCardState extends State<ExercicioCard> {
             // Vídeo: thumbnail imediata + play em 1 clique (autoplay).
             if (exercicio?.temVideo ?? false) ...[
               if (_reproduzir)
-                YoutubeVideoPlayer(
-                  url: exercicio!.linkYoutube!,
-                  autoPlay: true,
-                  initialPosition: _videoPosition,
-                  onNeedsPause: (pos) => setState(() {
-                    _videoPosition = pos;
-                    _reproduzir = false;
-                  }),
-                )
+                YoutubeVideoPlayer(url: exercicio!.linkYoutube!, autoPlay: true)
               else
                 _VideoThumb(
                   url: exercicio!.linkYoutube!,
