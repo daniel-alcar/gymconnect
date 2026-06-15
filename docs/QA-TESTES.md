@@ -219,7 +219,7 @@ imagem invisível/esticada, contraste ruim, e estados (carregando/vazio/erro).
 | 12.1.2 | Mascote da GIA (tela do chat) | **Visível e legível nos dois temas** (não some no claro) |
 | 12.1.3 | Mascote da GIA na navbar | Mesmo tamanho dos outros ícones, **centralizada**, não minúscula |
 | 12.1.4 | Ícone GIA no card do Dashboard | Proporcional, sem cortar |
-| 12.1.5 | Thumbnails de vídeo (YouTube) | Carregam; placeholder enquanto carrega; fallback se falhar |
+| 12.1.5 | Thumbnails de vídeo (YouTube / Shorts) | Carregam; placeholder enquanto carrega; fallback se falhar |
 | 12.1.6 | Foto de perfil | Recorte circular correto, sem esticar/achatar |
 | 12.1.7 | Ícones em geral | Cor adequada ao tema (sem ícone "sumido" por contraste) |
 

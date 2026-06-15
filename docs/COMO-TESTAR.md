@@ -249,7 +249,7 @@ flutter run --dart-define=API_BASE_URL=http://<IP_DO_PC>:8080
 
 **Gerenciar biblioteca de exercícios**
 1. Acesse a aba **Exercícios**.
-2. Crie um exercício: nome (obrigatório), link YouTube e descrição (opcionais).
+2. Crie um exercício: nome (obrigatório), link YouTube ou YouTube Shorts e descrição (opcionais).
 3. Edite um exercício existente (ícone de lápis) → confirme que as alterações persistem.
 4. Remova um exercício (ícone de lixeira) → confirme o diálogo e que some da lista.
 

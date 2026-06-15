@@ -246,8 +246,14 @@ Biblioteca de exercícios gerenciada pelo personal.
 | Campo | Tipo | Obrigatório |
 |---|---|---|
 | nome | string (máx 150) | sim |
-| linkYoutube | string (máx 264) | sim |
+| linkYoutube | string (máx 264) | sim | URL do YouTube (`watch?v=`) ou YouTube Shorts (`/shorts/`) |
 | descricao | string (máx 2000) | não |
+
+> **Formatos aceitos em `linkYoutube`:**
+> - Vídeo padrão: `https://www.youtube.com/watch?v=ID`
+> - YouTube Shorts: `https://www.youtube.com/shorts/ID`
+>
+> O app extrai o ID do vídeo de ambos os formatos e renderiza o player embutido normalmente.
 
 **Receber:**
 
