@@ -24,10 +24,18 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
   YoutubePlayerController? _controller;
   String? _videoId;
 
+  String? _extractVideoId(String url) {
+    final id = YoutubePlayer.convertUrlToId(url);
+    if (id != null) return id;
+    // YouTube Shorts: youtube.com/shorts/VIDEO_ID
+    final match = RegExp(r'youtube\.com/shorts/([a-zA-Z0-9_-]{11})').firstMatch(url);
+    return match?.group(1);
+  }
+
   @override
   void initState() {
     super.initState();
-    _videoId = YoutubePlayer.convertUrlToId(widget.url);
+    _videoId = _extractVideoId(widget.url);
     if (_videoId != null) {
       _controller = YoutubePlayerController(
         initialVideoId: _videoId!,
