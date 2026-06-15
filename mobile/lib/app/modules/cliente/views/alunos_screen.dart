@@ -74,7 +74,8 @@ class _AlunosScreenState extends State<AlunosScreen> {
         backgroundColor: context.c.surface,
         title: const Text('Remover aluno'),
         content: Text(
-            'Deseja remover "${aluno.nome}"? Esta ação não pode ser desfeita.'),
+            'Deseja remover "${aluno.nome}"?\n\n'
+            'Todos os treinos e registros associados a este aluno também serão removidos permanentemente.'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
