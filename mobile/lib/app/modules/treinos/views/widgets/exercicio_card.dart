@@ -31,6 +31,8 @@ class ExercicioCard extends StatefulWidget {
 class _ExercicioCardState extends State<ExercicioCard> {
   bool _reproduzir = false;
   AlunoTabNotifier? _tabNotifier;
+  YoutubePlayerController? _videoController;
+  int _videoStartAt = 0;
 
   @override
   void didChangeDependencies() {
@@ -45,6 +47,7 @@ class _ExercicioCardState extends State<ExercicioCard> {
 
   void _onTabChange() {
     if (_tabNotifier?.treinosAtiva == false && _reproduzir) {
+      _videoStartAt = _videoController?.value.position.inSeconds ?? 0;
       setState(() => _reproduzir = false);
     }
   }
@@ -52,6 +55,7 @@ class _ExercicioCardState extends State<ExercicioCard> {
   @override
   void dispose() {
     _tabNotifier?.removeListener(_onTabChange);
+    _videoController = null;
     super.dispose();
   }
 
@@ -92,7 +96,12 @@ class _ExercicioCardState extends State<ExercicioCard> {
             // Vídeo: thumbnail imediata + play em 1 clique (autoplay).
             if (exercicio?.temVideo ?? false) ...[
               if (_reproduzir)
-                YoutubeVideoPlayer(url: exercicio!.linkYoutube!, autoPlay: true)
+                YoutubeVideoPlayer(
+                  url: exercicio!.linkYoutube!,
+                  autoPlay: true,
+                  startAt: _videoStartAt,
+                  onControllerChanged: (ctrl) => _videoController = ctrl,
+                )
               else
                 _VideoThumb(
                   url: exercicio!.linkYoutube!,

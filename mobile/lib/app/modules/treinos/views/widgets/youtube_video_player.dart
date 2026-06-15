@@ -9,11 +9,15 @@ class YoutubeVideoPlayer extends StatefulWidget {
 
   /// Inicia a reprodução automaticamente ao montar (UX de 1 clique).
   final bool autoPlay;
+  final int startAt;
+  final void Function(YoutubePlayerController?)? onControllerChanged;
 
   const YoutubeVideoPlayer({
     super.key,
     required this.url,
     this.autoPlay = false,
+    this.startAt = 0,
+    this.onControllerChanged,
   });
 
   @override
@@ -43,14 +47,17 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
         initialVideoId: _videoId!,
         flags: YoutubePlayerFlags(
           autoPlay: widget.autoPlay,
+          startAt: widget.startAt,
           mute: false,
         ),
       );
+      widget.onControllerChanged?.call(_controller);
     }
   }
 
   @override
   void dispose() {
+    widget.onControllerChanged?.call(null);
     _controller?.dispose();
     super.dispose();
   }
