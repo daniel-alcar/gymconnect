@@ -28,6 +28,7 @@ class ExercicioCard extends StatefulWidget {
 
 class _ExercicioCardState extends State<ExercicioCard> {
   bool _reproduzir = false;
+  Duration? _videoPosition;
 
   void _concluir() {
     widget.onMarcarFeito();
@@ -66,7 +67,15 @@ class _ExercicioCardState extends State<ExercicioCard> {
             // Vídeo: thumbnail imediata + play em 1 clique (autoplay).
             if (exercicio?.temVideo ?? false) ...[
               if (_reproduzir)
-                YoutubeVideoPlayer(url: exercicio!.linkYoutube!, autoPlay: true)
+                YoutubeVideoPlayer(
+                  url: exercicio!.linkYoutube!,
+                  autoPlay: true,
+                  initialPosition: _videoPosition,
+                  onNeedsPause: (pos) => setState(() {
+                    _videoPosition = pos;
+                    _reproduzir = false;
+                  }),
+                )
               else
                 _VideoThumb(
                   url: exercicio!.linkYoutube!,
