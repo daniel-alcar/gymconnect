@@ -68,9 +68,6 @@ gymconnect/
 ├── .env.example               # Modelo de variáveis de ambiente
 └── README.md
 ```
-
-> A pasta `old/` contém a versão anterior do app e pode ser ignorada.
-
 ---
 
 ## Início rápido com Docker (recomendado)
