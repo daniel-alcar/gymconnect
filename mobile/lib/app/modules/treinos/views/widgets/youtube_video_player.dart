@@ -23,6 +23,7 @@ class YoutubeVideoPlayer extends StatefulWidget {
 class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
   YoutubePlayerController? _controller;
   String? _videoId;
+  bool _shortsVideo = false;
 
   String? _extractVideoId(String url) {
     final id = YoutubePlayer.convertUrlToId(url);
@@ -36,6 +37,7 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
   void initState() {
     super.initState();
     _videoId = _extractVideoId(widget.url);
+    _shortsVideo = widget.url.contains('youtube.com/shorts/');
     if (_videoId != null) {
       _controller = YoutubePlayerController(
         initialVideoId: _videoId!,
@@ -73,6 +75,7 @@ class _YoutubeVideoPlayerState extends State<YoutubeVideoPlayer> {
       borderRadius: BorderRadius.circular(12),
       child: YoutubePlayer(
         controller: _controller!,
+        aspectRatio: _shortsVideo ? 9 / 16 : 16 / 9,
         showVideoProgressIndicator: true,
         progressIndicatorColor: Theme.of(context).colorScheme.secondary,
       ),

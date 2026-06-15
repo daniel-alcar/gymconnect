@@ -304,9 +304,19 @@ class _VideoThumb extends StatelessWidget {
   final VoidCallback onPlay;
   const _VideoThumb({required this.url, required this.onPlay});
 
+  static String? _extractId(String url) {
+    final id = YoutubePlayer.convertUrlToId(url);
+    if (id != null) return id;
+    final match = RegExp(r'youtube\.com/shorts/([a-zA-Z0-9_-]{11})').firstMatch(url);
+    return match?.group(1);
+  }
+
+  static bool _isShorts(String url) => url.contains('youtube.com/shorts/');
+
   @override
   Widget build(BuildContext context) {
-    final id = YoutubePlayer.convertUrlToId(url);
+    final id = _extractId(url);
+    final isShorts = _isShorts(url);
     final thumb =
         id != null ? 'https://img.youtube.com/vi/$id/hqdefault.jpg' : null;
 
@@ -319,7 +329,7 @@ class _VideoThumb extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             AspectRatio(
-              aspectRatio: 16 / 9,
+              aspectRatio: isShorts ? 9 / 16 : 16 / 9,
               child: thumb != null
                   ? Image.network(
                       thumb,
