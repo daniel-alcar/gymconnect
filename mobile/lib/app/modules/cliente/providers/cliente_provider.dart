@@ -171,6 +171,12 @@ class ClienteProvider extends ChangeNotifier {
       _erroAlunos = e.toString();
     } finally {
       _carregandoAlunos = false;
+      if (_alunoSelecionado != null &&
+          !_alunos.any((a) => a.idUsuario == _alunoSelecionado)) {
+        _alunoSelecionado = null;
+        _treinosAluno = [];
+        _erroTreinosAluno = null;
+      }
       notifyListeners();
     }
   }
@@ -178,6 +184,11 @@ class ClienteProvider extends ChangeNotifier {
   Future<void> removerAluno(int id) async {
     await _repository.removerAluno(id);
     _alunos = _alunos.where((a) => a.idUsuario != id).toList();
+    if (_alunoSelecionado == id) {
+      _alunoSelecionado = null;
+      _treinosAluno = [];
+      _erroTreinosAluno = null;
+    }
     notifyListeners();
   }
 
